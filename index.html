@@ -418,13 +418,6 @@ tr.off td{opacity:.4}
   <span class="msg" id="u_msg"></span>
 </div>
 
-<nav class="tabs" role="tablist">
-  <button role="tab" id="tab-q" aria-selected="true" onclick="showTab('q')">Search</button>
-  <button role="tab" id="tab-a" aria-selected="false" onclick="showTab('a')">Add records</button>
-  <button role="tab" id="tab-d" aria-selected="false" onclick="showTab('d')">Database</button>
-  <button role="tab" id="tab-i" aria-selected="false" onclick="showTab('i')">Data &amp; updates</button>
-</nav>
-
 <!-- ============ QUERY ============ -->
 <section class="panel" id="pane-q">
   <div class="qrow">
@@ -488,114 +481,8 @@ tr.off td{opacity:.4}
 </section>
 
 <!-- ============ ADD ============ -->
-<section class="panel" id="pane-a" hidden>
-  <h2 class="sec">Enter a peak list from one paper</h2>
-  <p class="lede">Reagent ion, instrument, environment and citation are constant for a whole paper — only the formula changes row by row. So fill the shared fields once, then paste the whole table.</p>
-
-  <div class="bstep">
-    <h3><b>1</b> — Shared fields for this paper</h3>
-    <div class="grid">
-      <div class="field"><label>Reference *</label><input id="a_ref" placeholder="Ehn et al., 2014, Nature"></div>
-      <div class="field"><label>DOI</label><input class="mono" id="a_doi" placeholder="10.1038/nature13032"></div>
-      <div class="field"><label>Reagent ion *</label><select id="a_reagent"></select></div>
-      <div class="field"><label>Detection *</label><select id="a_detect" onchange="renderBatch()">
-        <option value="adduct">Cluster adduct [M·R]⁻</option>
-        <option value="deprot">Deprotonated [M−H]⁻</option>
-        <option value="prot">Protonated [M+H]⁺</option>
-      </select></div>
-      <div class="field"><label>Instrument</label><input id="a_instr" placeholder="CI-APi-TOF / FIGAERO / Vocus"></div>
-      <div class="field"><label>Environment *</label><input id="a_env" placeholder="boreal forest / urban / chamber"></div>
-    </div>
-  </div>
-
-  <div class="bstep">
-    <h3><b>2</b> — Paste the peak list</h3>
-    <textarea id="b_paste" spellcheck="false" oninput="parseBatch()"
-      placeholder="Copy straight out of Excel or an SI table — tab or comma separated both work; one formula per line is fine too.&#10;&#10;C10H16NO11&#9;α-pinene HOM monomer&#10;C10H16NO13&#9;more oxidised monomer&#10;C20H30NO17&#9;dimer"></textarea>
-    <div class="brow">
-      <span class="flabel">Pasted formulas are</span>
-      <span class="seg" id="b_kind">
-        <button aria-pressed="true"  onclick="setBatchKind('ion')">Ion formulas (reagent ion included)</button>
-        <button aria-pressed="false" onclick="setBatchKind('neutral')">Neutral formulas</button>
-      </span>
-      <span id="b_colpick"></span>
-    </div>
-  </div>
-
-  <div class="bstep" id="b_previewWrap" hidden>
-    <h3><b>3</b> — Review, then commit</h3>
-    <div class="bstat" id="b_stat"></div>
-    <div class="scroller" style="margin-top:10px"><table class="dbtable" id="b_table"></table></div>
-    <div class="actions">
-      <button class="btn" onclick="commitBatch()">Commit all</button>/button>
-      <button class="btn sec" onclick="document.getElementById('b_paste').value='';parseBatch();">Clear</button>
-      <span class="msg" id="b_msg"></span>
-    </div>
-  </div>
-
-  <details class="adv" style="margin-top:26px">
-    <summary>Add a single record</summary>
-    <div class="grid" style="margin-top:10px">
-      <div class="field"><label>Neutral formula *</label><input class="mono" id="a_formula" placeholder="C10H16O8"></div>
-      <div class="field"><label>Assignment / note</label><input id="a_note" placeholder="α-pinene HOM monomer"></div>
-    </div>
-    <div class="actions">
-      <button class="btn sec" onclick="addRecord()">Add this record</button>
-      <span class="msg" id="a_msg"></span>
-    </div>
-    <p class="lede" style="margin-top:10px">Uses the shared fields from step 1. Note this field takes a <b>neutral formula</b> — no restoration is applied.</p>
-    <div id="a_preview" style="margin-top:12px"></div>
-  </details>
-</section>
-
 <!-- ============ DATABASE ============ -->
-<section class="panel" id="pane-d" hidden>
-  <h2 class="sec">All literature records</h2>
-  <p class="lede">Sorted by formula. m/z is computed live from the neutral formula and reagent ion — never stored — so revising the mass table cannot corrupt the source records.</p>
-  <div class="scroller"><table class="dbtable" id="dbtable"></table></div>
-</section>
-
 <!-- ============ IMPORT / EXPORT ============ -->
-<section class="panel" id="pane-i" hidden>
-  <!-- 联网更新的按钮在页面顶部（masthead 下方），不在这里重复一份。
-       此前这里有一份同样的按钮，且 id="dataver" / id="u_msg" 与顶部那份重名——
-       HTML 里 id 必须唯一，getElementById 只返回第一个，所以这一份永远不会更新。 -->
-  <p class="lede">Syncing the databases is done with the <b>Update database</b> button at the top of the page.
-     <b>A failed update never breaks anything</b> — your local data is left untouched, and the tool works fully offline.</p>
-
-  <h2 class="sec">Import / export</h2>
-  <p class="lede">The databases live as CSV on your own disk. Typical loop: add records here → export CSV over the original; or organise a peak list in Excel → import.</p>
-  <div class="actions" style="margin-top:0">
-    <button class="btn" onclick="exportCSV()">Export CSV</button>
-    <button class="btn sec" onclick="document.getElementById('file').click()">Import CSV (append)</button>
-    <button class="btn sec" onclick="document.getElementById('file2').click()">Import CSV (replace all)</button>
-    <button class="btn sec danger" onclick="clearAll()">Clear database</button>
-    <input type="file" id="file" accept=".csv,.txt" hidden onchange="importCSV(event,false)">
-    <input type="file" id="file2" accept=".csv,.txt" hidden onchange="importCSV(event,true)">
-    <span class="msg" id="i_msg"></span>
-  </div>
-
-  <h2 class="sec" style="margin-top:28px">Ion library (measured peak lists contributed by authors)</h2>
-  <p class="lede">The second database, alongside the literature one. It stores <b>ion formulas verbatim</b> — no restoration. Built by <span class="mono">tools/build_ionlist.py</span> from the instrument peak lists under <span class="mono">PeakLists/</span> into <span class="mono">data/cims_ionlist.csv</span>.</p>
-  <div class="actions" style="margin-top:0">
-    <button class="btn" onclick="document.getElementById('file3').click()">Import ion library CSV (replace)</button>
-    <button class="btn sec" onclick="exportIonCSV()">Export ion library</button>
-    <button class="btn sec danger" onclick="clearIons()">Clear ion library</button>
-    <input type="file" id="file3" accept=".csv,.txt" hidden onchange="importIonCSV(event)">
-    <span class="msg" id="n_msg"></span>
-  </div>
-  <pre class="spec">ion_formula,charge,mz,class,reagent,phase,instrument,contributor,site,campaign,reference,peaklist_file
-
-class : organic (carbon-containing) | inorganic (no carbon) | reagent (reagent ion or its clusters) | unassigned (mass fitted, no formula assigned)</pre>
-  <h2 class="sec" style="margin-top:26px">CSV column format</h2>
-  <p class="lede">First row is the header; column names are case-insensitive and missing columns are filled with blanks. Duplicates (same formula + reagent ion + reference) are skipped on import.</p>
-  <pre class="spec">formula,reagent,detection,instrument,environment,reference,doi,note
-C10H16O8,NO3-,adduct,CI-APi-TOF,boreal forest,"Ehn et al., 2014",10.1038/nature13032,α-pinene HOM monomer
-
-reagent    : NO3-  |  I-  |  CH3COO-  |  Br-  |  H3O+  |  NH4+  |  C4H12N+
-detection  : adduct (cluster, default) | deprot ([M−H]⁻) | prot ([M+H]⁺)</pre>
-</section>
-
 </div>
 
 <script>
@@ -856,10 +743,16 @@ function renderCount(){
 }
 
 /* ---------------- 标签页 ---------------- */
+/* 维护用界面（Add records / Database / Data & updates）在**公开版里被构建脚本剥掉**，
+   见 tools/build_web.py 的 strip_maintenance_ui()。所以下面凡是碰这些元素的地方
+   都必须容忍它们不存在——代码两版共用，只是元素在不在。
+   MAINT 为 false 时，这些函数一律安静地什么都不做。*/
+var MAINT=!!document.getElementById("pane-a");
 function showTab(t){
   ["q","a","d","i"].forEach(function(k){
-    document.getElementById("pane-"+k).hidden=(k!==t);
-    document.getElementById("tab-"+k).setAttribute("aria-selected",k===t?"true":"false");
+    var p=document.getElementById("pane-"+k),b=document.getElementById("tab-"+k);
+    if(p)p.hidden=(k!==t);
+    if(b)b.setAttribute("aria-selected",k===t?"true":"false");
   });
   if(t==="d")renderDB();
 }
@@ -1792,6 +1685,7 @@ function renderColPick(rows){
 
 function renderBatch(){
   var wrap=document.getElementById("b_previewWrap");
+  if(!wrap)return;                 // 公开版没有录入界面
   if(!batchRows.length){wrap.hidden=true;return;}
   wrap.hidden=false;
   var rid=document.getElementById("a_reagent").value;
@@ -1950,6 +1844,7 @@ function delRecord(id){
 /* ---------------- 数据库视图 ---------------- */
 function renderDB(){
   var t=document.getElementById("dbtable");
+  if(!t)return;                    // 公开版没有这张表
   if(!DB.length){
     t.innerHTML='<tr><td style="padding:26px 4px;color:var(--muted);font-size:13px;line-height:1.7">'+
       '<b style="color:var(--ink)">The database is empty.</b><br>'+
@@ -2194,10 +2089,14 @@ function applyIonCSV(text){
 
 /* fetch 不一定存在（老浏览器、非浏览器环境）。这里必须返回 rejected Promise
    而不是同步抛错——bootstrapData 在 init 里调用，同步抛错会连累整个启动。*/
+/* 出错时把**具体哪个地址**失败了带出来。
+   只报「404」的话，用户无从判断是仓库名不对、data/ 没传上去、还是 Pages 没部署完——
+   带上 URL 就能自己复制到地址栏验证。 */
 function tryFetch(url){
   if(typeof fetch!=="function")return Promise.reject(new Error("fetch is unavailable in this environment"));
   return fetch(url,{cache:"no-store"}).then(function(r){
-    if(!r.ok)throw new Error(r.status);return r.text();
+    if(!r.ok){var e=new Error(r.status+" at "+url);e.url=url;e.status=r.status;throw e;}
+    return r.text();
   });
 }
 /* 依次尝试各镜像，返回第一个成功的。全失败则 reject。*/
@@ -2213,13 +2112,26 @@ function fetchFromMirrors(file){
   }
   return next();
 }
-function sha256Hex(text){
+function sha256Raw(s){
   if(!(window.crypto&&window.crypto.subtle))return Promise.resolve(null);
-  return window.crypto.subtle.digest("SHA-256",new TextEncoder().encode(text))
+  return window.crypto.subtle.digest("SHA-256",new TextEncoder().encode(s))
     .then(function(buf){
       return Array.prototype.map.call(new Uint8Array(buf),function(b){
         return ("0"+b.toString(16)).slice(-2);}).join("");
     }).catch(function(){return null;});
+}
+/* 返回两个候选哈希：不含 BOM 与含 BOM。
+
+   CSV 以 utf-8-sig 写出（开头 EF BB BF），但 fetch 的 `.text()` 按 UTF-8 解码规范
+   **会剥掉 BOM**，再 TextEncoder 编回去就比磁盘上的文件少 3 字节。构建脚本现已改为
+   哈希去 BOM 后的字节（tools/build_web.py 的 sha256_file），两边一致；
+   含 BOM 的那个候选值只为兼容 2026-08-06 及更早发布的 manifest，
+   好让**已经发出去的单文件版不必重发也能更新**。
+
+   这不是放宽校验强度：任一候选值仍要撞 SHA-256 原像才能伪造。*/
+function sha256Both(text){
+  var t=String(text).replace(/^\uFEFF/,"");
+  return Promise.all([sha256Raw(t),sha256Raw("\uFEFF"+t)]);
 }
 
 /* 首次装载：同源 data/ → 内嵌快照。
@@ -2229,6 +2141,7 @@ function sha256Hex(text){
    用户拿到新版程序，看到的还是几个月前的库，而且毫无提示。
    （真实事故：数据的 note 字段全部改成英文后，用户界面里仍显示中文，就是缓存挡住了。）
    所以：快照/本地数据的版本号与缓存版本号不一致时，一律以随程序发布的那份为准。*/
+var BOOT=null;   /* 首装的 Promise；checkUpdate 要等它，否则版本比对基于空版本号 */
 function bootstrapData(){
   var snapVer=(document.getElementById("snap_ver")||{textContent:""}).textContent.trim();
   return tryFetch(DATA_LOCAL+"data-manifest.json").then(function(t){
@@ -2269,7 +2182,13 @@ function checkUpdate(){
     return;
   }
   msg.className="msg";msg.textContent="Checking…";
-  fetchFromMirrors("data-manifest.json").then(function(res){
+  /* ★ 必须等首装完成再比版本号。bootstrapData() 是异步的，首次打开要下近 900 KB 离子库；
+     在它 resolve 之前 DATA_VERSION 还是空串，"已是最新" 的提前返回不成立，
+     程序会误判成「有新版」并强行重下一遍。
+     （真实事故：同事拿到单文件版，一打开就点 Update，撞上这条。）*/
+  (BOOT||Promise.resolve()).catch(function(){}).then(function(){
+    return fetchFromMirrors("data-manifest.json");
+  }).then(function(res){
     var mf=JSON.parse(res.text);
     if(mf.version&&mf.version===DATA_VERSION){
       msg.textContent="Already up to date ("+mf.version+", via "+res.mirror+")";
@@ -2281,11 +2200,13 @@ function checkUpdate(){
       fetchFromMirrors("cims_peaklist.csv"),
       fetchFromMirrors("cims_ionlist.csv")
     ]).then(function(rs){
-      return Promise.all(rs.map(function(r){return sha256Hex(r.text);})).then(function(hs){
+      return Promise.all(rs.map(function(r){return sha256Both(r.text);})).then(function(hs){
         var names=["cims_peaklist.csv","cims_ionlist.csv"];
         for(var i=0;i<2;i++){
           var exp=want[names[i]]&&want[names[i]].sha256;
-          if(exp&&hs[i]&&hs[i]!==exp)
+          var got=hs[i]||[];
+          if(!exp||!got[0])continue;                    // 无 crypto.subtle 时跳过校验
+          if(got.indexOf(exp)<0)
             throw new Error(names[i]+" failed checksum — update abandoned, local data untouched");
         }
         var n1=applyLitCSV(rs[0].text),n2=applyIonCSV(rs[1].text);
@@ -2295,31 +2216,44 @@ function checkUpdate(){
       });
     });
   }).catch(function(e){
-    /* 更新失败绝不能影响使用：本地数据原样保留 */
+    /* 更新失败绝不能影响使用：本地数据原样保留。
+       但要把失败的地址说清楚，否则用户只看到「404」，没法自查。*/
     msg.className="msg err";
-    msg.textContent="Update failed: "+(e&&e.message||e)+"　Local data untouched — the tool still works.";
+    var hint="";
+    if(e&&e.status===404&&e.url){
+      hint="　Open that URL in a browser: if it 404s too, either the repository name in "+
+           "DATA_MIRRORS is wrong, or the data/ folder was not uploaded.";
+    }
+    msg.textContent="Update failed: "+(e&&e.message||e)+hint+
+      "　Local data untouched — the tool still works.";
   });
 }
 
 /* ---------------- 启动 ---------------- */
 (function init(){
+  /* ★ 这一段只在维护版跑。公开版被 strip_maintenance_ui() 剥掉了这些元素，
+     不加这个判断的话 sel 是 null，sel.appendChild 抛异常 → init 直接中断 →
+     **整个工具白屏**。剥 UI 最容易踩的就是这里。*/
   var sel=document.getElementById("a_reagent");
-  REAGENTS.forEach(function(r){
-    var o=document.createElement("option");o.value=r.id;o.textContent=r.label;sel.appendChild(o);
-  });
-  /* 公共信息里影响判重与还原的字段一改，预览就得重算 */
-  ["a_ref","a_reagent","a_env"].forEach(function(id){
-    var el=document.getElementById(id);
-    el.addEventListener("input",renderBatch);
-    el.addEventListener("change",renderBatch);
-  });
+  if(sel){
+    REAGENTS.forEach(function(r){
+      var o=document.createElement("option");o.value=r.id;o.textContent=r.label;sel.appendChild(o);
+    });
+    /* 公共信息里影响判重与还原的字段一改，预览就得重算 */
+    ["a_ref","a_reagent","a_env"].forEach(function(id){
+      var el=document.getElementById(id);
+      if(!el)return;
+      el.addEventListener("input",renderBatch);
+      el.addEventListener("change",renderBatch);
+    });
+  }
   load();loadIons();
   try{DATA_VERSION=window.localStorage.getItem("cims_data_version")||"";}catch(e){}
   setDataVersion(DATA_VERSION);
   renderCount();loadReagentSel();buildFilters();
   document.getElementById("results").innerHTML=
     '<div class="empty"><b>Enter the ion formula you read off the spectrum</b>e.g. C10H16NO11 (nitrate cluster).</div>';
-  bootstrapData();
+  BOOT=bootstrapData();
   /* Service Worker：装成桌面应用、离线可用。file:// 下会失败，静默忽略。*/
   if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0){
     navigator.serviceWorker.register("sw.js").catch(function(){});

@@ -1,0 +1,19 @@
+{
+  "version": "2026-08-06",
+  "updated": "2026-08-06T15:09:04",
+  "includes_unpublished": false,
+  "files": [
+    {
+      "name": "cims_peaklist.csv",
+      "rows": 181,
+      "bytes": 41842,
+      "sha256": "6e7726ab39679653c4d3dac2e3ed2d521880edcc903f63bb6c821da4318c334a"
+    },
+    {
+      "name": "cims_ionlist.csv",
+      "rows": 4997,
+      "bytes": 867630,
+      "sha256": "1112968b793dbcd7088e9482b2356f0230cb055ba4862759fb7777b78aae58de"
+    }
+  ]
+}
