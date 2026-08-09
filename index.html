@@ -304,6 +304,7 @@ tr.phsep td{font-size:11px;color:var(--muted);background:#FAFAFA;
 .ruler text{font-family:var(--mono);font-size:9.5px;fill:var(--muted)}
 .ruler text.lbl{font-size:10px;fill:var(--ink)}
 .ruler text.lbl.dim{fill:var(--muted)}
+.ruler .rhid{color:var(--warn)}
 .ruler text.rband{font-size:9px;fill:var(--accent);letter-spacing:.04em}
 .ruler h3 .axis{font-size:9.5px;letter-spacing:.06em;color:var(--accent);
   background:var(--accent-soft);padding:1px 6px;border-radius:2px;margin-left:6px}
@@ -1958,12 +1959,50 @@ function escapeHtml(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c
      axis 为空  → 中性质量轴（质量查询、未勾试剂离子时）。
    曾经在还原查询下错误地锚在中性质量上，导致所有记录被 round(mz)!==anchor 滤掉，
    彩色实线全部消失——标尺只剩空壳。改动此处务必回归验证颜色还在。 */
-/* 缩放倍率。1 = 自适应候选分布；点 + 变小（放大画面），点 − 变大。
-   传 0 给 rulerZoom 表示回到自适应。*/
-var RULER_ZOOM=1;
-function rulerZoom(f){
-  RULER_ZOOM=f?Math.max(0.05,Math.min(40,RULER_ZOOM*f)):1;
-  runQueryInner();
+/* ---- 视窗状态 ----
+   以前用「相对数据范围的缩放倍率」，中心永远是数据中心或查询峰，拖不动。
+   现在直接存**中心与跨度**（Da），可任意平移。null = 自适应。
+
+   跨度上限 1.0 Da、平移范围锁在 anchor ± 0.5：
+   名义质量 339 的峰不会出现在 338.4 或 339.6，让用户滑出去只会看到空白。
+   （用户 2026-08-10：「范围可以考虑 +/- 0.5 amu」）*/
+var RULER_CTR=null,RULER_SPAN=null;
+var RULER_MAXSPAN=1.0,RULER_MINSPAN=0.004,RULER_HALFRANGE=0.5;
+var LAST_RULER=null;         // 缓存绘图参数，拖动时只重画标尺、不重跑整个查询
+var RULER_VIEW=null,RULER_DRAG=null;   // 当前窗口（Da）与拖动状态；事件绑在容器上要用
+
+function rulerClamp(anchor){
+  RULER_SPAN=Math.max(RULER_MINSPAN,Math.min(RULER_MAXSPAN,RULER_SPAN));
+  var lo=anchor-RULER_HALFRANGE+RULER_SPAN/2;
+  var hi=anchor+RULER_HALFRANGE-RULER_SPAN/2;
+  if(lo>hi){RULER_CTR=anchor;return;}          // 跨度已占满允许范围
+  RULER_CTR=Math.max(lo,Math.min(hi,RULER_CTR));
+}
+/* f>1 看得更宽，f<1 放大；f=0 回到自适应。at 为可选的缩放轴心（Da）。*/
+function rulerZoom(f,at){
+  if(!f){RULER_CTR=null;RULER_SPAN=null;redrawRuler();return;}
+  if(RULER_SPAN===null||RULER_CTR===null){
+    if(!LAST_RULER)return;
+    RULER_SPAN=LAST_RULER.autoSpan;RULER_CTR=LAST_RULER.autoCtr;
+  }
+  var ns=Math.max(RULER_MINSPAN,Math.min(RULER_MAXSPAN,RULER_SPAN*f));
+  if(at!=null){
+    /* 以光标处为不动点缩放——这是「选择缩放中心」最自然的做法：
+       把想看的位置放到光标下，滚轮一推就以它为中心展开。*/
+    var t=(at-(RULER_CTR-RULER_SPAN/2))/RULER_SPAN;
+    RULER_CTR=at-(t-0.5)*ns;
+  }
+  RULER_SPAN=ns;
+  redrawRuler();
+}
+function rulerPan(dm){
+  if(RULER_SPAN===null)return;
+  RULER_CTR+=dm;redrawRuler();
+}
+function redrawRuler(){
+  if(!LAST_RULER)return;
+  var L=LAST_RULER;
+  drawRuler(L.groups,L.gen,L.anchor,L.c,L.axis);
 }
 function drawRuler(groups,gen,anchor,c,axis){
   var host=document.getElementById("ruler");
@@ -2022,15 +2061,17 @@ function drawRuler(groups,gen,anchor,c,axis){
   var pad=Math.max((hi-lo)*0.18,0.012);
   lo-=pad;hi+=pad;
   if(hi-lo<MINSPAN){var mid0=(lo+hi)/2;lo=mid0-MINSPAN/2;hi=mid0+MINSPAN/2;}
-  /* 手动缩放：以窗口中心（有查询峰时以查询峰）为轴心伸缩。
-     RULER_ZOOM=1 表示自适应；>1 看得更宽，<1 放大。*/
-  if(RULER_ZOOM!==1){
-    var ctr=(queryMass!==null&&queryMass>=lo&&queryMass<=hi)?queryMass:(lo+hi)/2;
-    var half=(hi-lo)/2*RULER_ZOOM;
-    lo=ctr-half;hi=ctr+half;
+  var autoCtr=(queryMass!==null&&queryMass>=lo&&queryMass<=hi)?queryMass:(lo+hi)/2;
+  var autoSpan=hi-lo;
+  /* 拖动与滚轮缩放只重画标尺，不重跑查询——所以把参数缓存下来。*/
+  LAST_RULER={groups:groups,gen:gen,anchor:anchor,c:c,axis:axis,
+              autoCtr:autoCtr,autoSpan:autoSpan};
+  if(RULER_SPAN!==null&&RULER_CTR!==null){
+    rulerClamp(anchor);
+    lo=RULER_CTR-RULER_SPAN/2;hi=RULER_CTR+RULER_SPAN/2;
   }
   var zl=document.getElementById("zlev");
-  if(zl)zl.textContent=(RULER_ZOOM===1?"fit":(hi-lo).toFixed(3)+" Da");
+  if(zl)zl.textContent=(RULER_SPAN===null?"fit":(hi-lo).toFixed(3)+" Da");
 
   var W=1240,H=190,padL=14,padR=14,base=H-30;
   function X(m){return padL+(m-lo)/(hi-lo)*(W-padL-padR);}
@@ -2067,19 +2108,44 @@ function drawRuler(groups,gen,anchor,c,axis){
   }
 
   pts.sort(function(a,b){return a.mass-b.mass;});
-  var lastX=-99,row=0;
-  pts.forEach(function(p){
+
+  /* ---- 标签排布 ----
+     以前只有 3 行、且只在 x 间距 <70 时才换行，遇到二十来个峰挤在 0.02 Da 内
+     （实测峰表在同一名义质量上很常见）就叠成一团墨，一个字都读不出来。
+
+     现在做真正的避让：按行贪心找第一个放得下的行；行数用尽就**不画这个标签**，
+     竖线仍然保留（hover 有 tooltip）。画不下就不画，比叠成一团强——
+     叠出来的那团既读不出内容，还会盖住真正重要的文献标签。
+
+     优先级：文献记录 > 生成候选 > 实测峰表。文献标签一定画得出来。*/
+  var ROWS=6,ROWH=13,CHW=5.9;   // CHW：等宽字 10px 在 1240 宽 viewBox 下的近似字宽
+  var rowEnd=[];for(var ri=0;ri<ROWS;ri++)rowEnd.push(-1e9);
+  var order=pts.map(function(p,i){return {p:p,i:i};});
+  order.sort(function(a,b){
+    var pa=a.p.strong?0:(a.p.measured?2:1),pb=b.p.strong?0:(b.p.measured?2:1);
+    return pa!==pb?pa-pb:a.p.mass-b.p.mass;
+  });
+  var place={},hidden=0;
+  order.forEach(function(o){
+    var x=X(o.p.mass),w=o.p.label.length*CHW+10;
+    for(var r=0;r<ROWS;r++){
+      if(x-w/2>rowEnd[r]){rowEnd[r]=x+w/2;place[o.i]=r;return;}
+    }
+    hidden++;
+  });
+
+  pts.forEach(function(p,i){
     var x=X(p.mass),h=p.strong?base-34:base-58;
-    if(x-lastX<70)row=(row+1)%3;else row=0;
-    lastX=x;
     svg.push('<line class="stick" x1="'+x+'" y1="'+base+'" x2="'+x+'" y2="'+h+'" stroke="'+p.color+
              '" stroke-width="'+(p.strong?3:p.measured?1.8:1.4)+'" stroke-dasharray="'+(p.dashed?"3 3":"0")+
              '" opacity="'+(p.measured?0.72:1)+'"><title>'+
              escapeHtml(p.label)+"  "+p.mass.toFixed(4)+(p.measured?"  (measured peak list)":"")+'</title></line>');
     svg.push('<circle cx="'+x+'" cy="'+h+'" r="'+(p.strong?3.5:2)+'" fill="'+p.color+
              '" opacity="'+(p.measured?0.72:1)+'"/>');
-    svg.push('<text class="lbl'+(p.strong?"":" dim")+'" x="'+x+'" y="'+(h-9-row*13)+'" text-anchor="middle">'+
-             escapeHtml(p.label)+'</text>');
+    if(place[i]!==undefined){
+      svg.push('<text class="lbl'+(p.strong?"":" dim")+'" x="'+x+'" y="'+(h-9-place[i]*ROWH)+
+               '" text-anchor="middle">'+escapeHtml(p.label)+'</text>');
+    }
   });
   /* 查询峰的位置标记 */
   if(queryMass!==null){
@@ -2097,7 +2163,73 @@ function drawRuler(groups,gen,anchor,c,axis){
       'Dashed = neutral mass or candidate with no record. '+
       'Horizontal axis is the decimal part: further right means more hydrogen, less oxygen.'+
       (queryMass!==null?' The shaded band is one FWHM at the stated resolving power — peaks inside it are not separable.':'')+
+      ' <b>Drag to pan, scroll to zoom where the cursor is.</b>'+
+      (hidden?' <span class="rhid">'+hidden+' label'+(hidden>1?'s':'')+' hidden for space — zoom in, or hover a line.</span>':'')+
     '</p>'+svg.join("")+'</div>';
+  bindRulerDrag(anchor,lo,hi);
+}
+
+/* ---- 拖动平移 / 滚轮缩放 ----
+   用户 2026-08-10：「这个谱图能否左右滑动，选择缩放中心」。
+
+   都只重画标尺（redrawRuler），不重跑 runQueryInner——后者要重新过一遍两个库
+   并重排整份 report，拖动时每帧跑一次会卡。
+
+   坐标换算走 getBoundingClientRect：SVG 是 preserveAspectRatio="none" 拉伸的，
+   viewBox 单位和屏幕像素不是 1:1，只能按元素实际宽度折算。*/
+function bindRulerDrag(anchor,lo,hi){
+  RULER_VIEW={anchor:anchor,lo:lo,hi:hi};
+  var host=document.getElementById("ruler");
+  if(!host)return;
+  var svg=host.querySelector("svg");
+  if(svg)svg.style.cursor=RULER_DRAG?"grabbing":"grab";
+  if(host.getAttribute("data-panbound")==="1")return;
+  host.setAttribute("data-panbound","1");
+
+  /* ★ 事件绑在 #ruler 容器上，不能绑在 <svg> 上。
+     每次重画都会把 host.innerHTML 整个换掉，svg 元素随之销毁——
+     绑在它身上的话，拖动第一帧重画完监听器和指针捕获就一起没了，拖一下就断。
+     容器本身不会被替换，所以只绑一次、状态放在模块作用域里。*/
+  function massAt(clientX){
+    var el=host.querySelector("svg");if(!el||!RULER_VIEW)return null;
+    var r=el.getBoundingClientRect();
+    return RULER_VIEW.lo+((clientX-r.left)/r.width)*(RULER_VIEW.hi-RULER_VIEW.lo);
+  }
+  function ensureManual(){
+    if(RULER_SPAN===null&&RULER_VIEW){
+      RULER_SPAN=RULER_VIEW.hi-RULER_VIEW.lo;
+      RULER_CTR=(RULER_VIEW.lo+RULER_VIEW.hi)/2;
+    }
+  }
+  host.addEventListener("pointerdown",function(e){
+    if(!host.querySelector("svg")||!RULER_VIEW)return;
+    if(e.target.closest&&e.target.closest("h3,p"))return;   // 别把选文字变成拖动
+    ensureManual();
+    var w=host.querySelector("svg").getBoundingClientRect().width;
+    RULER_DRAG={x:e.clientX,ctr:RULER_CTR,w:w,span:RULER_SPAN};
+    try{host.setPointerCapture(e.pointerId);}catch(err){}
+    var sv=host.querySelector("svg");if(sv)sv.style.cursor="grabbing";
+  });
+  host.addEventListener("pointermove",function(e){
+    if(!RULER_DRAG)return;
+    e.preventDefault();
+    RULER_CTR=RULER_DRAG.ctr-((e.clientX-RULER_DRAG.x)/RULER_DRAG.w)*RULER_DRAG.span;
+    redrawRuler();
+  });
+  function endDrag(e){
+    if(!RULER_DRAG)return;
+    RULER_DRAG=null;
+    try{host.releasePointerCapture(e.pointerId);}catch(err){}
+    var sv=host.querySelector("svg");if(sv)sv.style.cursor="grab";
+  }
+  host.addEventListener("pointerup",endDrag);
+  host.addEventListener("pointercancel",endDrag);
+  host.addEventListener("wheel",function(e){
+    if(!host.querySelector("svg")||!RULER_VIEW)return;
+    e.preventDefault();
+    ensureManual();
+    rulerZoom(e.deltaY>0?1.18:1/1.18,massAt(e.clientX));
+  },{passive:false});
 }
 
 /* ---------------- 批量录入 ----------------

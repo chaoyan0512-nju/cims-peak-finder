@@ -3,7 +3,7 @@
      * 程序外壳（html/图标/manifest）用 cache-first，装好后秒开、断网可用
      * 数据文件用 network-first，联网时拿最新的，断网退回缓存
    版本号变了就丢弃旧缓存。改动程序后记得改 CACHE_VER。*/
-var CACHE_VER = "cims-pf-v8";
+var CACHE_VER = "cims-pf-v9";
 var SHELL = [
   "./", "./index.html",
   "./manifest.webmanifest",
