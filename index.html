@@ -243,8 +243,33 @@ details.secondary[open]>summary::before{content:"▾ "}
 .cand .ctag.rad{background:#F0EAF6;color:#5B3E86}
 .cand .cf .dot{color:#5B3E86;margin-left:2px;font-weight:700}
 .cand.dim .cf{color:var(--muted)}
+/* 相态标记与异相行 */
+.vsep{display:inline-block;width:1px;height:16px;background:var(--line);margin:0 4px}
+.chip.empty{opacity:.45}
+.chip small{opacity:.6;margin-left:3px;font-size:10px}
+.ph{font-size:10.5px;padding:1px 6px;border-radius:3px;letter-spacing:.02em}
+.ph-gas{background:#E7F1FB;color:#1B4E7E}
+.ph-particle{background:#F3EDE2;color:#6B4A08}
+tr.offphase td{opacity:.62}
+tr.phsep td{font-size:11px;color:var(--muted);background:#FAFAFA;
+  padding:5px 8px!important;letter-spacing:.04em;text-transform:uppercase}
 .cnote{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.5}
 .cnote b{color:var(--ink)}
+/* 输入解释告警。左侧色条而非整块底色：要显眼，但不能压过下面的结果本身。*/
+.qwarn{font-size:12.5px;line-height:1.6;padding:9px 12px;margin-bottom:10px;
+  border-left:3px solid;border-radius:0 4px 4px 0;background:#FBF7EF}
+.qwarn.lvl-warn{border-color:#C7891B;color:#6B4A08}
+.qwarn.lvl-note{border-color:#B8BEC4;color:var(--muted);background:#F6F7F8}
+.qwarn a{color:inherit;font-weight:600}
+/* 次要解释：默认收起，展开后与主答案有明显视觉层级差 */
+.secalt{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.secalt>summary{font-size:12px;color:var(--muted);cursor:pointer;list-style:none;
+  padding:3px 0;user-select:none}
+.secalt>summary::-webkit-details-marker{display:none}
+.secalt>summary::before{content:"▸ ";font-size:10px}
+.secalt[open]>summary::before{content:"▾ "}
+.secalt>summary:hover{color:var(--ink)}
+.secalt .cand .cf{font-size:13px}
 
 /* ---------- mass-defect ruler (signature) ---------- */
 .ruler{margin-top:22px;border:1px solid var(--line);border-radius:3px;background:#FAFBFC;padding:14px 16px 8px}
@@ -422,7 +447,7 @@ tr.off td{opacity:.4}
 <section class="panel" id="pane-q">
   <div class="qrow">
     <div class="qfield">
-      <input id="q" placeholder="C10H16NO11   ← ion formula read off your spectrum" autocomplete="off" spellcheck="false">
+      <input id="q" placeholder="C10H16NO11-   ← ion formula, charge sign included" autocomplete="off" spellcheck="false">
       <span class="qmode" id="qmode">awaiting input</span>
     </div>
     <button class="go" onclick="runQuery()">Search</button>
@@ -432,7 +457,25 @@ tr.off td{opacity:.4}
     <span class="flabel">Reagent ion</span>
     <span id="fReagent"></span>
   </div>
-  <div class="hint">Enter the <b>ion formula you read off the spectrum</b> (reagent ion included, e.g. C10H16NO11) and tick the reagent ion you used. Neutral formulas and plain masses are also accepted.</div>
+  <!-- 相态。**只排序不过滤**：同相的证据排在前面，异相的仍然列出但排在后面并标注。
+       同一个分子在气相和颗粒相都可能出现，把异相记录藏起来反而会丢掉线索。 -->
+  <div class="rsel">
+    <span class="flabel">Phase</span>
+    <span id="fPhase"></span>
+  </div>
+  <!-- 采样场景，两级。**这个是真过滤**（与 Phase 不同）：
+       「我要看外场数据」时烟雾箱记录混进来就是干扰，那是不同的化学条件。
+       为数据库变大做准备——用户 2026-08-10。 -->
+  <div class="rsel">
+    <span class="flabel">Setting</span>
+    <span id="fSetting"></span>
+    <span class="vsep"></span>
+    <span id="fBiome"></span>
+  </div>
+  <div class="hint">Tick the reagent ion you used, then type one of three things — <b>the charge sign decides how it is read</b>:<br>
+  <b>C10H16NO11−</b> an ion from your spectrum → the neutral molecule is restored by removing the reagent ion.<br>
+  <b>C10H15NO8</b> (no sign) a neutral molecule → the ion it would form is computed forward.<br>
+  <b>339</b> a plain number → taken as the <b>ion m/z</b>, since that is what a spectrum shows.</div>
 
   <details class="adv">
     <summary>Advanced</summary>
@@ -443,6 +486,7 @@ tr.off td{opacity:.4}
       </div>
       <div class="fgroup">
         <label class="tog"><input type="checkbox" id="optGen" checked onchange="runQuery()"> Also generate formulas absent from the database</label>
+        <label class="tog"><input type="checkbox" id="optF" onchange="GEN_LIMITS.F=this.checked?2:0;runQuery()"> Include F in generated formulas (contaminant — off by default)</label>
       </div>
     </div>
   </details>
@@ -456,6 +500,9 @@ tr.off td{opacity:.4}
      分子式查询与质量查询共用这一套结构，输出在同一面板里。 -->
 <section class="panel" id="pane-r">
   <h2 class="sec">Result</h2>
+  <!-- 输入解释上的告警（漏写电荷符号、试剂离子与离子式不符）。放最上面：
+       它决定了下面所有结果该怎么读，看晚了等于白看。 -->
+  <div id="warnings"></div>
   <div id="verdict"></div>
   <div id="reported"></div>
   <div id="inferred">
@@ -583,21 +630,36 @@ function hill(o){ // Hill 记法：C, H, 其余按字母序
 }
 function fmass(o){var s=0;for(var k in o)s+=M[k]*o[k];return s;}
 function pretty(f){return f.replace(/(\d+)/g,"<sub>$1</sub>");}
-/* 环加双键当量。通式 DBE = 1 + Σ nᵢ(vᵢ−2)/2，按各元素价态计：
-     四价（C、Si）      每个 +1
-     三价（N、P）       每个 +0.5
-     二价（O、S）       0
-     一价（H、卤素）    每个 −0.5
-   旧版只数 C/H/N，含硅和含卤素的分子会算错——例如 D5 硅氧烷 C10H30O5Si5
-   本该是 1（一个环），旧式给 −4；CH3IO2 本该是 0（闭壳层），旧式给 0.5 而被误判成自由基。
-   DBE 是自由基判定的唯一依据（见 §4.7、§4.8），算错就会把闭壳层分子标成自由基。
-   注：S 按二价、P 按三价的常规约定；高价态硫/磷（如砜、磷酸酯）会使 DBE 偏低，属已知局限。*/
-function rdbe(o){
+/* 环加双键当量（DBE）。
+
+   ★ 2026-08-10 起用**大气化学定义**：把 N 当作一价，与 H 等效。
+
+     DBE = 1 + (C + Si) − (H + N + 卤素 + …)/2
+
+   为什么不是通常的「N 记 +0.5」：在本工具覆盖的化学里，中性分子中的 N 几乎必然是
+   硝基 −NO2 或硝酸酯基 −ONO2（用户 2026-08-10 定的约束 2）。这类 N 不参与碳骨架的
+   不饱和度，把它按三价计会让有机硝酸酯的 DBE 凭空多出 N —— 得到的数字不再反映碳骨架。
+   例：C10H15NO8 旧式得 4、新式得 3；硝基酚 C6H5NO3 得 4，正好是苯环的 3 个 C=C 加 1 个环。
+
+   **自由基判定不受影响**：两种算法只差整数 N，奇偶性相同。半整数 DBE 仍然、且只能
+   由奇电子数产生，这正是 §4.7 要保住的东西。顺带一提，新式让 §4.8 的氮奇偶规则变成
+   恒等式——DBE 为整数 ⟺ H 与 N 同奇偶，不必再单独记一条规则。
+
+   **例外：正模式（H3O⁺ / NH4⁺ / C4H12N⁺）**。那里测的常常是胺类，N 是三价的胺氮，
+   按一价算会得到负 DBE 而被误判为不可能——例如二甲胺 C2H7N 会算出 −1。
+   所以正模式下退回传统定义。opts.amineN 控制这一点。
+
+   注：S 按二价、P 按三价的常规约定；高价态硫/磷（如砜、磷酸酯）会使 DBE 偏低，属已知局限。
+   加新元素时要在下面归入正确的价态组。*/
+function rdbe(o,opts){
+  var amineN=!!(opts&&opts.amineN);
   var tetra=(o.C||0)+(o.Si||0);
-  var tri=(o.N||0)+(o.P||0);
   var mono=(o.H||0)+(o.Cl||0)+(o.Br||0)+(o.I||0)+(o.F||0)+(o.Na||0)+(o.K||0);
-  return 1+tetra+(tri/2)-(mono/2);
+  if(amineN)return 1+tetra+(((o.N||0)+(o.P||0))/2)-(mono/2);   // 传统：N 三价
+  return 1+tetra-((mono+(o.N||0)+(o.P||0))/2);                 // 大气：N 与 H 等效
 }
+/* 正模式的试剂离子下，N 可能是胺氮而非硝基氮 */
+function dbeOpts(rid){return {amineN: !!rid && rid.slice(-1)==="+"};}
 function ionMz(neutral,reagentId,detection){
   if(detection==="deprot")return neutral-MP;
   if(detection==="prot")return neutral+MP;
@@ -628,77 +690,42 @@ function atomsSub(a,b){var o={},k;for(k in a)o[k]=a[k];
 function atomsAdd(a,b){var o={},k;for(k in a)o[k]=a[k];for(k in b)o[k]=(o[k]||0)+b[k];return o;}
 function atomsHasAll(a,b){for(var k in b)if((a[k]||0)<b[k])return false;return true;}
 
-/* 给定谱图上读到的离子式与一种试剂离子，列出所有化学上成立的中性还原。
-   likely  用户给的经验规则：离子式里含全套试剂离子原子 → 判为团簇，否则判为脱氢/质子化。
-           这条规则背后是机理约束——硝酸根的酸性决定了只有比 HNO3 更强的酸才会脱氢，
-           普通 HOM 即便脱氢后的分子式"对得上"，实际上也很少脱氢。所以它是首选判据。
-   valid   只排除真正不可能的：DBE < 0。
-   radical DBE 为半整数 → 该组成是奇电子物种，即自由基。**不是错误，不能剔除**：
-           RO2 过氧自由基（如 C10H15O8•，DBE=3.5）正是硝酸根 CIMS 的重要观测对象，
-           剔掉半整数 DBE 会把真实的自由基整批漏掉。这里只作标记并排在闭壳层之后。*/
-function restore(ion,rid){
-  var ra=REAGENT_ATOMS[rid],out=[],neu,positive=rid.slice(-1)==="+";
-  if(ra){
-    neu=atomsSub(ion,ra);
-    if(neu&&Object.keys(neu).length)out.push({atoms:neu,det:"adduct"});
-  }
-  if(positive){
-    neu=atomsSub(ion,{H:1});
-    if(neu&&Object.keys(neu).length)out.push({atoms:neu,det:"prot"});
-  }else{
-    out.push({atoms:atomsAdd(ion,{H:1}),det:"deprot"});
-  }
-  var clusterLikely=!!ra&&atomsHasAll(ion,ra);
-  return out.map(function(o){
-    o.reagent=rid;
-    o.formula=hill(o.atoms);
-    o.mass=fmass(o.atoms);
-    o.dbe=rdbe(o.atoms);
-    o.likely=(o.det==="adduct")?clusterLikely:!clusterLikely;
+/* 给定离子式与一种试剂离子，中性分子是**确定的**，不是一串猜测：
+     能减掉试剂离子的原子 → 团簇加合，中性 = 离子 − 试剂离子
+     减不掉               → 去质子／质子化，中性 = 离子 ± H
+   （用户 2026-08-09：「自动判断中性分子是剪掉 NO3⁻（不含则加一个 H）」）
+
+   两支在算术上同时成立时，主答案取加合支，另一支作为**次要解释折叠**起来——
+   这是用户 2026-08-05 定的「首选试剂离子规则，其次也输出另一种可能」。
+   机理上的理由：硝酸根的酸性决定了只有比 HNO3 更强的酸才会脱氢，
+   普通 HOM 即便脱氢后分子式「对得上」，实际也很少脱氢。
+
+   mismatch：试剂离子的原子在离子式里**根本减不掉**（例如输 C6H5N2O6 却勾了 I⁻，
+   式子里没有碘）。这几乎一定是勾错了试剂离子，要提醒——但不阻断，
+   因为强酸确实会以 [M−H]⁻ 形式被碘离子检测到，判断权在用户。*/
+function restoreForReagent(ionAtoms,rid){
+  var ra=REAGENT_ATOMS[rid],positive=rid.slice(-1)==="+";
+  var canSub=!!ra&&atomsHasAll(ionAtoms,ra);
+  function mk(atoms,det){
+    if(!atoms||!Object.keys(atoms).length)return null;
+    var o={atoms:atoms,det:det,reagent:rid,reagents:[rid],
+           formula:hill(atoms),mass:fmass(atoms),dbe:rdbe(atoms,dbeOpts(rid))};
     o.radical=Math.abs(o.dbe-Math.round(o.dbe))>1e-9;
-    o.valid=(o.dbe>=0);
+    o.valid=(o.dbe>=0);          // 只排除真正不可能的；半整数 DBE 是自由基，不是错误
     return o;
-  });
+  }
+  var adduct=canSub?mk(atomsSub(ionAtoms,ra),"adduct"):null;
+  var transfer=positive?mk(atomsSub(ionAtoms,{H:1}),"prot")
+                       :mk(atomsAdd(ionAtoms,{H:1}),"deprot");
+  if(adduct&&!adduct.valid)adduct=null;
+  if(transfer&&!transfer.valid)transfer=null;
+  return {reagent:rid,
+          primary: adduct||transfer||null,
+          secondary: (adduct&&transfer)?transfer:null,
+          mismatch: (!!ra&&!canSub)};
 }
 var DET_LABEL={adduct:"cluster adduct",deprot:"deprotonated [M−H]⁻",prot:"protonated [M+H]⁺"};
 function dbeText(v){return (Math.abs(v-Math.round(v))>1e-9)?v.toFixed(1):v.toFixed(0);}
-
-/* 汇总所有勾选试剂离子下的还原候选，去重后排序。
-   排序优先级：① 符合试剂离子规则 ② 闭壳层优先于自由基 ③ 命中库中记录 ④ 团簇优先。
-   规则排在命中之前是用户（本领域研究者）明确要求的，理由是机理约束比文献命中更硬：
-   以 C10H14NO8⁻ 为例，脱氢支得到的 C10H15NO8 虽然分子式对得上、库中也有记录，
-   但该类物质在硝酸根下实际很少脱氢；团簇支的 C10H14O5 才是多篇文献报道过的峰。
-   何况本库目前条目稀少且文献对应关系尚未核实，不足以用来推翻化学判断。
-   其余可能性仍全部列出，只是排在后面。 */
-function buildCandidates(ionAtoms){
-  var seen={},list=[];
-  selectedReagents().forEach(function(rid){
-    restore(ionAtoms,rid).forEach(function(c){
-      if(!c.valid)return;
-      var key=c.formula+"|"+c.det;
-      if(seen[key]){ if(seen[key].reagents.indexOf(rid)<0)seen[key].reagents.push(rid);
-                     seen[key].likely=seen[key].likely||c.likely; return; }
-      c.reagents=[rid];seen[key]=c;list.push(c);
-    });
-  });
-  list.forEach(function(c){
-    /* 与 runQuery 的比对方式保持一致：库里的分子式重新过一遍 hill()。
-       导入或历史数据里可能存着未规范化的写法（例如无碳分子写作 H2SO4 而非 Hill 记法的 H2O4S），
-       直接比对字符串会算不进命中数，导致候选卡标「库中无记录」而下方结果却列出了记录。*/
-    c.hits=DB.filter(function(r){
-      return canon(r.formula)===c.formula&&
-             c.reagents.indexOf(r.reagent)>=0&&passFilter(r);
-    });
-  });
-  list.sort(function(a,b){
-    if(a.likely!==b.likely)return a.likely?-1:1;
-    if(a.radical!==b.radical)return a.radical?1:-1;
-    if(!!a.hits.length!==!!b.hits.length)return a.hits.length?-1:1;
-    if(a.det!==b.det)return a.det==="adduct"?-1:1;
-    return a.mass-b.mass;
-  });
-  return list;
-}
 
 /* ---------------- 初始数据：空 ----------------
    这里**有意留空**。2026-08-05 之前预置过 8 条示例记录（Ehn 2014 / Jokinen 2012 /
@@ -759,6 +786,64 @@ function showTab(t){
 
 /* ---------------- 筛选器 ---------------- */
 var filtR={},filtE={};
+/* 相态偏好："" = 不限、"gas"、"particle"。
+   ★ 它**不是过滤器**，是排序键。同一个分子在气相和颗粒相都可能被测到，
+   把异相记录藏起来会丢线索；排在后面并标注才是对的。*/
+var PHASE="";
+function savePhase(){try{window.localStorage.setItem("cims_phase",PHASE);}catch(e){}}
+function loadPhase(){try{PHASE=window.localStorage.getItem("cims_phase")||"";}catch(e){PHASE="";}}
+/* ---- 采样场景的两级分类（用户 2026-08-10 提的，为数据库变大做准备）----
+     第一级 setting：atmosphere / chamber —— 外场实测 还是 烟雾箱
+     第二级 biome：  urban / forest / marine —— 只对外场有意义
+
+   两个 CSV 里都有显式的 setting / biome 列，**显式列优先**。
+   下面的关键词推导只是兜底：别人导入自己的 CSV 时多半没有这两列，
+   总比整列空着、筛选器直接失效要好。**推导结果不如显式列可信，别倒过来用。**
+
+   加新场景时：先在 CSV 里补列，再考虑要不要往关键词表里加词。 */
+var SETTINGS=[{id:"atmosphere",label:"Atmosphere"},{id:"chamber",label:"Chamber"}];
+var BIOMES=[{id:"urban",label:"Urban"},{id:"forest",label:"Forest"},{id:"marine",label:"Marine"}];
+var SETTING_WORDS={chamber:/chamber|cloud|smog|flow ?tube|teflon bag/i,
+                   atmosphere:/field|ambient|forest|urban|marine|coastal|station|smear|site|boreal|mountain/i};
+var BIOME_WORDS={urban:/urban|city|beijing|shanghai|delhi|helsinki|megacity|roadside|traffic/i,
+                 forest:/forest|boreal|hyyti|smear|canopy|woodland|taiga/i,
+                 marine:/marine|ocean|coastal|sea|ship|island|mace head/i};
+function recSetting(r){
+  var v=String(r.setting||"").toLowerCase();
+  if(v)return v;
+  var t=[r.environment,r.site,r.campaign,r.instrument].filter(Boolean).join(" ");
+  for(var k in SETTING_WORDS)if(SETTING_WORDS[k].test(t))return k;
+  return "";
+}
+function recBiome(r){
+  var v=String(r.biome||"").toLowerCase();
+  if(v)return v;
+  if(recSetting(r)==="chamber")return "";        // 烟雾箱没有生态类型
+  var t=[r.environment,r.site,r.campaign].filter(Boolean).join(" ");
+  for(var k in BIOME_WORDS)if(BIOME_WORDS[k].test(t))return k;
+  return "";
+}
+/* 场景筛选是**真过滤**，与相态不同。
+   相态只排序，是因为同一个分子在两相都可能出现，异相记录仍有参考价值；
+   而「我要看外场数据」时，烟雾箱记录混进来就是干扰——那是不同的化学条件。
+   不勾则全给。*/
+var filtSet={},filtBio={};
+function passScene(r){
+  var ks=Object.keys(filtSet);
+  if(ks.length&&!filtSet[recSetting(r)])return false;
+  var kb=Object.keys(filtBio);
+  if(kb.length&&!filtBio[recBiome(r)])return false;
+  return true;
+}
+/* 记录的相态：文献库读 phase 列，离子库读峰表自带的 phase。取不到就算 unknown，
+   永远排在中间——既不冒充同相，也不当成明确的异相。*/
+function recPhase(r){return String(r.phase||"").toLowerCase();}
+function phaseRank(r){
+  if(!PHASE)return 0;
+  var p=recPhase(r);
+  if(!p)return 1;              // 未标注
+  return p===PHASE?0:2;        // 同相 → 异相
+}
 function selectedReagents(){
   return REAGENTS.filter(function(r){return filtR[r.id];}).map(function(r){return r.id;});
 }
@@ -795,6 +880,53 @@ function buildFilters(){
     };
     rHost.appendChild(b);
   });
+  /* 相态：单选，默认 any。选定后同相记录排前面，异相排后面——不隐藏。*/
+  var pHost=document.getElementById("fPhase");
+  if(pHost){
+    pHost.innerHTML="";
+    var np={gas:0,particle:0};
+    DB.forEach(function(r){if(np[r.phase]!=null)np[r.phase]++;});
+    IONDB.forEach(function(r){if(np[r.phase]!=null)np[r.phase]++;});
+    [{id:"",label:"Any"},{id:"gas",label:"Gas"},{id:"particle",label:"Particle"}]
+    .forEach(function(o){
+      var b=document.createElement("button");
+      b.className="chip";
+      b.innerHTML=escapeHtml(o.label)+(o.id?' <small>'+np[o.id]+'</small>':'');
+      b.title=o.id?("Records measured in the "+o.id+" phase are shown first; the other phase follows, labelled")
+                  :"No phase preference";
+      b.setAttribute("aria-pressed",PHASE===o.id?"true":"false");
+      b.onclick=function(){PHASE=o.id;savePhase();buildFilters();runQuery();};
+      pHost.appendChild(b);
+    });
+  }
+  /* 场景两级。每个按钮带条数——数据库变大后，「这个筛选还剩多少」比标签本身更有用。
+     计数只统计当前试剂离子筛选下的可见记录，否则勾了 NO3⁻ 却看到含碘峰表的数字。*/
+  function sceneRow(hostId,defs,store,getter){
+    var host=document.getElementById(hostId);
+    if(!host)return;
+    host.innerHTML="";
+    var cnt={};
+    function tally(r){
+      if(Object.keys(filtR).length&&!filtR[r.reagent])return;
+      var k=getter(r);if(k)cnt[k]=(cnt[k]||0)+1;
+    }
+    DB.forEach(tally);IONDB.forEach(tally);
+    defs.forEach(function(o){
+      var b=document.createElement("button");
+      b.className="chip";
+      b.innerHTML=escapeHtml(o.label)+' <small>'+(cnt[o.id]||0)+'</small>';
+      b.setAttribute("aria-pressed",store[o.id]?"true":"false");
+      if(!cnt[o.id])b.classList.add("empty");
+      b.onclick=function(){
+        if(store[o.id])delete store[o.id];else store[o.id]=1;
+        buildFilters();runQuery();
+      };
+      host.appendChild(b);
+    });
+  }
+  sceneRow("fSetting",SETTINGS,filtSet,recSetting);
+  sceneRow("fBiome",  BIOMES,  filtBio,recBiome);
+
   var eHost=document.getElementById("fEnv");eHost.innerHTML="";
   var envs={};
   DB.forEach(function(r){ String(r.environment||"").split(/[;,、]/).forEach(function(e){
@@ -813,6 +945,7 @@ function buildFilters(){
 }
 function passFilter(r){
   if(Object.keys(filtR).length&&!filtR[r.reagent])return false;
+  if(!passScene(r))return false;
   var ks=Object.keys(filtE);
   if(ks.length){
     var s=String(r.environment||"").toLowerCase();
@@ -823,49 +956,115 @@ function passFilter(r){
 }
 
 /* ---------------- 输入识别 ---------------- */
+/* 电荷符号是「这是离子还是中性分子」的唯一依据（用户 2026-08-09 定的规则）。
+   parseFormula 会把符号剥掉，所以要在剥之前先把它读出来。*/
+function formulaCharge(s){
+  s=String(s==null?"":s).replace(/\s+/g,"");
+  if(/\^\d*[+⁺]$/.test(s)||/[+⁺]$/.test(s))return 1;
+  if(/\^\d*[-⁻−–]$/.test(s)||/[-⁻−–]$/.test(s))return -1;
+  return 0;
+}
+/* 输入分类。三条路，语义各不相同：
+     ion      带 + 或 − 的分子式 —— 谱图上读到的离子，中性分子由试剂离子确定性还原
+     neutral  不带符号的分子式   —— 当作中性分子，正向算出它在各试剂离子下的离子
+     mass     纯数字             —— **一律当作离子 m/z**，因为谱图上读到的就是离子
+   （用户 2026-08-09：「如果用户输入质量，八成是带着试剂离子的质谱实测数据」）*/
 function classify(s){
   s=(s||"").trim();
   if(!s)return {mode:"none"};
   if(/^\d+$/.test(s))return {mode:"nominal",value:parseInt(s,10)};
   if(/^\d*\.\d+$/.test(s))return {mode:"exact",value:parseFloat(s)};
   var f=parseFormula(s);
-  if(f)return {mode:"formula",value:f};
+  if(f){
+    var q=formulaCharge(s);
+    return {mode:"formula",value:f,charge:q,isIon:q!==0,raw:s};
+  }
   return {mode:"bad"};
 }
+/* 边打字边告诉用户程序会怎么理解这串输入。
+   误解都发生在按 Search 之前——等结果出来才发现「它把我的离子式当中性分子了」，
+   已经晚了。所以把解释方式实时摆在输入框里。*/
 document.getElementById("q").addEventListener("input",function(){
-  var c=classify(this.value),el=document.getElementById("qmode");
-  el.textContent={none:"awaiting input",formula:"formula",nominal:"nominal mass",exact:"exact mass",bad:"unrecognised"}[c.mode];
-  el.style.background=c.mode==="bad"?"#FBEAE8":"var(--accent-soft)";
-  el.style.color=c.mode==="bad"?"#B3261E":"var(--accent)";
+  var c=classify(this.value),el=document.getElementById("qmode"),txt,warn=false;
+  if(c.mode==="none")txt="awaiting input";
+  else if(c.mode==="bad"){txt="unrecognised";warn=true;}
+  else if(c.mode==="nominal"||c.mode==="exact")txt="ion m/z";
+  else if(c.isIon)txt="ion formula "+(c.charge>0?"(+)":"(−)");
+  else {txt="neutral molecule — no charge sign";warn=true;}
+  el.textContent=txt;
+  el.style.background=(c.mode==="bad")?"#FBEAE8":(warn?"#FBF3E4":"var(--accent-soft)");
+  el.style.color   =(c.mode==="bad")?"#B3261E":(warn?"#8A5A00":"var(--accent)");
 });
 document.getElementById("q").addEventListener("keydown",function(e){if(e.key==="Enter")runQuery();});
 
 /* ---------------- 分子式生成器 ---------------- */
-function generate(targetNeutral,tolDa){
+/* 在给定中性质量附近枚举**大气化学上说得通**的分子式。
+
+   约束来自用户 2026-08-10。不加约束的话，一个名义质量附近有几百个"数学上成立"
+   的组成，绝大多数在大气里根本不存在，列出来只会淹没真正的候选。
+
+     ① 元素只取 C H O N Cl F S。其余元素（I、Br、Si…）只可能来自试剂离子，
+        而这里枚举的是**扣掉试剂离子之后的中性分子**，所以不生成。
+     ② 中性分子里的 N 必为硝基 −NO2 或硝酸酯基 −ONO2，S 必为 −HSO3 或 −HSO4，
+        因此氧必须够用而且有富余：**O > 2N + 3S**。
+        （例外：NH4⁺ / C4H12N⁺ 等正模式试剂离子下测的可能是胺，N 是胺氮——见 amineN）
+     ③ N ≤ 3、S ≤ 1、Cl ≤ 2。
+     ④⑤ DBE 用大气化学定义（N 与 H 等效，见 rdbe），且 **0 ≤ DBE ≤ 9**。
+        上限 9 对应多环芳烃产物或部分二聚体，再高在大气中不现实。
+
+   已用库里 181 条文献记录验证：全部满足 ①–⑤。唯一落在约束外的是
+   D5 硅氧烷 C10H30O5Si5——那是仪器污染物，Riva 2019 报它正是为了说明它是伪信号，
+   本来就不该被算作大气分子。这反过来说明约束卡在了正确的位置。*/
+/* F 默认关掉。用户把 F 标为「杂质」——它在大气有机物里罕见，但质量 18.9984
+   离 H2O 很近，放开后一个名义质量附近会冒出大量含氟候选，把真正的 CHONS 候选挤下去。
+   实测：C10H15NO8 附近 ±20 ppm，开 F 得 10 个候选、其中 4 个含 F；关掉后剩 6 个。
+   需要时在 Advanced 里勾上。Cl 保留（海盐、工业源里是真实存在的）。*/
+var GEN_LIMITS={N:3,S:1,Cl:2,F:0,DBEmax:9};
+function generate(targetNeutral,tolDa,opts){
+  var amineN=!!(opts&&opts.amineN);
   var out=[],maxC=Math.min(40,Math.floor(targetNeutral/12)+1);
+  var L=GEN_LIMITS;
   for(var c=1;c<=maxC;c++){
-    for(var n=0;n<=3;n++){
-      for(var s=0;s<=1;s++){
-        var maxO=Math.min(26,Math.floor((targetNeutral-12*c)/16)+1);
-        for(var o=0;o<=maxO;o++){
-          var rest=targetNeutral-(c*M.C+n*M.N+s*M.S+o*M.O);
-          if(rest<-tolDa)continue;
-          var h=Math.round(rest/M.H);
-          if(h<0)continue;
-          if(Math.abs(rest-h*M.H)>tolDa)continue;
-          if(h>2*c+2+n)continue;
-          if(c>0&&(h/c<0.2||h/c>3.1))continue;
-          if(c>0&&o/c>3.2)continue;
-          var d=c-h/2+n/2+1;
-          if(d<-0.5||d>25)continue;
-          if(Math.abs(d*2-Math.round(d*2))>1e-6)continue;
-          var obj={C:c,H:h};if(n)obj.N=n;if(o)obj.O=o;if(s)obj.S=s;
-          out.push({formula:hill(obj),atoms:obj,mass:fmass(obj)});
-        }
+   for(var n=0;n<=L.N;n++){
+    for(var sx=0;sx<=L.S;sx++){
+     for(var cl=0;cl<=L.Cl;cl++){
+      for(var f=0;f<=L.F;f++){
+       var base=c*M.C+n*M.N+sx*M.S+cl*M.Cl+f*M.F;
+       if(base-tolDa>targetNeutral)continue;
+       var maxO=Math.min(30,Math.floor((targetNeutral-base)/M.O)+1);
+       for(var o=0;o<=maxO;o++){
+        /* ② 氧必须够 NO2/ONO2 与 HSO3/HSO4 用，且有富余。
+              胺模式下这条不适用——那时的 N 是胺氮，不带氧。*/
+        if(!amineN&&!(o>2*n+3*sx))continue;
+        if(amineN&&!(o>=3*sx))continue;
+        var rest=targetNeutral-(base+o*M.O);
+        if(rest<-tolDa)continue;
+        var h=Math.round(rest/M.H);
+        if(h<0)continue;
+        if(Math.abs(rest-h*M.H)>tolDa)continue;
+        var obj={C:c,H:h};
+        if(n)obj.N=n; if(o)obj.O=o; if(sx)obj.S=sx; if(cl)obj.Cl=cl; if(f)obj.F=f;
+        var dbe=rdbe(obj,{amineN:amineN});
+        if(dbe<0||dbe>L.DBEmax)continue;                  // ④⑤
+        if(Math.abs(dbe*2-Math.round(dbe*2))>1e-6)continue; // DBE 必为整数或半整数
+        out.push({formula:hill(obj),atoms:obj,mass:fmass(obj),dbe:dbe,
+                  radical:Math.abs(dbe-Math.round(dbe))>1e-9});
+       }
       }
+     }
     }
+   }
   }
-  out.sort(function(a,b){return Math.abs(a.mass-targetNeutral)-Math.abs(b.mass-targetNeutral);});
+  /* 先按质量偏差排，同偏差下闭壳层优先、含杂原子少的优先——
+     Cl/F 在大气有机物里少见，同等贴合度下不该压过纯 CHON 的候选。*/
+  out.sort(function(a,b){
+    var da=Math.abs(a.mass-targetNeutral),db=Math.abs(b.mass-targetNeutral);
+    if(Math.abs(da-db)>1e-9)return da-db;
+    if(a.radical!==b.radical)return a.radical?1:-1;
+    var ha=(a.atoms.Cl||0)+(a.atoms.F||0)+(a.atoms.S||0);
+    var hb=(b.atoms.Cl||0)+(b.atoms.F||0)+(b.atoms.S||0);
+    return ha-hb;
+  });
   return out.slice(0,30);
 }
 
@@ -898,9 +1097,12 @@ function recIonAtoms(r){
 }
 
 /* 勾选的试剂离子同样约束离子库：同一个离子式在不同试剂离子下是不同的分子。*/
+/* 场景筛选对两个库一视同仁——不然勾了 Atmosphere，文献行被滤了、峰表行还在，
+   同一份 report 里两套标准，用户没法读。*/
 function ionPassFilter(r){
   var ks=Object.keys(filtR);
-  return !ks.length||!!filtR[r.reagent];
+  if(ks.length&&!filtR[r.reagent])return false;
+  return passScene(r);
 }
 
 function exactIonHits(qf){
@@ -926,78 +1128,146 @@ function exactLitHits(qf){
 
 var CLS_LABEL={organic:"organic",inorganic:"inorganic",reagent:"reagent ion",unassigned:"unassigned"};
 
-/* Reported 区：证据本身，按**来源**分成两块（From publication / From peak lists）。
-   分子式查询与质量查询共用这一个渲染入口，输出在同一面板里。*/
+/* Reported 区：一份统一的 report。
+
+   用户 2026-08-09：「无论是文献里的匹配还是 peaklist（均为离子模式），可以统一做一个
+   report，不用区分，只需要表明是文献还是某个用户提供的 peaklist 即可。」
+
+   合并的理由是对的：两者都是**离子模式的实测观测**，区别只在于谁报的。
+   以前拆成 From publication / From peak lists 两块，读者要在两张表之间来回对照
+   同一个分子的证据，反而看不清「到底有多少人见过这个峰」。
+
+   每行必须标明来源。文献行给出 DOI 链接，峰表行给出贡献者与峰表文件——
+   这是可追溯性的底线，合并的是版面，不是出处。*/
+function evidenceRows(lit,pk){
+  var rows=[];
+  lit.forEach(function(r){
+    var a=parseFormula(r.formula),ia=recIonAtoms(r);
+    rows.push({
+      kind:"lit",
+      ion: ia?hill(ia):"—",
+      neutral: r.formula,
+      neutralDerived:false,
+      mz: a?ionMz(fmass(a),r.reagent,r.detection).toFixed(4):"—",
+      reagent: r.reagent,
+      detection: r.detection,
+      source: r.reference||"—",
+      doi: r.doi||"",
+      context: [r.environment,r.instrument].filter(Boolean).join(" · "),
+      phase: recPhase(r), prank: phaseRank(r),
+      note: r.note||""
+    });
+  });
+  pk.forEach(function(r){
+    var ia=r.ion_formula?parseFormula(r.ion_formula):null;
+    var ra=REAGENT_ATOMS[r.reagent];
+    /* 峰表存的是离子式（作者拟合时的归属）。中性式由「减掉试剂离子」得到——
+       和离子式路径同一个确定性运算，不是新的推断。减不掉就留空，不猜。*/
+    var neu=(ia&&ra&&atomsHasAll(ia,ra))?hill(atomsSub(ia,ra)):"";
+    rows.push({
+      kind:"peak",
+      ion: r.ion_formula||"—",
+      neutral: neu,
+      neutralDerived:true,
+      mz: r.mz||"—",
+      reagent: r.reagent,
+      detection: "",
+      source: r.contributor||"—",
+      doi: "",
+      context: [r.site,r.campaign,r.instrument,r.phase].filter(Boolean).join(" · "),
+      peakfile: r.peaklist_file||"",
+      phase: recPhase(r), prank: phaseRank(r),
+      cls: r["class"]||"organic",
+      reference: r.reference||"",
+      note: ""
+    });
+  });
+  return rows;
+}
+
 function renderReported(lit,pk,label){
   var box=document.getElementById("reported");
   box.innerHTML="";
   if(!lit.length&&!pk.length)return;
+  var rows=evidenceRows(lit,pk);
 
   var head=document.createElement("h4");
   head.className="colhead";
   head.textContent="Reported"+(label?" · "+label:"");
   box.appendChild(head);
 
-  var w=document.createElement("div");
   var body=document.createElement("div");
   body.className="ebody";
   body.style.padding="0";
 
-  if(lit.length){
-    var sh=document.createElement("div");
-    sh.className="subhead";sh.innerHTML="<span>From publication</span>";
-    body.appendChild(sh);
-  }
-  if(lit.length){
-    var byF={};lit.forEach(function(r){(byF[r.formula]=byF[r.formula]||[]).push(r);});
-    var p=document.createElement("div");
-    p.className="eline";
-    p.innerHTML='<span class="src lit">Literature</span> <b>'+lit.length+'</b> record'+(lit.length>1?'s':'')+
-      ' for <b>'+Object.keys(byF).map(function(f){return pretty(f);}).join(" / ")+
-      '</b>. Matched by forward-computing each record\'s ion from its neutral formula, reagent ion and detection mode — exact, not inferred.';
-    body.appendChild(p);
-    var t=document.createElement("table");
-    t.innerHTML='<tr><th>Neutral</th><th>Reagent</th><th>Detection</th><th>Environment</th><th>Reference</th><th>Assignment</th></tr>';
-    lit.forEach(function(r){
-      var R=reagent(r.reagent);
-      var ref=r.doi?'<a href="https://doi.org/'+r.doi+'" target="_blank" rel="noopener">'+escapeHtml(r.reference)+'</a>':escapeHtml(r.reference||"—");
-      t.innerHTML+='<tr><td class="mono">'+pretty(r.formula)+'</td>'+
-        '<td class="mono" style="color:'+R.color+'">'+escapeHtml(r.reagent)+'</td>'+
-        '<td>'+(DET_LABEL[r.detection]||r.detection)+'</td>'+
-        '<td>'+escapeHtml(r.environment||"—")+'</td>'+
-        '<td>'+provTag(r.note)+ref+'</td>'+
-        '<td style="color:var(--muted)">'+escapeHtml((r.note||"").split("｜")[0])+'</td></tr>';
-    });
-    body.appendChild(t);
-  }
+  /* 概览行：说清楚这些证据由几个来源提供。
+     单一贡献者的峰表之间可能同源，不构成独立确认——这一点必须写出来，
+     否则「出现在 4 个峰表里」会被读成 4 次独立验证。*/
+  var papers={},contribs={};
+  rows.forEach(function(r){ (r.kind==="lit"?papers:contribs)[r.source]=1; });
+  var np=Object.keys(papers).length,nc=Object.keys(contribs).length;
+  var parts=[];
+  if(np)parts.push("<b>"+np+"</b> publication"+(np>1?"s":""));
+  if(nc)parts.push("<b>"+nc+"</b> peak-list contributor"+(nc>1?"s":""));
+  var p=document.createElement("div");
+  p.className="eline";
+  p.innerHTML='<b>'+rows.length+'</b> record'+(rows.length>1?'s':'')+' from '+parts.join(" and ")+
+    '. All are ion-mode observations; literature rows are matched by forward-computing '+
+    'each record\'s ion from its neutral formula, reagent ion and detection mode — exact, not inferred.'+
+    (nc===1?'<br><span style="color:#8A5A00">Peak lists from a single contributor may share a common ancestor — that is not independent confirmation. Agreement <i>across</i> contributors is the strong evidence.</span>':'');
+  body.appendChild(p);
 
-  if(pk.length){
-    var sh2=document.createElement("div");
-    sh2.className="subhead";sh2.innerHTML="<span>From peak lists</span>";
-    body.appendChild(sh2);
-    var files={},contrib={};
-    pk.forEach(function(r){files[r.peaklist_file]=1;contrib[r.contributor]=1;});
-    var nf=Object.keys(files).length,nc=Object.keys(contrib).length;
-    var p2=document.createElement("div");
-    p2.className="eline";
-    p2.innerHTML='<span class="src peak">Measured</span> Present in <b>'+nf+'</b> peak list'+(nf>1?'s':'')+' from <b>'+nc+
-      '</b> contributor'+(nc>1?'s':'')+'.'+(nc<2?'<br><span style="color:#8A5A00">Peak lists from one contributor may share a common ancestor — not independent confirmation. Agreement across contributors is the strong evidence.</span>':'');
-    body.appendChild(p2);
-    var t2=document.createElement("table");
-    t2.innerHTML='<tr><th>m/z</th><th>Class</th><th>Reagent</th><th>Instrument / phase</th><th>Site / campaign</th><th>Contributor</th><th>Reference</th></tr>';
-    pk.forEach(function(r){
-      var R=reagent(r.reagent);
-      var cls=r["class"]||"organic";
-      t2.innerHTML+='<tr><td class="mono">'+escapeHtml(r.mz||"—")+'</td>'+
-        '<td>'+(cls==="organic"?"":'<span class="cls '+cls+'">'+(CLS_LABEL[cls]||cls)+'</span>')+'</td>'+
-        '<td class="mono" style="color:'+R.color+'">'+escapeHtml(r.reagent)+'</td>'+
-        '<td>'+escapeHtml(r.instrument||"—")+'<br><span style="color:var(--muted)">'+escapeHtml(r.phase||"")+'</span></td>'+
-        '<td>'+escapeHtml(r.site||"—")+(r.campaign?' <span style="color:var(--muted)">/ '+escapeHtml(r.campaign)+'</span>':"")+'</td>'+
-        '<td>'+escapeHtml(r.contributor||"—")+'</td>'+
-        '<td style="color:var(--muted)">'+escapeHtml(r.reference||"—")+'</td></tr>';
-    });
-    body.appendChild(t2);
-  }
+  /* 同相优先。异相不隐藏，只排到后面并插一条分隔说明——
+     同一个分子在两相都出现本身就是有用的信息。*/
+  rows.sort(function(a,b){
+    if(a.prank!==b.prank)return a.prank-b.prank;
+    return (a.kind===b.kind)?0:(a.kind==="lit"?-1:1);
+  });
+  var t=document.createElement("table");
+  t.innerHTML='<tr><th>Ion</th><th>Neutral</th><th>m/z</th><th>Phase</th><th>Reagent</th>'+
+              '<th>Source</th><th>Context</th></tr>';
+  var lastRank=-1;
+  rows.forEach(function(r){
+    if(PHASE&&r.prank!==lastRank&&lastRank>=0){
+      t.innerHTML+='<tr class="phsep"><td colspan="7">'+
+        (r.prank===2?('Other phase — measured in the '+(PHASE==="gas"?"particle":"gas")+
+                      ' phase, not '+PHASE)
+                    :'Phase not recorded')+'</td></tr>';
+    }
+    lastRank=r.prank;
+    var R=reagent(r.reagent);
+    var src;
+    if(r.kind==="lit"){
+      src='<span class="src lit">Literature</span> '+provTag(r.note)+
+          (r.doi?'<a href="https://doi.org/'+r.doi+'" target="_blank" rel="noopener">'+
+                 escapeHtml(r.source)+'</a>':escapeHtml(r.source));
+    }else{
+      src='<span class="src peak">Peak list</span> '+escapeHtml(r.source)+
+          (r.peakfile?'<br><span style="color:var(--muted)">'+escapeHtml(r.peakfile)+'</span>':'')+
+          (r.reference?'<br><span style="color:var(--muted)">'+escapeHtml(r.reference)+'</span>':'');
+    }
+    var neu=r.neutral
+      ? (r.neutralDerived?'<span style="color:var(--muted)" title="Derived by subtracting the reagent ion from the assigned ion formula">'+pretty(r.neutral)+'</span>'
+                         :pretty(r.neutral))
+      : '<span style="color:var(--muted)">—</span>';
+    var cls=(r.kind==="peak"&&r.cls&&r.cls!=="organic")
+      ? ' <span class="cls '+r.cls+'">'+(CLS_LABEL[r.cls]||r.cls)+'</span>' : '';
+    var ph=r.phase
+      ? '<span class="ph ph-'+r.phase+'">'+escapeHtml(r.phase)+'</span>'
+      : '<span style="color:var(--muted)">—</span>';
+    t.innerHTML+='<tr'+(r.prank===2?' class="offphase"':'')+'><td class="mono">'+pretty(r.ion)+cls+'</td>'+
+      '<td class="mono">'+neu+'</td>'+
+      '<td class="mono">'+escapeHtml(String(r.mz))+'</td>'+
+      '<td>'+ph+'</td>'+
+      '<td class="mono" style="color:'+R.color+'">'+escapeHtml(r.reagent)+
+        (r.detection&&r.detection!=="adduct"?'<br><span style="color:var(--muted)">'+
+          escapeHtml(DET_LABEL[r.detection]||r.detection)+'</span>':'')+'</td>'+
+      '<td>'+src+'</td>'+
+      '<td style="color:var(--muted)">'+escapeHtml(r.context||"—")+'</td></tr>';
+  });
+  body.appendChild(t);
+
+  var w=document.createElement("div");
   w.appendChild(body);
   box.appendChild(w);
 }
@@ -1010,21 +1280,25 @@ function renderCands(list,ionAtoms){
   var wrap=document.createElement("div");
   wrap.className="cands";
   var ionF=hill(ionAtoms);
-  wrap.innerHTML='<h3>Neutral formulas restored from '+pretty(ionF)+'</h3>';
+  wrap.innerHTML='<h3>Neutral molecule restored from '+pretty(ionF)+'</h3>';
 
   if(!list.length){
     var w=document.createElement("div");
     w.className="cnote";
-    w.innerHTML="<b>No valid restoration</b> under the selected reagent ion — subtracting it would give a negative atom count, or a negative DBE.<br>"+
-      "Most likely: <b>what you typed is already a neutral formula</b>. Searching it as one.";
+    w.innerHTML="<b>No valid restoration</b> under the selected reagent ion — subtracting it would give a negative atom count, or a negative DBE.";
     wrap.appendChild(w);
     box.appendChild(wrap);
     return;
   }
 
-  var grid=document.createElement("div");
-  grid.className="cgrid";
-  list.forEach(function(c,i){
+  /* 主答案与次要解释分层显示。
+     用户 2026-08-09 选了「保留，但收起来」：给定离子式与试剂离子，中性分子是确定的，
+     主答案只该有一个；脱氢那支在算术上也成立，但把它和主答案平级摆出来正是
+     「容易引起误解」的来源。所以折叠——不丢信息，也不制造歧义。*/
+  var prim=list.filter(function(c){return c.tier!=="secondary";});
+  var sec =list.filter(function(c){return c.tier==="secondary";});
+
+  function card(c,i){
     var b=document.createElement("button");
     b.className="cand"+(c.hits.length?"":" dim");
     b.setAttribute("aria-pressed",i===candIdx?"true":"false");
@@ -1032,46 +1306,211 @@ function renderCands(list,ionAtoms){
     var tag=c.hits.length
       ? '<span class="ctag hit">'+c.hits.length+' record'+(c.hits.length>1?'s':'')+'</span>'
       : '<span class="ctag none">no record</span>';
-    var rule=c.likely?'<span class="ctag rule">matches reagent-ion rule</span>':"";
     var rad=c.radical?'<span class="ctag rad">radical</span>':"";
     b.innerHTML=
       '<span class="cf">'+pretty(c.formula)+(c.radical?'<span class="dot">•</span>':"")+'</span>'+
       '<span class="cmeta">'+DET_LABEL[c.det]+' · '+c.reagents.join("/")+'</span>'+
       '<span class="cmeta">neutral '+c.mass.toFixed(4)+' · DBE '+dbeText(c.dbe)+'</span>'+
-      '<span class="cmeta" style="margin-top:6px">'+rule+rad+tag+'</span>';
-    grid.appendChild(b);
-  });
+      '<span class="cmeta" style="margin-top:6px">'+rad+tag+'</span>';
+    return b;
+  }
+
+  var grid=document.createElement("div");
+  grid.className="cgrid";
+  prim.forEach(function(c){grid.appendChild(card(c,list.indexOf(c)));});
   wrap.appendChild(grid);
 
-  /* 首选项来自试剂离子规则。若另有一支库中有记录，把这个分歧摆出来，但不替用户改判。*/
-  var top=list[0];
-  if(list.length>1&&top.likely&&!top.hits.length){
-    var alt=list.filter(function(c){return c!==top&&c.hits.length;})[0];
-    if(alt){
-      var n=document.createElement("div");
-      n.className="cnote";
-      n.innerHTML='The first choice <b>'+pretty(top.formula)+'</b> ('+DET_LABEL[top.det]+
-        ') follows the reagent-ion rule but has no record; the other branch <b>'+pretty(alt.formula)+'</b> ('+
-        DET_LABEL[alt.det]+') has '+alt.hits.length+' record'+(alt.hits.length>1?'s':'')+'.'+
-        '<br>Both compositions fit — they differ in mechanism. The database is still small, which is not grounds to overrule the chemistry. The assignment is yours.';
-      wrap.appendChild(n);
-    }
+  if(sec.length){
+    var det=document.createElement("details");
+    det.className="secalt";
+    var sum=document.createElement("summary");
+    sum.innerHTML='Other arithmetically possible reading'+(sec.length>1?'s':'')+
+      ' ('+sec.map(function(c){return pretty(c.formula)+", "+DET_LABEL[c.det];}).join("; ")+')';
+    det.appendChild(sum);
+    var note=document.createElement("div");
+    note.className="cnote";
+    note.innerHTML='The composition fits, but the mechanism is different. Under nitrate the reagent ion '+
+      'is only displaced by acids stronger than HNO<sub>3</sub>, so ordinary HOMs rarely deprotonate — '+
+      'that is why the cluster adduct is given as the answer. If your compound <i>is</i> a strong acid, '+
+      'this reading may be the right one. The call is yours.';
+    det.appendChild(note);
+    var g2=document.createElement("div");
+    g2.className="cgrid";
+    sec.forEach(function(c){g2.appendChild(card(c,list.indexOf(c)));});
+    det.appendChild(g2);
+    wrap.appendChild(det);
   }
-  /* 全部候选都是自由基时提醒一句 */
-  if(list.length&&list.every(function(c){return c.radical;})){
-    var m=document.createElement("div");
-    m.className="cnote";
-    m.innerHTML='Every restoration has a half-integer DBE, so all of them would have to be <b>radicals</b> (e.g. RO<sub>2</sub>). '+
-      'If you are not looking for a radical, what you typed is more likely <b>already a neutral formula</b> rather than an ion.';
-    wrap.appendChild(m);
+
+  if(prim.length&&prim.every(function(c){return c.radical;})){
+    var rn=document.createElement("div");
+    rn.className="cnote";
+    rn.innerHTML='Every restoration here has a half-integer DBE, i.e. an <b>odd-electron species</b> (a radical). '+
+      'That is a legitimate result — RO<sub>2</sub> radicals are a core target of nitrate CIMS — but if you '+
+      'expected a closed-shell molecule, check the reagent ion you ticked.';
+    wrap.appendChild(rn);
   }
   box.appendChild(wrap);
 }
+
+/* 中性式输入：正向算出它在各试剂离子下会以什么离子被看到。这一步是**精确的**，
+   不含任何推断——中性 + 试剂离子 → 离子，方向上没有歧义。
+   （反方向「离子 → 中性」才有歧义，那是 restoreForReagent 处理的事。）*/
+function renderForward(neutralAtoms){
+  var box=document.getElementById("cands");
+  box.innerHTML="";
+  var sel=selectedReagents();
+  if(!sel.length)return;
+  var nf=hill(neutralAtoms),nm=fmass(neutralAtoms);
+  var wrap=document.createElement("div");
+  wrap.className="cands";
+  wrap.innerHTML='<h3>How '+pretty(nf)+' would appear in your spectrum</h3>';
+  var t=document.createElement("table");
+  t.innerHTML='<tr><th>Reagent</th><th>Detection</th><th>Ion formula</th><th>Ion m/z</th><th>Peak lists</th></tr>';
+  sel.forEach(function(rid){
+    var R=reagent(rid),ra=REAGENT_ATOMS[rid],positive=rid.slice(-1)==="+";
+    var forms=[];
+    if(ra)forms.push({det:"adduct",atoms:atomsAdd(neutralAtoms,ra),mz:nm+R.mass});
+    if(positive)forms.push({det:"prot",atoms:atomsAdd(neutralAtoms,{H:1}),mz:nm+MP});
+    else{var da=atomsSub(neutralAtoms,{H:1});
+         if(da)forms.push({det:"deprot",atoms:da,mz:nm-MP});}
+    forms.forEach(function(f){
+      var fi=hill(f.atoms);
+      var n=IONDB.filter(function(r){
+        return r.ion_formula&&canon(r.ion_formula)===fi&&ionPassFilter(r);}).length;
+      t.innerHTML+='<tr><td class="mono" style="color:'+R.color+'">'+escapeHtml(rid)+'</td>'+
+        '<td>'+DET_LABEL[f.det]+'</td>'+
+        '<td class="mono">'+pretty(fi)+'</td>'+
+        '<td class="mono">'+f.mz.toFixed(4)+'</td>'+
+        '<td>'+(n?('<b>'+n+'</b>'):'<span style="color:var(--muted)">—</span>')+'</td></tr>';
+    });
+  });
+  wrap.appendChild(t);
+  var note=document.createElement("div");
+  note.className="cnote";
+  note.innerHTML='Neutral mass '+nm.toFixed(4)+' · DBE '+dbeText(rdbe(neutralAtoms,dbeOpts(selectedReagents()[0])))+
+    '. These ion formulas are computed forward from the neutral — exact, not inferred.';
+  wrap.appendChild(note);
+  box.appendChild(wrap);
+}
+
+/* 质量输入：输进来的数字是**离子的 m/z**，不是中性分子的质量。
+   （用户 2026-08-09：「339 为例，如果用户选择 NO3⁻，那么带 NO3⁻ 的离子质量是 339，
+     中性分子不是 339，而是 339 − m/z(NO3⁻) = 339 − 62 = 277」）
+   所以这里按每种勾选的试剂离子，把中性质量倒算出来一并给出。*/
+function renderMassInterp(iv,c,ppm){
+  var box=document.getElementById("cands");
+  box.innerHTML="";
+  var sel=selectedReagents();
+  if(!sel.length)return;
+  var wrap=document.createElement("div");
+  wrap.className="cands";
+  wrap.innerHTML='<h3>Read as an ion m/z of '+
+    (c.mode==="nominal"?c.value:c.value.toFixed(4))+'</h3>';
+  var t=document.createElement("table");
+  t.innerHTML='<tr><th>Reagent</th><th>If cluster adduct</th><th>If deprotonated / protonated</th></tr>';
+  iv.restos.forEach(function(e){
+    var R=reagent(e.reagent);
+    t.innerHTML+='<tr><td class="mono" style="color:'+R.color+'">'+escapeHtml(e.reagent)+'</td>'+
+      '<td class="mono">'+(e.adduct!=null
+        ? 'neutral '+e.adduct.toFixed(4)+'<br><span style="color:var(--muted)">'+
+          (c.mode==="nominal"?c.value:c.value.toFixed(4))+' − '+R.mass.toFixed(4)+'</span>'
+        : '<span style="color:var(--muted)">no adduct for this reagent</span>')+'</td>'+
+      '<td class="mono">neutral '+e.transfer.toFixed(4)+'</td></tr>';
+  });
+  wrap.appendChild(t);
+  var note=document.createElement("div");
+  note.className="cnote";
+  note.innerHTML='A number typed here is taken to be the <b>m/z you read off the spectrum</b>, i.e. the ion — '+
+    'not the neutral mass. The neutral masses above are worked back from it using the reagent ion you ticked. '+
+    'Both the ion m/z and the neutral masses are searched.';
+  wrap.appendChild(note);
+  box.appendChild(wrap);
+}
+
 
 /* ---------------- 查询 ---------------- */
 var lastHits=[],candIdx=0;
 function runQuery(){candIdx=0;runQueryInner();}
 function pickCand(i){candIdx=i;runQueryInner();}
+/* 输入解释的三条路。每一条的语义都是用户 2026-08-09 明确定下来的，
+   改动前请先读 HANDOFF §4.9。核心是：**不要让程序去猜用户输入的是什么**——
+   电荷符号说了算，纯数字一律当离子 m/z。*/
+function interpret(c,ppm){
+  var out={route:null,ionAtoms:null,ionStr:null,neutralAtoms:null,
+           restos:[],warnings:[],massIon:null,massNeutral:null,label:""};
+  var sel=selectedReagents();
+
+  if(c.mode==="formula"&&c.isIon){
+    /* ① 谱图上读到的离子式。中性分子由试剂离子确定性还原。*/
+    out.route="ion";
+    out.ionAtoms=c.value;out.ionStr=hill(c.value);
+    sel.forEach(function(rid){out.restos.push(restoreForReagent(c.value,rid));});
+    var bad=out.restos.filter(function(r){return r.mismatch;});
+    if(bad.length&&bad.length===out.restos.length){
+      out.warnings.push({level:"warn",
+        text:"This ion formula does not contain "+
+             bad.map(function(r){return r.reagent.replace(/[-+]$/,"");}).join(" or ")+
+             ", so it cannot be a "+bad.map(function(r){return r.reagent;}).join("/")+
+             " cluster adduct. Either you ticked the wrong reagent ion, or this peak is a "+
+             "deprotonated species — only you can tell. The restoration below assumes deprotonation."});
+    }else if(bad.length){
+      out.warnings.push({level:"note",
+        text:"Ignoring "+bad.map(function(r){return r.reagent;}).join(", ")+
+             ": the ion formula contains none of those atoms, so no cluster adduct is possible."});
+    }
+    if(!sel.length)out.warnings.push({level:"warn",text:"Tick the reagent ion you used — without it the neutral molecule cannot be restored."});
+    return out;
+  }
+
+  if(c.mode==="formula"){
+    /* ② 不带电荷符号 → 中性分子。正向算出它在各试剂离子下的离子式，零推断。
+       但要提醒：谱图上**读不到**中性分子，没写符号八成是漏了。*/
+    out.route="neutral";
+    out.neutralAtoms=c.value;
+    out.warnings.push({level:"warn",
+      text:"Read as a <b>neutral molecule</b> — there is no charge sign. "+
+           "A neutral cannot be observed directly in a mass spectrum, so if you copied this "+
+           "off your spectrum the sign is probably missing. "+
+           '<a href="#" onclick="addMinus();return false;">Add “−” and read it as an ion</a>'});
+    if(!sel.length)out.warnings.push({level:"warn",text:"Tick the reagent ion you used — without it the ion formula cannot be computed."});
+    return out;
+  }
+
+  /* ③ 纯数字 → 一律当作**离子 m/z**（谱图上读到的就是离子）。
+     中性质量 = m/z − 试剂离子质量（加合），或 m/z + H（脱氢）。*/
+  out.route="mass";
+  out.massIon=c.value;
+  out.label=(c.mode==="nominal")?("nominal m/z "+c.value)
+            :("m/z "+c.value.toFixed(4)+" ± "+ppm+" ppm");
+  sel.forEach(function(rid){
+    var R=reagent(rid),positive=rid.slice(-1)==="+";
+    var e={reagent:rid};
+    if(REAGENT_ATOMS[rid])e.adduct=c.value-R.mass;
+    e.transfer=positive?(c.value-MP):(c.value+MP);
+    out.restos.push(e);
+  });
+  if(!sel.length)out.warnings.push({level:"warn",
+    text:"Tick the reagent ion you used — the measured m/z is the <i>ion</i>, so the neutral mass cannot be worked out without it."});
+  return out;
+}
+
+/* 给输入框补一个负号并重查。用于「你大概漏了负号」那条提示的一键修正。*/
+function addMinus(){
+  var q=document.getElementById("q");
+  if(q&&!/[-+⁻⁺−–]$/.test(q.value.trim())){q.value=q.value.trim()+"-";runQuery();}
+}
+function renderWarnings(list){
+  var box=document.getElementById("warnings");
+  if(!box)return;
+  box.innerHTML="";
+  list.forEach(function(w){
+    var d=document.createElement("div");
+    d.className="qwarn "+(w.level==="warn"?"lvl-warn":"lvl-note");
+    d.innerHTML=w.text;
+    box.appendChild(d);
+  });
+}
+
 function runQueryInner(){
   var c=classify(document.getElementById("q").value);
   var ppm=parseFloat(document.getElementById("ppm").value)||20;
@@ -1080,23 +1519,42 @@ function runQueryInner(){
   res.innerHTML="";rul.innerHTML="";cbox.innerHTML="";
   document.getElementById("reported").innerHTML="";
   document.getElementById("verdict").innerHTML="";lastHits=[];
+  renderWarnings([]);
   if(c.mode==="none"){
-    res.innerHTML='<div class="empty"><b>Enter the ion formula you read off the spectrum</b>e.g. C10H16NO11 (nitrate cluster). It will be matched directly, then restored to a neutral formula.</div>';return;
+    res.innerHTML='<div class="empty"><b>Enter the ion formula you read off the spectrum</b>'+
+      'Include the charge sign, e.g. C10H16NO11<b>−</b>. Without a sign the input is read as a neutral molecule. A plain number is read as the ion m/z.</div>';return;
   }
   if(c.mode==="bad"){
-    res.innerHTML='<div class="empty"><b>Unrecognised input</b>Write formulas like C10H16NO11; for a mass, enter digits only.</div>';return;
+    res.innerHTML='<div class="empty"><b>Unrecognised input</b>Write formulas like C10H16NO11−; for a mass, enter digits only.</div>';return;
   }
 
-  /* 第一优先：输入的东西**原样**在两个库里找直接命中。这一步不含任何推断。
-     分子式 → 按元素数量比对；质量 → 按 m/z 比对（离子库里存着实测 m/z）。
-     两种模式共用同一套输出结构，落在同一个 Result 面板里。*/
-  var qIonStr=(c.mode==="formula")?hill(c.value):null;
-  var dLit=[],dPk=[],repLabel="";
-  if(qIonStr){
-    dLit=exactLitHits(qIonStr);dPk=exactIonHits(qIonStr);
+  var iv=interpret(c,ppm);
+  renderWarnings(iv.warnings);
+
+  /* 第一优先：**零推断**的直接命中。
+       离子式输入 → 拿离子式在两个库里比（文献记录的离子由其中性式正向算出，是精确的）
+       中性式输入 → 拿中性式比文献库，拿正向算出的离子式比离子库
+       质量输入   → 拿 m/z 比离子库实测值，比文献记录正向算出的离子 m/z */
+  var dLit=[],dPk=[],repLabel=iv.label;
+  if(iv.route==="ion"){
+    dLit=exactLitHits(iv.ionStr);dPk=exactIonHits(iv.ionStr);
+    repLabel="ion "+iv.ionStr;
+  }else if(iv.route==="neutral"){
+    var nf=hill(iv.neutralAtoms),selN=selectedReagents();
+    dLit=DB.filter(function(r){return passFilter(r)&&canon(r.formula)===nf;});
+    var wantIons={};
+    selN.forEach(function(rid){
+      var ra=REAGENT_ATOMS[rid];
+      if(ra)wantIons[hill(atomsAdd(iv.neutralAtoms,ra))]=1;
+      if(rid.slice(-1)==="+"){var pa=atomsAdd(iv.neutralAtoms,{H:1});wantIons[hill(pa)]=1;}
+      else{var da=atomsSub(iv.neutralAtoms,{H:1});if(da)wantIons[hill(da)]=1;}
+    });
+    dPk=IONDB.filter(function(r){
+      return r.ion_formula&&wantIons[canon(r.ion_formula)]&&ionPassFilter(r);
+    });
+    repLabel="neutral "+nf;
   }else{
-    var mq=(c.mode==="nominal")?c.value:c.value;
-    var tolDa=(c.mode==="nominal")?0.5:mq*ppm/1e6;
+    var mq=c.value,tolDa=(c.mode==="nominal")?0.5:mq*ppm/1e6;
     dPk=massIonHits(mq,tolDa);
     dLit=DB.filter(function(r){
       if(!passFilter(r))return false;
@@ -1104,24 +1562,48 @@ function runQueryInner(){
       var ion=ionMz(fmass(a),r.reagent,r.detection);
       return (c.mode==="nominal")?Math.round(ion)===c.value:Math.abs(ion-mq)<=tolDa;
     });
-    repLabel=(c.mode==="nominal")?("nominal m/z "+c.value)
-             :("m/z "+mq.toFixed(4)+" ± "+ppm+" ppm");
   }
   renderReported(dLit,dPk,repLabel);
 
-  /* 其次才是还原：把谱图上的离子式推成中性分子式，再走原有的查询流程。这一步含推断。*/
+  /* 其次是还原／正向计算的呈现。*/
   var restoredFrom=null,candList=[];
-  if(c.mode==="formula"&&selectedReagents().length){
-    candList=buildCandidates(c.value);
+  if(iv.route==="ion"&&selectedReagents().length){
+    /* 主答案在前、次要解释在后。次要解释是折叠的（用户 2026-08-09 的选择）。*/
+    var seen={};
+    iv.restos.forEach(function(rr){
+      [["primary",rr.primary],["secondary",rr.secondary]].forEach(function(pair){
+        var cand=pair[1];if(!cand)return;
+        cand.tier=pair[0];
+        var k=cand.formula+"|"+cand.det;
+        if(seen[k]){if(seen[k].reagents.indexOf(cand.reagent)<0)seen[k].reagents.push(cand.reagent);return;}
+        seen[k]=cand;candList.push(cand);
+      });
+    });
+    candList.forEach(function(cd){
+      cd.likely=(cd.tier==="primary");
+      cd.hits=DB.filter(function(r){
+        return canon(r.formula)===cd.formula&&cd.reagents.indexOf(r.reagent)>=0&&passFilter(r);
+      });
+    });
+    /* 主答案永远排在次要解释之前；同一层内闭壳层优先。 */
+    candList.sort(function(a,b){
+      if(a.tier!==b.tier)return a.tier==="primary"?-1:1;
+      if(a.radical!==b.radical)return a.radical?1:-1;
+      if(!!a.hits.length!==!!b.hits.length)return a.hits.length?-1:1;
+      return a.mass-b.mass;
+    });
     if(candIdx>=candList.length)candIdx=0;
-    renderCands(candList,c.value);
+    renderCands(candList,iv.ionAtoms);
     if(candList.length){
-      restoredFrom={ion:qIonStr,cand:candList[candIdx]};
+      restoredFrom={ion:iv.ionStr,cand:candList[candIdx]};
       c={mode:"formula",value:candList[candIdx].atoms};
     }
+  }else if(iv.route==="neutral"){
+    renderForward(iv.neutralAtoms);
+  }else if(iv.route==="mass"){
+    renderMassInterp(iv,c,ppm);
   }
-  /* 证据构成带放最后算、最上面显示：它要同时知道直接命中与还原候选的情况 */
-  renderVerdict(qIonStr,candList,restoredFrom,dLit,dPk,repLabel);
+  renderVerdict(iv.route==="ion"?iv.ionStr:null,candList,restoredFrom,dLit,dPk,repLabel);
 
   var groups={};   // formula -> {records:[], via:{}, atoms, mass}
   function push(rec,via){
@@ -1178,7 +1660,8 @@ function runQueryInner(){
   if(document.getElementById("optGen").checked&&anchorNominal!==null){
     var tgt=(c.mode==="formula")?target:(c.mode==="exact"?c.value:anchorNominal);
     var tolDa=(c.mode==="nominal")?0.5:tgt*ppm/1e6;
-    gen=generate(tgt,tolDa).filter(function(g){return !groups[g.formula];});
+    gen=generate(tgt,tolDa,dbeOpts(selectedReagents()[0]))
+          .filter(function(g){return !groups[g.formula];});
   }
 
   /* ---- 标尺 ----
@@ -1291,7 +1774,7 @@ function renderHit(formula,g,c){
       '<span class="f">'+pretty(formula)+'</span>'+badge+
       '<span class="m">neutral <b>'+neu.toFixed(4)+'</b></span>'+
       '<span class="props">'+
-        '<span>DBE '+dbeText(rdbe(atoms))+'</span>'+
+        '<span>DBE '+dbeText(rdbe(atoms,dbeOpts(selectedReagents()[0])))+'</span>'+
         '<span>O/C '+oc.toFixed(2)+'</span>'+
         '<span>H/C '+hc.toFixed(2)+'</span>'+
       '</span>'+
@@ -1711,7 +2194,7 @@ function renderBatch(){
       o.hint=(det==="adduct"&&!REAGENT_ATOMS[rid])?"this reagent ion does not form cluster adducts":"subtracting the reagent ion gives a negative atom count";
       return o;
     }
-    o.formula=hill(neu);o.mass=fmass(neu);o.dbe=rdbe(neu);
+    o.formula=hill(neu);o.mass=fmass(neu);o.dbe=rdbe(neu,dbeOpts(o.reagent));
     o.radical=Math.abs(o.dbe-Math.round(o.dbe))>1e-9;
     /* 氮奇偶规则：闭壳层中性分子满足 H 与 N 同奇偶（等价于 DBE 为整数）。
        把「为什么是自由基」直接写出来，因为二聚体必为闭壳层——
@@ -2041,7 +2524,7 @@ function applyLitCSV(text){
   var rows=parseCSV(text);
   if(rows.length<2)return 0;
   var head=rows[0].map(function(h){return h.trim().toLowerCase();});
-  var ix={};["formula","reagent","detection","instrument","environment","reference","doi","note"]
+  var ix={};["formula","reagent","detection","instrument","phase","setting","biome","environment","reference","doi","note"]
     .forEach(function(k){ix[k]=head.indexOf(k);});
   if(ix.formula<0)return 0;
   var out=[];
@@ -2051,6 +2534,8 @@ function applyLitCSV(text){
     var f=parseFormula(g("formula"));if(!f)continue;
     out.push({id:"s"+i,formula:hill(f),reagent:g("reagent")||"NO3-",
       detection:(g("detection")||"adduct").toLowerCase(),instrument:g("instrument"),
+      phase:(g("phase")||"").toLowerCase(),
+      setting:(g("setting")||"").toLowerCase(),biome:(g("biome")||"").toLowerCase(),
       environment:g("environment"),reference:g("reference"),doi:g("doi"),note:g("note")});
   }
   if(out.length){DB=out;save();}
@@ -2250,9 +2735,9 @@ function checkUpdate(){
   load();loadIons();
   try{DATA_VERSION=window.localStorage.getItem("cims_data_version")||"";}catch(e){}
   setDataVersion(DATA_VERSION);
-  renderCount();loadReagentSel();buildFilters();
+  renderCount();loadReagentSel();loadPhase();buildFilters();
   document.getElementById("results").innerHTML=
-    '<div class="empty"><b>Enter the ion formula you read off the spectrum</b>e.g. C10H16NO11 (nitrate cluster).</div>';
+    '<div class="empty"><b>Enter the ion formula you read off the spectrum</b>Include the charge sign, e.g. C10H16NO11−. No sign means a neutral molecule; a plain number means an ion m/z.</div>';
   BOOT=bootstrapData();
   /* Service Worker：装成桌面应用、离线可用。file:// 下会失败，静默忽略。*/
   if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0){
