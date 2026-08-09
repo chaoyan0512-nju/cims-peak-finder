@@ -103,11 +103,19 @@ button.go:hover{background:var(--accent)}
 .filters{display:flex;gap:22px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line-soft)}
 .fgroup{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .flabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+/* 控件行的标签列定宽，第二行的空标签才能与第一行对齐。
+   84px 刚好容下最长的 REAGENT ION；改标签文字时记得回来看一眼。*/
+.rsel>.flabel{font-size:11px;width:84px;flex:none}
+/* 三行控件（试剂离子 / 相态 / 筛选）共用同一个尺寸与形状。
+   以前 chip 是 11.5px 圆角胶囊、rchk 是 12px 方角，三行三种长相，
+   看上去像三个不同来源的控件。统一成 13px / 8×14 / 4px 圆角。*/
 .chip{
-  font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);background:#fff;
-  padding:3px 9px;border-radius:11px;cursor:pointer;color:var(--muted);
+  font-family:var(--mono);font-size:13px;border:1px solid var(--line);background:#fff;
+  padding:8px 14px;border-radius:4px;cursor:pointer;color:var(--muted);line-height:1.15;
 }
+.chip:hover{border-color:var(--muted)}
 .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip[aria-pressed="true"] small{color:#C3CBD0}
 .chip.dot::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;
   background:currentColor;margin-right:6px;vertical-align:1px}
 label.tog{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer}
@@ -116,10 +124,11 @@ label.tog input{accent-color:var(--accent)}
 /* ---------- reagent selector (main control) ---------- */
 .rsel{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
 .rchk{
-  font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:#fff;
-  padding:5px 11px;border-radius:3px;cursor:pointer;color:var(--muted);
-  display:inline-flex;align-items:center;gap:7px;user-select:none;
+  font-family:var(--mono);font-size:13px;border:1px solid var(--line);background:#fff;
+  padding:8px 14px;border-radius:4px;cursor:pointer;color:var(--muted);
+  display:inline-flex;align-items:center;gap:7px;user-select:none;line-height:1.15;
 }
+.rchk:hover{border-color:var(--muted)}
 .rchk::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;
   background:currentColor;flex:none}
 .rchk[aria-pressed="true"]{border-color:var(--ink);color:var(--ink);font-weight:600;
@@ -244,9 +253,21 @@ details.secondary[open]>summary::before{content:"▾ "}
 .cand .cf .dot{color:#5B3E86;margin-left:2px;font-weight:700}
 .cand.dim .cf{color:var(--muted)}
 /* 相态标记与异相行 */
-.vsep{display:inline-block;width:1px;height:16px;background:var(--line);margin:0 4px}
-.chip.empty{opacity:.45}
-.chip small{opacity:.6;margin-left:3px;font-size:10px}
+/* 计数。用颜色区分而不是 opacity——opacity 会连边框一起淡掉，读起来像被禁用。*/
+.chip small,.rchk small{color:#98A2A9;margin-left:4px;font-size:12px;font-weight:400}
+/* 该类目前无数据：虚线边框 + 淡字，读作「这一类还没有数据」而不是「这个按钮坏了」。
+   它仍然可以点——将来录入海洋数据后自然就有内容了。*/
+.chip.empty{border-style:dashed;border-color:var(--line-soft);color:#AEB6BC}
+.chip.empty small{color:#AEB6BC}
+/* ★ 焦点环。不写这条的话浏览器画自己的默认环——Safari 那个是外扩的大圆角框，
+   点完一个按钮后会留在上面，看起来像某个控件的框莫名其妙变大了。
+   （用户 2026-08-10 报的「marine 的框太大了」就是这个，不是布局出错。）*/
+.chip:focus-visible,.rchk:focus-visible,.btn:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px;border-radius:4px}
+.chip:focus:not(:focus-visible),.rchk:focus:not(:focus-visible){outline:none}
+/* 筛选组：与上面两行之间划一条线。上面决定怎么解释输入，这里决定看哪些数据。*/
+.fsec{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-soft)}
+.rsel.tight{margin-top:8px}
 .ph{font-size:10.5px;padding:1px 6px;border-radius:3px;letter-spacing:.02em}
 .ph-gas{background:#E7F1FB;color:#1B4E7E}
 .ph-particle{background:#F3EDE2;color:#6B4A08}
@@ -463,14 +484,22 @@ tr.off td{opacity:.4}
     <span class="flabel">Phase</span>
     <span id="fPhase"></span>
   </div>
-  <!-- 采样场景，两级。**这个是真过滤**（与 Phase 不同）：
+  <!-- 采样场景，两级、分两行。**这个是真过滤**（与 Phase 不同）：
        「我要看外场数据」时烟雾箱记录混进来就是干扰，那是不同的化学条件。
-       为数据库变大做准备——用户 2026-08-10。 -->
-  <div class="rsel">
-    <span class="flabel">Setting</span>
-    <span id="fSetting"></span>
-    <span class="vsep"></span>
-    <span id="fBiome"></span>
+
+       上面两行（试剂离子、相态）决定**怎么解释你的输入**，
+       这一组决定**看哪些数据**——是两件事，所以中间有分隔线。
+       FILTER 标签只放第一行，第二行留空对齐：读起来是「一个 filter 组、两个维度」，
+       而不是两个互不相干的筛选器。 -->
+  <div class="fsec">
+    <div class="rsel">
+      <span class="flabel">Filter</span>
+      <span id="fSetting"></span>
+    </div>
+    <div class="rsel tight">
+      <span class="flabel"></span>
+      <span id="fBiome"></span>
+    </div>
   </div>
   <div class="hint">Tick the reagent ion you used, then type one of three things — <b>the charge sign decides how it is read</b>:<br>
   <b>C10H16NO11−</b> an ion from your spectrum → the neutral molecule is restored by removing the reagent ion.<br>
