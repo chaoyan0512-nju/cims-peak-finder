@@ -1,6 +1,6 @@
 # CIMS Peak Finder
 
-**For Better Peak Identification** — developed by Chao Yan, Nanjing University.
+**For Better Peak Identification** — developed by CIMS group in Nanjing University.
 
 A peak-lookup tool for chemical ionisation mass spectrometry. Type the ion formula
 you read off your spectrum, tick the reagent ion you used, and it tells you what

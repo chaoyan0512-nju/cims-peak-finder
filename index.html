@@ -271,6 +271,7 @@ details.secondary[open]>summary::before{content:"▾ "}
 .ph{font-size:10.5px;padding:1px 6px;border-radius:3px;letter-spacing:.02em}
 .ph-gas{background:#E7F1FB;color:#1B4E7E}
 .ph-particle{background:#F3EDE2;color:#6B4A08}
+.ph-both{background:#EAF0EC;color:#2A5240}
 tr.offphase td{opacity:.62}
 tr.phsep td{font-size:11px;color:var(--muted);background:#FAFAFA;
   padding:5px 8px!important;letter-spacing:.04em;text-transform:uppercase}
@@ -452,7 +453,7 @@ tr.off td{opacity:.4}
   <h1 class="sronly">CIMS Peak Finder</h1>
   <div class="tagline">
     <p class="t1">For Better Peak Identification</p>
-    <p class="t2">— Developed by Chao Yan, Nanjing University</p>
+    <p class="t2">— Developed by CIMS group in Nanjing University</p>
     <p class="sub">Chemical ionisation mass spectrometry · peak databases</p>
   </div>
   <span class="count" id="dbcount"></span>
@@ -867,12 +868,20 @@ function passScene(r){
 }
 /* 记录的相态：文献库读 phase 列，离子库读峰表自带的 phase。取不到就算 unknown，
    永远排在中间——既不冒充同相，也不当成明确的异相。*/
-function recPhase(r){return String(r.phase||"").toLowerCase();}
+/* 相态可以是多个。很多分子**气相与颗粒相都测得到**，强行二选一等于造假；
+   Ye 2021 那类气/粒同步测量的文献就写成 `gas/particle`（用户 2026-08-11）。
+   分隔符接受 / ; , 与空白。*/
+function recPhases(r){
+  return String(r.phase||"").toLowerCase().split(/[\/;,\s]+/).filter(Boolean);
+}
+function recPhase(r){return recPhases(r).join("/");}   // 显示用
 function phaseRank(r){
   if(!PHASE)return 0;
-  var p=recPhase(r);
-  if(!p)return 1;              // 未标注
-  return p===PHASE?0:2;        // 同相 → 异相
+  var ps=recPhases(r);
+  if(!ps.length)return 1;                       // 未标注 → 排中间
+  /* 只要该记录在所选相态里被观测到就算同相。
+     `gas/particle` 对 Gas 和 Particle 都算同相——它确实在两相都测到了。*/
+  return ps.indexOf(PHASE)>=0?0:2;
 }
 function selectedReagents(){
   return REAGENTS.filter(function(r){return filtR[r.id];}).map(function(r){return r.id;});
@@ -914,9 +923,10 @@ function buildFilters(){
   var pHost=document.getElementById("fPhase");
   if(pHost){
     pHost.innerHTML="";
+    /* 一条 gas/particle 记录在两个计数里都要出现——它确实两相都测到了。*/
     var np={gas:0,particle:0};
-    DB.forEach(function(r){if(np[r.phase]!=null)np[r.phase]++;});
-    IONDB.forEach(function(r){if(np[r.phase]!=null)np[r.phase]++;});
+    function tallyPhase(r){recPhases(r).forEach(function(p){if(np[p]!=null)np[p]++;});}
+    DB.forEach(tallyPhase);IONDB.forEach(tallyPhase);
     [{id:"",label:"Any"},{id:"gas",label:"Gas"},{id:"particle",label:"Particle"}]
     .forEach(function(o){
       var b=document.createElement("button");
@@ -1036,7 +1046,8 @@ document.getElementById("q").addEventListener("keydown",function(e){if(e.key==="
      ① 元素只取 C H O N Cl F S。其余元素（I、Br、Si…）只可能来自试剂离子，
         而这里枚举的是**扣掉试剂离子之后的中性分子**，所以不生成。
      ② 中性分子里的 N 必为硝基 −NO2 或硝酸酯基 −ONO2，S 必为 −HSO3 或 −HSO4，
-        因此氧必须够用而且有富余：**O > 2N + 3S**。
+        因此氧必须够用：**N=S=0 时不设限，否则 O ≥ 2N + 3S**（用户 2026-08-11 改定）。
+        没有 N 和 S 时这条是空条件，不该顺带把纯烃与氯代烃排除掉。
         （例外：NH4⁺ / C4H12N⁺ 等正模式试剂离子下测的可能是胺，N 是胺氮——见 amineN）
      ③ N ≤ 3、S ≤ 1、Cl ≤ 2。
      ④⑤ DBE 用大气化学定义（N 与 H 等效，见 rdbe），且 **0 ≤ DBE ≤ 9**。
@@ -1049,7 +1060,29 @@ document.getElementById("q").addEventListener("keydown",function(e){if(e.key==="
    离 H2O 很近，放开后一个名义质量附近会冒出大量含氟候选，把真正的 CHONS 候选挤下去。
    实测：C10H15NO8 附近 ±20 ppm，开 F 得 10 个候选、其中 4 个含 F；关掉后剩 6 个。
    需要时在 Advanced 里勾上。Cl 保留（海盐、工业源里是真实存在的）。*/
-var GEN_LIMITS={N:3,S:1,Cl:2,F:0,DBEmax:9};
+/* DBE 上限。用户 2026-08-10 给的是「空气中最高为 9（多环芳烃产物或一些二聚体）」。
+
+   ★ 2026-08-11 改成随碳数分段。起因：Cheng 2024 与 Garmash 2020 入库后，
+     43 条实测分子超出 9，DBE 落在 10–16，而它们**恰恰就是用户当初写的那两类**——
+     萘与甲基萘体系的 C20/C22 二聚体。
+
+     根子在于萘本身 DBE 就是 7，两个萘衍生单元加合必然落到 13–16。
+     上限 9 是按单萜（α-蒎烯 DBE 3、二聚体约 6）和单环芳烃校准的，
+     **多环芳烃的二聚体在结构上不可能满足**。
+
+   分段依据：二聚体是两个单体加合，所以它的上限应当是单体上限的两倍。
+   C ≥ 15 时判为二聚体区（单萜 C10 体系的二聚体是 C15–C20；这里只用碳数，
+   不需要知道前体，与 §4.8 里「程序不硬编码什么算二聚体」的约束不冲突——
+   那条说的是氮奇偶规则的适用范围，这里只是生成器的一个上界）。
+
+   ⚠ 这是我按证据提的方案，不是用户逐字定的。要改回单一上限就把 dbeMax 换成常数。*/
+/* dimerC=14 是实测定的：苯的二聚体是 C12、甲苯是 C14。取 15 会漏掉 C14H8O5（DBE 11，
+   m-二甲苯体系的实测二聚体）；取 14 救回它，而 C14 附近的候选只从 5 个增到 6 个。
+   再往下降到 13/12/11 不再有收益，只会平白放宽。*/
+var GEN_LIMITS={N:3,S:1,Cl:2,F:0,DBEmax:9,DBEmaxDimer:18,dimerC:14};
+function dbeCeiling(C){
+  return C>=GEN_LIMITS.dimerC?GEN_LIMITS.DBEmaxDimer:GEN_LIMITS.DBEmax;
+}
 function generate(targetNeutral,tolDa,opts){
   var amineN=!!(opts&&opts.amineN);
   var out=[],maxC=Math.min(40,Math.floor(targetNeutral/12)+1);
@@ -1063,9 +1096,19 @@ function generate(targetNeutral,tolDa,opts){
        if(base-tolDa>targetNeutral)continue;
        var maxO=Math.min(30,Math.floor((targetNeutral-base)/M.O)+1);
        for(var o=0;o<=maxO;o++){
-        /* ② 氧必须够 NO2/ONO2 与 HSO3/HSO4 用，且有富余。
-              胺模式下这条不适用——那时的 N 是胺氮，不带氧。*/
-        if(!amineN&&!(o>2*n+3*sx))continue;
+        /* ② 氧必须够 NO2/ONO2 与 HSO3/HSO4 用。
+              胺模式下这条不适用——那时的 N 是胺氮，不带氧。
+
+           ★ 2026-08-11 用户改定：**N=S=0 时不设限；否则 O ≥ 2N+3S**。
+             改了两处：
+             (a) N=S=0 时旧式 `o>0` 会把**所有无氧化合物一概排除**。
+                 这条规则的本意是「氧要够硝基/磺酸基用」，没有这两类基团时它是空条件，
+                 却误伤了纯烃与氯代烃：Li 2020 的 4 个母体萜烯（C5H8、C10H16、
+                 C15H24、C20H32）和 Masoud 2021 的 C10H10Cl2、C10H14Cl2 都是这么被挡掉的。
+             (b) 严格不等号 `>` 放宽成 `≥`。旧式要求「有富余」，
+                 但恰好用完的分子是真实存在的：甲磺酸 CH4O3S（O=3、S=1）、
+                 二硝酸酯 C7H8N2O4（O=4、N=2）都卡在等号上。*/
+        if(!amineN&&(n||sx)&&!(o>=2*n+3*sx))continue;
         if(amineN&&!(o>=3*sx))continue;
         var rest=targetNeutral-(base+o*M.O);
         if(rest<-tolDa)continue;
@@ -1075,7 +1118,7 @@ function generate(targetNeutral,tolDa,opts){
         var obj={C:c,H:h};
         if(n)obj.N=n; if(o)obj.O=o; if(sx)obj.S=sx; if(cl)obj.Cl=cl; if(f)obj.F=f;
         var dbe=rdbe(obj,{amineN:amineN});
-        if(dbe<0||dbe>L.DBEmax)continue;                  // ④⑤
+        if(dbe<0||dbe>dbeCeiling(c))continue;             // ④⑤（上限随碳数分段）
         if(Math.abs(dbe*2-Math.round(dbe*2))>1e-6)continue; // DBE 必为整数或半整数
         out.push({formula:hill(obj),atoms:obj,mass:fmass(obj),dbe:dbe,
                   radical:Math.abs(dbe-Math.round(dbe))>1e-9});
@@ -1184,7 +1227,7 @@ function evidenceRows(lit,pk){
       source: r.reference||"—",
       doi: r.doi||"",
       context: [r.environment,r.instrument].filter(Boolean).join(" · "),
-      phase: recPhase(r), prank: phaseRank(r),
+      phase: recPhase(r), phases: recPhases(r), prank: phaseRank(r),
       note: r.note||""
     });
   });
@@ -1206,7 +1249,7 @@ function evidenceRows(lit,pk){
       doi: "",
       context: [r.site,r.campaign,r.instrument,r.phase].filter(Boolean).join(" · "),
       peakfile: r.peaklist_file||"",
-      phase: recPhase(r), prank: phaseRank(r),
+      phase: recPhase(r), phases: recPhases(r), prank: phaseRank(r),
       cls: r["class"]||"organic",
       reference: r.reference||"",
       note: ""
@@ -1260,8 +1303,7 @@ function renderReported(lit,pk,label){
   rows.forEach(function(r){
     if(PHASE&&r.prank!==lastRank&&lastRank>=0){
       t.innerHTML+='<tr class="phsep"><td colspan="7">'+
-        (r.prank===2?('Other phase — measured in the '+(PHASE==="gas"?"particle":"gas")+
-                      ' phase, not '+PHASE)
+        (r.prank===2?('Not observed in the '+PHASE+' phase')
                     :'Phase not recorded')+'</td></tr>';
     }
     lastRank=r.prank;
@@ -1282,8 +1324,11 @@ function renderReported(lit,pk,label){
       : '<span style="color:var(--muted)">—</span>';
     var cls=(r.kind==="peak"&&r.cls&&r.cls!=="organic")
       ? ' <span class="cls '+r.cls+'">'+(CLS_LABEL[r.cls]||r.cls)+'</span>' : '';
-    var ph=r.phase
-      ? '<span class="ph ph-'+r.phase+'">'+escapeHtml(r.phase)+'</span>'
+    /* 多相时用 ph-both 这个类——不能把 "gas/particle" 直接拼进 class 名，
+       斜杠在 CSS 选择器里非法，规则会静默失配。*/
+    var pl=r.phases||[];
+    var ph=pl.length
+      ? '<span class="ph ph-'+(pl.length>1?"both":pl[0])+'">'+escapeHtml(pl.join(" / "))+'</span>'
       : '<span style="color:var(--muted)">—</span>';
     t.innerHTML+='<tr'+(r.prank===2?' class="offphase"':'')+'><td class="mono">'+pretty(r.ion)+cls+'</td>'+
       '<td class="mono">'+neu+'</td>'+
