@@ -425,6 +425,42 @@ tr.off td{opacity:.4}
 .dbtable td{padding:6px 8px;border-bottom:1px solid var(--line-soft)}
 .dbtable td.mono{font-family:var(--mono)}
 .scroller{max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:3px}
+/* ---------- Feature 1: 单峰原文化学释义卡片与峰表子来源徽章 ---------- */
+.vconsensus{margin-top:12px;padding:9px 12px;background:#F6F9FA;border-left:3px solid var(--accent);
+  border-radius:0 3px 3px 0;font-size:12.5px;line-height:1.55;color:var(--ink)}
+.vconsensus .vclab{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--accent);font-weight:600;margin-right:8px}
+table.rep{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+table.rep th{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.rep td{padding:8px 8px;vertical-align:top;border-bottom:1px solid var(--line-soft)}
+table.rep td.mono{font-family:var(--mono)}
+table.rep tr.r-main td,table.recs tr.r-main td{border-bottom:none;padding-bottom:4px}
+table.rep tr.r-interp td,table.recs tr.r-interp td{padding-top:2px;padding-bottom:12px;border-bottom:1px solid var(--line-soft)}
+.cls.contaminant{background:#FBEAE8;color:#B3261E}
+a.doi{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft);font-weight:500}
+a.doi:hover{border-bottom-color:var(--accent)}
+.loc{font-family:var(--mono);font-size:10.5px;color:var(--muted);background:#F3F6F8;
+  padding:1px 6px;border-radius:2px;margin-left:5px;display:inline-block;margin-top:2px}
+.ibox{background:#F8FAFB;border:1px solid var(--line-soft);border-left:3px solid var(--accent);
+  border-radius:0 4px 4px 0;padding:8px 12px;margin-top:2px}
+.ibox.series-box{border-left-color:#8A5A00;background:#FCF9F2}
+.ibox.range-box{border-left-color:#B3261E;background:#FDF7F6}
+.ibox.table-only{border-left-color:#B8C2C8;background:#F9FAFB}
+.ibox.peak-tags{border-left-color:#4A6136;background:#F7F9F5}
+.itop{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.iid{font-weight:650;color:var(--ink);font-size:13px}
+.iprec{font-family:var(--mono);font-size:11px;background:#E8F1F2;color:#0F5257;padding:1px 7px;border-radius:3px}
+.icaveat{font-family:var(--mono);font-size:10.5px;background:#FFF6E6;color:var(--warn);
+  border:1px solid #EAD8B8;padding:1px 7px;border-radius:3px}
+.imech{font-size:12.5px;color:#2C363C;line-height:1.5}
+.imuted{font-size:12px;color:var(--muted);font-style:italic;line-height:1.45}
+.taglab{font-family:var(--mono);font-size:10.5px;color:#4A6136;text-transform:uppercase;
+  letter-spacing:.06em;font-weight:600;margin-right:2px}
+.tagpill{font-family:var(--mono);font-size:11px;background:#fff;border:1px solid #CFD8C8;
+  color:#384B28;padding:1px 7px;border-radius:3px;display:inline-block;margin:2px 5px 2px 0}
+.audit-btn{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-left:auto;
+  cursor:help;border-bottom:1px dotted var(--line)}
 @media (max-width:640px){
   .wrap{padding:14px 12px 60px}
   .qfield input{font-size:17px}
@@ -780,21 +816,18 @@ var SEED=[];
 var DB=[];
 function load(){
   var raw=null;
-  /* 存储键在删除 seed 时从 v1 推到 v2：老浏览器里缓存着那 8 条示例，
-     只删代码不换键的话，用户打开文件仍会看到它们。换键让旧缓存自然失效。*/
-  try{raw=window.localStorage.getItem("cims_peaks_v2");}catch(e){}
+  /* 存储键推进至 v3：结构化释义列（basis/identity/precursor/mechanism/locator/caveat/audit_note）
+     上线后，让旧版 8/11 列缓存自然失效并重装随程序发布的完整数据库。*/
+  try{raw=window.localStorage.getItem("cims_peaks_v3");}catch(e){}
   if(raw){try{DB=JSON.parse(raw);}catch(e){DB=SEED.slice();}}
   else DB=SEED.slice();
   DB.forEach(function(r,i){
     if(!r.id)r.id="r"+i+"_"+Math.random().toString(36).slice(2,7);
-    /* 入库即规范化，这是「按元素数量匹配」的收口点。
-       不同文献写法各异（H2SO4 / H2O4S、C20H32O6(NO3)2 / C20H32N2O12 都是同一分子），
-       只要库里存的一律是 hill() 规范形式，后面所有比较才能安全地比字符串。*/
     r.formula=canon(r.formula);
   });
 }
 function save(){
-  try{window.localStorage.setItem("cims_peaks_v2",JSON.stringify(DB));}catch(e){}
+  try{window.localStorage.setItem("cims_peaks_v3",JSON.stringify(DB));}catch(e){}
   renderCount();
 }
 function renderCount(){
@@ -809,10 +842,6 @@ function renderCount(){
 }
 
 /* ---------------- 标签页 ---------------- */
-/* 维护用界面（Add records / Database / Data & updates）在**公开版里被构建脚本剥掉**，
-   见 tools/build_web.py 的 strip_maintenance_ui()。所以下面凡是碰这些元素的地方
-   都必须容忍它们不存在——代码两版共用，只是元素在不在。
-   MAINT 为 false 时，这些函数一律安静地什么都不做。*/
 var MAINT=!!document.getElementById("pane-a");
 function showTab(t){
   ["q","a","d","i"].forEach(function(k){
@@ -825,21 +854,10 @@ function showTab(t){
 
 /* ---------------- 筛选器 ---------------- */
 var filtR={},filtE={};
-/* 相态偏好："" = 不限、"gas"、"particle"。
-   ★ 它**不是过滤器**，是排序键。同一个分子在气相和颗粒相都可能被测到，
-   把异相记录藏起来会丢线索；排在后面并标注才是对的。*/
 var PHASE="";
 function savePhase(){try{window.localStorage.setItem("cims_phase",PHASE);}catch(e){}}
 function loadPhase(){try{PHASE=window.localStorage.getItem("cims_phase")||"";}catch(e){PHASE="";}}
-/* ---- 采样场景的两级分类（用户 2026-08-10 提的，为数据库变大做准备）----
-     第一级 setting：atmosphere / chamber —— 外场实测 还是 烟雾箱
-     第二级 biome：  urban / forest / marine —— 只对外场有意义
 
-   两个 CSV 里都有显式的 setting / biome 列，**显式列优先**。
-   下面的关键词推导只是兜底：别人导入自己的 CSV 时多半没有这两列，
-   总比整列空着、筛选器直接失效要好。**推导结果不如显式列可信，别倒过来用。**
-
-   加新场景时：先在 CSV 里补列，再考虑要不要往关键词表里加词。 */
 var SETTINGS=[{id:"atmosphere",label:"Atmosphere"},{id:"chamber",label:"Chamber"}];
 var BIOMES=[{id:"urban",label:"Urban"},{id:"forest",label:"Forest"},{id:"marine",label:"Marine"}];
 var SETTING_WORDS={chamber:/chamber|cloud|smog|flow ?tube|teflon bag/i,
@@ -848,47 +866,45 @@ var BIOME_WORDS={urban:/urban|city|beijing|shanghai|delhi|helsinki|megacity|road
                  forest:/forest|boreal|hyyti|smear|canopy|woodland|taiga/i,
                  marine:/marine|ocean|coastal|sea|ship|island|mace head/i};
 function recSetting(r){
-  var v=String(r.setting||"").toLowerCase();
+  var v=String(r.setting||"").toLowerCase().trim();
   if(v)return v;
   var t=[r.environment,r.site,r.campaign,r.instrument].filter(Boolean).join(" ");
   for(var k in SETTING_WORDS)if(SETTING_WORDS[k].test(t))return k;
   return "";
 }
 function recBiome(r){
-  var v=String(r.biome||"").toLowerCase();
+  var v=String(r.biome||"").toLowerCase().trim();
   if(v)return v;
-  if(recSetting(r)==="chamber")return "";        // 烟雾箱没有生态类型
+  if(recSetting(r)==="chamber")return "";
   var t=[r.environment,r.site,r.campaign].filter(Boolean).join(" ");
   for(var k in BIOME_WORDS)if(BIOME_WORDS[k].test(t))return k;
   return "";
 }
-/* 场景筛选是**真过滤**，与相态不同。
-   相态只排序，是因为同一个分子在两相都可能出现，异相记录仍有参考价值；
-   而「我要看外场数据」时，烟雾箱记录混进来就是干扰——那是不同的化学条件。
-   不勾则全给。*/
+function splitSceneVals(s){
+  return String(s||"").split(/[\/;,]+/).map(function(x){return x.trim();}).filter(Boolean);
+}
 var filtSet={},filtBio={};
 function passScene(r){
   var ks=Object.keys(filtSet);
-  if(ks.length&&!filtSet[recSetting(r)])return false;
+  if(ks.length){
+    var sv=splitSceneVals(recSetting(r));
+    if(!sv.some(function(v){return filtSet[v];}))return false;
+  }
   var kb=Object.keys(filtBio);
-  if(kb.length&&!filtBio[recBiome(r)])return false;
+  if(kb.length){
+    var bv=splitSceneVals(recBiome(r));
+    if(!bv.some(function(v){return filtBio[v];}))return false;
+  }
   return true;
 }
-/* 记录的相态：文献库读 phase 列，离子库读峰表自带的 phase。取不到就算 unknown，
-   永远排在中间——既不冒充同相，也不当成明确的异相。*/
-/* 相态可以是多个。很多分子**气相与颗粒相都测得到**，强行二选一等于造假；
-   Ye 2021 那类气/粒同步测量的文献就写成 `gas/particle`（用户 2026-08-11）。
-   分隔符接受 / ; , 与空白。*/
 function recPhases(r){
   return String(r.phase||"").toLowerCase().split(/[\/;,\s]+/).filter(Boolean);
 }
-function recPhase(r){return recPhases(r).join("/");}   // 显示用
+function recPhase(r){return recPhases(r).join("/");}
 function phaseRank(r){
   if(!PHASE)return 0;
   var ps=recPhases(r);
-  if(!ps.length)return 1;                       // 未标注 → 排中间
-  /* 只要该记录在所选相态里被观测到就算同相。
-     `gas/particle` 对 Gas 和 Particle 都算同相——它确实在两相都测到了。*/
+  if(!ps.length)return 1;
   return ps.indexOf(PHASE)>=0?0:2;
 }
 function selectedReagents(){
@@ -901,12 +917,9 @@ function loadReagentSel(){
   var raw=null;
   try{raw=window.localStorage.getItem("cims_reagents_v1");}catch(e){}
   if(raw){try{JSON.parse(raw).forEach(function(id){filtR[id]=1;});return;}catch(e){}}
-  filtR["NO3-"]=1;   // 首次使用的默认值
+  filtR["NO3-"]=1;
 }
 function buildFilters(){
-  /* 试剂离子既决定「用哪种试剂离子去还原」，也同时充当数据库筛选条件——
-     你用的是硝酸根，就只该看硝酸根的文献记录。所以这里列出全部试剂离子，
-     而不是只列库中已有记录的那几种（否则新试剂离子永远没法被选来还原）。*/
   var rHost=document.getElementById("fReagent");
   rHost.innerHTML="";
   var used={},uion={};
@@ -927,11 +940,9 @@ function buildFilters(){
     };
     rHost.appendChild(b);
   });
-  /* 相态：单选，默认 any。选定后同相记录排前面，异相排后面——不隐藏。*/
   var pHost=document.getElementById("fPhase");
   if(pHost){
     pHost.innerHTML="";
-    /* 一条 gas/particle 记录在两个计数里都要出现——它确实两相都测到了。*/
     var np={gas:0,particle:0};
     function tallyPhase(r){recPhases(r).forEach(function(p){if(np[p]!=null)np[p]++;});}
     DB.forEach(tallyPhase);IONDB.forEach(tallyPhase);
@@ -947,8 +958,6 @@ function buildFilters(){
       pHost.appendChild(b);
     });
   }
-  /* 场景两级。每个按钮带条数——数据库变大后，「这个筛选还剩多少」比标签本身更有用。
-     计数只统计当前试剂离子筛选下的可见记录，否则勾了 NO3⁻ 却看到含碘峰表的数字。*/
   function sceneRow(hostId,defs,store,getter){
     var host=document.getElementById(hostId);
     if(!host)return;
@@ -956,7 +965,7 @@ function buildFilters(){
     var cnt={};
     function tally(r){
       if(Object.keys(filtR).length&&!filtR[r.reagent])return;
-      var k=getter(r);if(k)cnt[k]=(cnt[k]||0)+1;
+      splitSceneVals(getter(r)).forEach(function(k){cnt[k]=(cnt[k]||0)+1;});
     }
     DB.forEach(tally);IONDB.forEach(tally);
     defs.forEach(function(o){
@@ -991,8 +1000,7 @@ function buildFilters(){
     eHost.appendChild(b);
   });
 }
-function passFilter(r){
-  if(Object.keys(filtR).length&&!filtR[r.reagent])return false;
+function passSceneEnv(r){
   if(!passScene(r))return false;
   var ks=Object.keys(filtE);
   if(ks.length){
@@ -1002,21 +1010,18 @@ function passFilter(r){
   }
   return true;
 }
+function passFilter(r){
+  if(Object.keys(filtR).length&&!filtR[r.reagent])return false;
+  return passSceneEnv(r);
+}
 
 /* ---------------- 输入识别 ---------------- */
-/* 电荷符号是「这是离子还是中性分子」的唯一依据（用户 2026-08-09 定的规则）。
-   parseFormula 会把符号剥掉，所以要在剥之前先把它读出来。*/
 function formulaCharge(s){
   s=String(s==null?"":s).replace(/\s+/g,"");
   if(/\^\d*[+⁺]$/.test(s)||/[+⁺]$/.test(s))return 1;
   if(/\^\d*[-⁻−–]$/.test(s)||/[-⁻−–]$/.test(s))return -1;
   return 0;
 }
-/* 输入分类。三条路，语义各不相同：
-     ion      带 + 或 − 的分子式 —— 谱图上读到的离子，中性分子由试剂离子确定性还原
-     neutral  不带符号的分子式   —— 当作中性分子，正向算出它在各试剂离子下的离子
-     mass     纯数字             —— **一律当作离子 m/z**，因为谱图上读到的就是离子
-   （用户 2026-08-09：「如果用户输入质量，八成是带着试剂离子的质谱实测数据」）*/
 function classify(s){
   s=(s||"").trim();
   if(!s)return {mode:"none"};
@@ -1029,9 +1034,6 @@ function classify(s){
   }
   return {mode:"bad"};
 }
-/* 边打字边告诉用户程序会怎么理解这串输入。
-   误解都发生在按 Search 之前——等结果出来才发现「它把我的离子式当中性分子了」，
-   已经晚了。所以把解释方式实时摆在输入框里。*/
 document.getElementById("q").addEventListener("input",function(){
   var c=classify(this.value),el=document.getElementById("qmode"),txt,warn=false;
   if(c.mode==="none")txt="awaiting input";
@@ -1046,47 +1048,6 @@ document.getElementById("q").addEventListener("input",function(){
 document.getElementById("q").addEventListener("keydown",function(e){if(e.key==="Enter")runQuery();});
 
 /* ---------------- 分子式生成器 ---------------- */
-/* 在给定中性质量附近枚举**大气化学上说得通**的分子式。
-
-   约束来自用户 2026-08-10。不加约束的话，一个名义质量附近有几百个"数学上成立"
-   的组成，绝大多数在大气里根本不存在，列出来只会淹没真正的候选。
-
-     ① 元素只取 C H O N Cl F S。其余元素（I、Br、Si…）只可能来自试剂离子，
-        而这里枚举的是**扣掉试剂离子之后的中性分子**，所以不生成。
-     ② 中性分子里的 N 必为硝基 −NO2 或硝酸酯基 −ONO2，S 必为 −HSO3 或 −HSO4，
-        因此氧必须够用：**N=S=0 时不设限，否则 O ≥ 2N + 3S**（用户 2026-08-11 改定）。
-        没有 N 和 S 时这条是空条件，不该顺带把纯烃与氯代烃排除掉。
-        （例外：NH4⁺ / C4H12N⁺ 等正模式试剂离子下测的可能是胺，N 是胺氮——见 amineN）
-     ③ N ≤ 3、S ≤ 1、Cl ≤ 2。
-     ④⑤ DBE 用大气化学定义（N 与 H 等效，见 rdbe），且 **0 ≤ DBE ≤ 9**。
-        上限 9 对应多环芳烃产物或部分二聚体，再高在大气中不现实。
-
-   已用库里 181 条文献记录验证：全部满足 ①–⑤。唯一落在约束外的是
-   D5 硅氧烷 C10H30O5Si5——那是仪器污染物，Riva 2019 报它正是为了说明它是伪信号，
-   本来就不该被算作大气分子。这反过来说明约束卡在了正确的位置。*/
-/* F 默认关掉。用户把 F 标为「杂质」——它在大气有机物里罕见，但质量 18.9984
-   离 H2O 很近，放开后一个名义质量附近会冒出大量含氟候选，把真正的 CHONS 候选挤下去。
-   实测：C10H15NO8 附近 ±20 ppm，开 F 得 10 个候选、其中 4 个含 F；关掉后剩 6 个。
-   需要时在 Advanced 里勾上。Cl 保留（海盐、工业源里是真实存在的）。*/
-/* DBE 上限。用户 2026-08-10 给的是「空气中最高为 9（多环芳烃产物或一些二聚体）」。
-
-   ★ 2026-08-11 改成随碳数分段。起因：Cheng 2024 与 Garmash 2020 入库后，
-     43 条实测分子超出 9，DBE 落在 10–16，而它们**恰恰就是用户当初写的那两类**——
-     萘与甲基萘体系的 C20/C22 二聚体。
-
-     根子在于萘本身 DBE 就是 7，两个萘衍生单元加合必然落到 13–16。
-     上限 9 是按单萜（α-蒎烯 DBE 3、二聚体约 6）和单环芳烃校准的，
-     **多环芳烃的二聚体在结构上不可能满足**。
-
-   分段依据：二聚体是两个单体加合，所以它的上限应当是单体上限的两倍。
-   C ≥ 15 时判为二聚体区（单萜 C10 体系的二聚体是 C15–C20；这里只用碳数，
-   不需要知道前体，与 §4.8 里「程序不硬编码什么算二聚体」的约束不冲突——
-   那条说的是氮奇偶规则的适用范围，这里只是生成器的一个上界）。
-
-   ⚠ 这是我按证据提的方案，不是用户逐字定的。要改回单一上限就把 dbeMax 换成常数。*/
-/* dimerC=14 是实测定的：苯的二聚体是 C12、甲苯是 C14。取 15 会漏掉 C14H8O5（DBE 11，
-   m-二甲苯体系的实测二聚体）；取 14 救回它，而 C14 附近的候选只从 5 个增到 6 个。
-   再往下降到 13/12/11 不再有收益，只会平白放宽。*/
 var GEN_LIMITS={N:3,S:1,Cl:2,F:0,DBEmax:9,DBEmaxDimer:18,dimerC:14};
 function dbeCeiling(C){
   return C>=GEN_LIMITS.dimerC?GEN_LIMITS.DBEmaxDimer:GEN_LIMITS.DBEmax;
@@ -1104,18 +1065,6 @@ function generate(targetNeutral,tolDa,opts){
        if(base-tolDa>targetNeutral)continue;
        var maxO=Math.min(30,Math.floor((targetNeutral-base)/M.O)+1);
        for(var o=0;o<=maxO;o++){
-        /* ② 氧必须够 NO2/ONO2 与 HSO3/HSO4 用。
-              胺模式下这条不适用——那时的 N 是胺氮，不带氧。
-
-           ★ 2026-08-11 用户改定：**N=S=0 时不设限；否则 O ≥ 2N+3S**。
-             改了两处：
-             (a) N=S=0 时旧式 `o>0` 会把**所有无氧化合物一概排除**。
-                 这条规则的本意是「氧要够硝基/磺酸基用」，没有这两类基团时它是空条件，
-                 却误伤了纯烃与氯代烃：Li 2020 的 4 个母体萜烯（C5H8、C10H16、
-                 C15H24、C20H32）和 Masoud 2021 的 C10H10Cl2、C10H14Cl2 都是这么被挡掉的。
-             (b) 严格不等号 `>` 放宽成 `≥`。旧式要求「有富余」，
-                 但恰好用完的分子是真实存在的：甲磺酸 CH4O3S（O=3、S=1）、
-                 二硝酸酯 C7H8N2O4（O=4、N=2）都卡在等号上。*/
         if(!amineN&&(n||sx)&&!(o>=2*n+3*sx))continue;
         if(amineN&&!(o>=3*sx))continue;
         var rest=targetNeutral-(base+o*M.O);
@@ -1126,8 +1075,8 @@ function generate(targetNeutral,tolDa,opts){
         var obj={C:c,H:h};
         if(n)obj.N=n; if(o)obj.O=o; if(sx)obj.S=sx; if(cl)obj.Cl=cl; if(f)obj.F=f;
         var dbe=rdbe(obj,{amineN:amineN});
-        if(dbe<0||dbe>dbeCeiling(c))continue;             // ④⑤（上限随碳数分段）
-        if(Math.abs(dbe*2-Math.round(dbe*2))>1e-6)continue; // DBE 必为整数或半整数
+        if(dbe<0||dbe>dbeCeiling(c))continue;
+        if(Math.abs(dbe*2-Math.round(dbe*2))>1e-6)continue;
         out.push({formula:hill(obj),atoms:obj,mass:fmass(obj),dbe:dbe,
                   radical:Math.abs(dbe-Math.round(dbe))>1e-9});
        }
@@ -1136,8 +1085,6 @@ function generate(targetNeutral,tolDa,opts){
     }
    }
   }
-  /* 先按质量偏差排，同偏差下闭壳层优先、含杂原子少的优先——
-     Cl/F 在大气有机物里少见，同等贴合度下不该压过纯 CHON 的候选。*/
   out.sort(function(a,b){
     var da=Math.abs(a.mass-targetNeutral),db=Math.abs(b.mass-targetNeutral);
     if(Math.abs(da-db)>1e-9)return da-db;
@@ -1149,37 +1096,29 @@ function generate(targetNeutral,tolDa,opts){
   return out.slice(0,30);
 }
 
-/* ================= 离子库（作者直供的实测峰表）=================
-   与文献库并列的第二个数据库，见 PeakLists/README.md。
-   存的是**离子式原样**，不还原——还原要逐条判 cluster/deprot，五千多条等于注入五千次推断。 */
+/* ================= 离子库（作者直供的实测峰表）================= */
 var IONDB=[];
 function loadIons(){
   var raw=null;
-  try{raw=window.localStorage.getItem("cims_ions_v1");}catch(e){}
+  /* 存储键推进至 v2：补齐 setting / biome / source_tags 三列后让旧缓存自然刷新 */
+  try{raw=window.localStorage.getItem("cims_ions_v2");}catch(e){}
   if(raw){try{IONDB=JSON.parse(raw);}catch(e){IONDB=[];}}
 }
 function saveIons(){
-  try{window.localStorage.setItem("cims_ions_v1",JSON.stringify(IONDB));}catch(e){}
+  try{window.localStorage.setItem("cims_ions_v2",JSON.stringify(IONDB));}catch(e){}
   renderCount();
 }
 
-/* 文献记录 → 它对应的离子式（**正算**）。
-   文献里中性式、试剂离子、检测方式三者齐备，唯一确定一个离子式，所以这是精确的。
-   反过来「由离子式还原中性式」分不开团簇与脱氢两支，是猜——
-   所以拿离子式匹配文献库要用正算，还原只在两个库都没命中时作为探索工具出场。*/
 function recIonAtoms(r){
   var a=parseFormula(r.formula); if(!a)return null;
   var d=(r.detection||"adduct");
   if(d==="deprot")return atomsSub(a,{H:1});
   if(d==="prot")  return atomsAdd(a,{H:1});
   var ra=REAGENT_ATOMS[r.reagent];
-  if(!ra)return null;                       // 该试剂离子不形成加合（如 H3O+）
+  if(!ra)return null;
   return atomsAdd(a,ra);
 }
 
-/* 勾选的试剂离子同样约束离子库：同一个离子式在不同试剂离子下是不同的分子。*/
-/* 场景筛选对两个库一视同仁——不然勾了 Atmosphere，文献行被滤了、峰表行还在，
-   同一份 report 里两套标准，用户没法读。*/
 function ionPassFilter(r){
   var ks=Object.keys(filtR);
   if(ks.length&&!filtR[r.reagent])return false;
@@ -1191,8 +1130,6 @@ function exactIonHits(qf){
     return r.ion_formula&&canon(r.ion_formula)===qf&&ionPassFilter(r);
   });
 }
-/* 按 m/z 查离子库。峰表里存着实测 m/z，输一个质量就该能问出
-   「哪些峰表在这个位置有峰」——包括那些拟合出了质量但没归属分子式的峰。*/
 function massIonHits(mz,tolDa){
   return IONDB.filter(function(r){
     if(!r.mz||!ionPassFilter(r))return false;
@@ -1207,25 +1144,96 @@ function exactLitHits(qf){
   });
 }
 
-var CLS_LABEL={organic:"organic",inorganic:"inorganic",reagent:"reagent ion",unassigned:"unassigned"};
+var CLS_LABEL={organic:"organic",inorganic:"inorganic",reagent:"reagent ion",
+               unassigned:"unassigned",contaminant:"contaminant"};
 
-/* Reported 区：一份统一的 report。
+/* Rima Master_RB 汇总表 28 个保留子峰表标签的可读英文释义（严格对照 _Rima_source_map.csv） */
+var SOURCE_TAG_LABELS={
+  "peakList_HOMs_Budapest_Lei.db":"Budapest HOMs (Lei Yao, nitrate LTOF)",
+  "Brean_etal_2020":"Barcelona urban HOMs (Brean et al., 2020)",
+  "PeakList_Raty_acp_2021":"Cyclohexene + O3/OH/NO (Räty et al., 2021)",
+  "peakList_Hyde_2016.db":"Hyytiälä boreal forest (SMEAR II, 2016)",
+  "peakList_APINENE.db":"α-Pinene oxidation (chamber, Quéléver)",
+  "peakList_limonene_with_dimers.db":"Limonene oxidation w/ dimers (chamber, Jokinen)",
+  "peakList_cloud7.db":"CERN CLOUD7 chamber",
+  "peakList_cloud7_no_homos.db":"CERN CLOUD7 chamber (HOMs removed)",
+  "peakList_a-pinene.db":"α-Pinene oxidation (chamber, Jokinen)",
+  "peakList__PNNL15_Chaos_contamination_peaks.db":"PNNL 2015 CHAOS background/contaminants",
+  "peakList_b-pinene.db":"β-Pinene oxidation (chamber, Jokinen)",
+  "peakList_amiinit_hom_teflon.db":"Amine + HOM Teflon background (Jokinen)",
+  "peakList_TOLUENE_cloud11_nox_with_nitro.db":"Toluene + NOx (CERN CLOUD11, Mao Xiao)",
+  "peakList_TMB_cloud11_nox_with_nitro.db":"1,3,5-Trimethylbenzene + NOx (CERN CLOUD11)",
+  "peakList_myrcene.db":"Myrcene oxidation (chamber, Jokinen)",
+  "peakList_isoprene.db":"Isoprene oxidation (chamber, Jokinen)",
+  "peakList_limonene_FULL_IfT.db":"Limonene oxidation (TROPOS/IfT Leipzig)",
+  "Kurten_acp_2016":"Rural central Germany NPF & HOMs (Kürten et al., 2016)",
+  "peakList_teflon_cloud7.db":"CERN CLOUD7 Teflon background",
+  "Molteni_acp_2016_ethylbenzene (C8H10) oxidation products":"Ethylbenzene + OH (Molteni et al., 2018)",
+  "Molteni_acp_2016_biphenyl (C12H10) oxidation products":"Biphenyl + OH (Molteni et al., 2018)",
+  "Molteni_acp_2016_benzene (C6H6) oxidation products":"Benzene + OH (Molteni et al., 2018)",
+  "Molteni_acp_2016_toluene (C7H8) oxidation products":"Toluene + OH (Molteni et al., 2018)",
+  "Molteni_acp_2016_naphthalene (C10H8) oxidation products":"Naphthalene + OH (Molteni et al., 2018)",
+  "Molteni_acp_2016_xylene (C8H10) oxidation products":"Xylene + OH (Molteni et al., 2018)",
+  "Molteni_acp_2016_mesitylene (C9H12) oxidation products":"Mesitylene + OH (Molteni et al., 2018)",
+  "peakList_teflon contaminants.db":"Teflon background contaminants (Jokinen)",
+  "peaklist_benzene_Olga.db":"Benzene multi-gen OH (Garmash et al., 2020)"
+};
+function parseSourceTags(s){
+  var out=[],seen={};
+  String(s||"").split(";").forEach(function(t){
+    t=t.trim();if(!t||seen[t])return;
+    seen[t]=1;
+    out.push({raw:t,label:SOURCE_TAG_LABELS[t]||t});
+  });
+  return out;
+}
+function fmtContributor(s){
+  return String(s||"—").split(" / ").map(function(p){
+    p=p.trim();return p==="文献"?"Published literature":p;
+  }).join(" / ");
+}
 
-   用户 2026-08-09：「无论是文献里的匹配还是 peaklist（均为离子模式），可以统一做一个
-   report，不用区分，只需要表明是文献还是某个用户提供的 peaklist 即可。」
+/* 单峰化学释义条（主从双层卡片的下层 .ibox），统一供 renderReported / renderHit / addRecord 预览调用 */
+function renderInterpStrip(row){
+  if(!row)return "";
+  if(row.kind==="peak"){
+    var tags=row.tags||parseSourceTags(row.source_tags||(row.rec&&row.rec.source_tags));
+    if(!tags.length)return "";
+    return '<div class="ibox peak-tags"><div class="itop"><span class="taglab">Measured sub-lists ('+tags.length+'):</span>'+
+      tags.map(function(t){return '<span class="tagpill" title="'+escapeHtml(t.raw)+'">'+escapeHtml(t.label)+'</span>';}).join("")+
+      '</div></div>';
+  }
+  var r=row.rec||row;
+  var pv=provenance(r);
+  var basis=String(r.basis||"").toLowerCase()||(pv?(pv.k==="box"?"range":"series"):"explicit");
+  var ident=r.identity||"",prec=r.precursor||"",mech=r.mechanism||"",cav=r.caveat||"",aud=r.audit_note||"";
+  if(!ident&&!prec&&!mech&&!cav){
+    var legacy=(r.note||"").replace(/^(?:series-expanded|range-expanded|系列展开|范围展开)\s*:\s*/i,"").trim();
+    if(!legacy)return "";
+    mech=legacy;
+  }
+  var bcls=(basis==="series")?" series-box":(basis==="range"?" range-box":(basis==="table_only"?" table-only":""));
+  var top=[];
+  if(ident)top.push('<span class="iid">'+escapeHtml(ident)+'</span>');
+  else if(basis==="table_only")top.push('<span class="imuted">Formula reported in peak list (no compound name assigned)</span>');
+  if(prec)top.push('<span class="iprec">'+escapeHtml(prec)+'</span>');
+  if(cav)top.push('<span class="icaveat">&#9888; '+escapeHtml(cav)+'</span>');
+  if(aud)top.push('<span class="audit-btn" title="'+escapeHtml(aud)+'">audit info &#9432;</span>');
+  var mcls=(basis==="table_only"&&!ident)?"imuted":"imech";
+  return '<div class="ibox'+bcls+'">'+
+    (top.length?'<div class="itop">'+top.join("")+'</div>':'')+
+    (mech?'<div class="'+mcls+'">'+escapeHtml(mech)+'</div>':'')+
+    '</div>';
+}
 
-   合并的理由是对的：两者都是**离子模式的实测观测**，区别只在于谁报的。
-   以前拆成 From publication / From peak lists 两块，读者要在两张表之间来回对照
-   同一个分子的证据，反而看不清「到底有多少人见过这个峰」。
-
-   每行必须标明来源。文献行给出 DOI 链接，峰表行给出贡献者与峰表文件——
-   这是可追溯性的底线，合并的是版面，不是出处。*/
+/* Reported 区：一份统一的实测证据表（文献行 + 峰表行）。*/
 function evidenceRows(lit,pk){
   var rows=[];
   lit.forEach(function(r){
     var a=parseFormula(r.formula),ia=recIonAtoms(r);
     rows.push({
       kind:"lit",
+      rec: r,
       ion: ia?hill(ia):"—",
       neutral: r.formula,
       neutralDerived:false,
@@ -1234,6 +1242,7 @@ function evidenceRows(lit,pk){
       detection: r.detection,
       source: r.reference||"—",
       doi: r.doi||"",
+      locator: r.locator||"",
       context: [r.environment,r.instrument].filter(Boolean).join(" · "),
       phase: recPhase(r), phases: recPhases(r), prank: phaseRank(r),
       note: r.note||""
@@ -1242,24 +1251,25 @@ function evidenceRows(lit,pk){
   pk.forEach(function(r){
     var ia=r.ion_formula?parseFormula(r.ion_formula):null;
     var ra=REAGENT_ATOMS[r.reagent];
-    /* 峰表存的是离子式（作者拟合时的归属）。中性式由「减掉试剂离子」得到——
-       和离子式路径同一个确定性运算，不是新的推断。减不掉就留空，不猜。*/
     var neu=(ia&&ra&&atomsHasAll(ia,ra))?hill(atomsSub(ia,ra)):"";
     rows.push({
       kind:"peak",
+      rec: r,
       ion: r.ion_formula||"—",
       neutral: neu,
       neutralDerived:true,
       mz: r.mz||"—",
       reagent: r.reagent,
       detection: "",
-      source: r.contributor||"—",
+      source: fmtContributor(r.contributor),
       doi: "",
-      context: [r.site,r.campaign,r.instrument,r.phase].filter(Boolean).join(" · "),
+      locator: "",
+      context: [r.site,r.campaign,r.instrument].filter(Boolean).join(" · "),
       peakfile: r.peaklist_file||"",
       phase: recPhase(r), phases: recPhases(r), prank: phaseRank(r),
       cls: r["class"]||"organic",
       reference: r.reference||"",
+      tags: parseSourceTags(r.source_tags),
       note: ""
     });
   });
@@ -1281,9 +1291,6 @@ function renderReported(lit,pk,label){
   body.className="ebody";
   body.style.padding="0";
 
-  /* 概览行：说清楚这些证据由几个来源提供。
-     单一贡献者的峰表之间可能同源，不构成独立确认——这一点必须写出来，
-     否则「出现在 4 个峰表里」会被读成 4 次独立验证。*/
   var papers={},contribs={};
   rows.forEach(function(r){ (r.kind==="lit"?papers:contribs)[r.source]=1; });
   var np=Object.keys(papers).length,nc=Object.keys(contribs).length;
@@ -1293,38 +1300,38 @@ function renderReported(lit,pk,label){
   var p=document.createElement("div");
   p.className="eline";
   p.innerHTML='<b>'+rows.length+'</b> record'+(rows.length>1?'s':'')+' from '+parts.join(" and ")+
-    '. All are ion-mode observations; literature rows are matched by forward-computing '+
-    'each record\'s ion from its neutral formula, reagent ion and detection mode — exact, not inferred.'+
+    '. Literature rows pair forward-computed ion stoichiometry with the <b>chemical assignment, precursor system, and mechanistic role</b> stated in each source paper.'+
     (nc===1?'<br><span style="color:#8A5A00">Peak lists from a single contributor may share a common ancestor — that is not independent confirmation. Agreement <i>across</i> contributors is the strong evidence.</span>':'');
   body.appendChild(p);
 
-  /* 同相优先。异相不隐藏，只排到后面并插一条分隔说明——
-     同一个分子在两相都出现本身就是有用的信息。*/
   rows.sort(function(a,b){
     if(a.prank!==b.prank)return a.prank-b.prank;
     return (a.kind===b.kind)?0:(a.kind==="lit"?-1:1);
   });
   var t=document.createElement("table");
-  t.innerHTML='<tr><th>Ion</th><th>Neutral</th><th>m/z</th><th>Phase</th><th>Reagent</th>'+
-              '<th>Source</th><th>Context</th></tr>';
+  t.className="rep";
+  var htmlRows=['<tr><th>Ion</th><th>Neutral</th><th>m/z</th><th>Phase</th><th>Reagent</th>'+
+                '<th>Source &amp; Locator</th><th>Scene &amp; Instrument</th></tr>'];
   var lastRank=-1;
   rows.forEach(function(r){
     if(PHASE&&r.prank!==lastRank&&lastRank>=0){
-      t.innerHTML+='<tr class="phsep"><td colspan="7">'+
+      htmlRows.push('<tr class="phsep"><td colspan="7">'+
         (r.prank===2?('Not observed in the '+PHASE+' phase')
-                    :'Phase not recorded')+'</td></tr>';
+                    :'Phase not recorded')+'</td></tr>');
     }
     lastRank=r.prank;
     var R=reagent(r.reagent);
+    var pv=(r.kind==="lit")?provenance(r.rec):null;
     var src;
     if(r.kind==="lit"){
-      src='<span class="src lit">Literature</span> '+provTag(r.note)+
-          (r.doi?'<a href="https://doi.org/'+r.doi+'" target="_blank" rel="noopener">'+
-                 escapeHtml(r.source)+'</a>':escapeHtml(r.source));
+      src='<span class="src lit">Literature</span> '+provTag(r.rec,true)+
+          (r.doi?'<a class="doi" href="'+doiHref(r.doi)+'" target="_blank" rel="noopener">'+
+                 escapeHtml(r.source)+'</a>':escapeHtml(r.source))+
+          (r.locator?' <span class="loc">'+escapeHtml(r.locator)+'</span>':'');
     }else{
       src='<span class="src peak">Peak list</span> '+escapeHtml(r.source)+
-          (r.peakfile?'<br><span style="color:var(--muted)">'+escapeHtml(r.peakfile)+'</span>':'')+
-          (r.reference?'<br><span style="color:var(--muted)">'+escapeHtml(r.reference)+'</span>':'');
+          (r.peakfile?'<br><span style="color:var(--muted);font-size:11.5px">'+escapeHtml(r.peakfile)+'</span>':'')+
+          (r.reference?'<br><span style="color:var(--muted);font-size:11.5px">'+escapeHtml(r.reference)+'</span>':'');
     }
     var neu=r.neutral
       ? (r.neutralDerived?'<span style="color:var(--muted)" title="Derived by subtracting the reagent ion from the assigned ion formula">'+pretty(r.neutral)+'</span>'
@@ -1332,22 +1339,32 @@ function renderReported(lit,pk,label){
       : '<span style="color:var(--muted)">—</span>';
     var cls=(r.kind==="peak"&&r.cls&&r.cls!=="organic")
       ? ' <span class="cls '+r.cls+'">'+(CLS_LABEL[r.cls]||r.cls)+'</span>' : '';
-    /* 多相时用 ph-both 这个类——不能把 "gas/particle" 直接拼进 class 名，
-       斜杠在 CSS 选择器里非法，规则会静默失配。*/
     var pl=r.phases||[];
     var ph=pl.length
       ? '<span class="ph ph-'+(pl.length>1?"both":pl[0])+'">'+escapeHtml(pl.join(" / "))+'</span>'
       : '<span style="color:var(--muted)">—</span>';
-    t.innerHTML+='<tr'+(r.prank===2?' class="offphase"':'')+'><td class="mono">'+pretty(r.ion)+cls+'</td>'+
+    var strip=renderInterpStrip(r);
+    var rCls=[];
+    if(strip)rCls.push("r-main");
+    if(pv)rCls.push(pv.k==="box"?"derived box":"derived");
+    if(r.prank===2)rCls.push("offphase");
+    htmlRows.push('<tr'+(rCls.length?' class="'+rCls.join(" ")+'"':'')+'><td class="mono">'+pretty(r.ion)+cls+'</td>'+
       '<td class="mono">'+neu+'</td>'+
       '<td class="mono">'+escapeHtml(String(r.mz))+'</td>'+
       '<td>'+ph+'</td>'+
-      '<td class="mono" style="color:'+R.color+'">'+escapeHtml(r.reagent)+
-        (r.detection&&r.detection!=="adduct"?'<br><span style="color:var(--muted)">'+
+      '<td class="mono" style="color:'+R.color+';font-weight:600">'+escapeHtml(r.reagent)+
+        (r.detection&&r.detection!=="adduct"?'<br><span style="color:var(--muted);font-weight:400;font-size:11px">'+
           escapeHtml(DET_LABEL[r.detection]||r.detection)+'</span>':'')+'</td>'+
       '<td>'+src+'</td>'+
-      '<td style="color:var(--muted)">'+escapeHtml(r.context||"—")+'</td></tr>';
+      '<td style="color:var(--muted)">'+escapeHtml(r.context||"—")+'</td></tr>');
+    if(strip){
+      var iCls=["r-interp"];
+      if(pv)iCls.push(pv.k==="box"?"derived box":"derived");
+      if(r.prank===2)iCls.push("offphase");
+      htmlRows.push('<tr class="'+iCls.join(" ")+'"><td></td><td colspan="6">'+strip+'</td></tr>');
+    }
   });
+  t.innerHTML=htmlRows.join("");
   body.appendChild(t);
 
   var w=document.createElement("div");
@@ -1594,6 +1611,7 @@ function renderWarnings(list){
   });
 }
 
+function doiHref(d){return "https:"+"//doi.org/"+escapeHtml(d);}
 function runQueryInner(){
   var c=classify(document.getElementById("q").value);
   var ppm=parseFloat(document.getElementById("ppm").value)||20;
@@ -1612,12 +1630,10 @@ function runQueryInner(){
   }
 
   var iv=interpret(c,ppm);
+  var qIonStr=(iv.route==="ion")?iv.ionStr:null;
   renderWarnings(iv.warnings);
 
-  /* 第一优先：**零推断**的直接命中。
-       离子式输入 → 拿离子式在两个库里比（文献记录的离子由其中性式正向算出，是精确的）
-       中性式输入 → 拿中性式比文献库，拿正向算出的离子式比离子库
-       质量输入   → 拿 m/z 比离子库实测值，比文献记录正向算出的离子 m/z */
+  /* 第一优先：**零推断**的直接命中。*/
   var dLit=[],dPk=[],repLabel=iv.label;
   if(iv.route==="ion"){
     dLit=exactLitHits(iv.ionStr);dPk=exactIonHits(iv.ionStr);
@@ -1651,7 +1667,6 @@ function runQueryInner(){
   /* 其次是还原／正向计算的呈现。*/
   var restoredFrom=null,candList=[];
   if(iv.route==="ion"&&selectedReagents().length){
-    /* 主答案在前、次要解释在后。次要解释是折叠的（用户 2026-08-09 的选择）。*/
     var seen={};
     iv.restos.forEach(function(rr){
       [["primary",rr.primary],["secondary",rr.secondary]].forEach(function(pair){
@@ -1668,7 +1683,6 @@ function runQueryInner(){
         return canon(r.formula)===cd.formula&&cd.reagents.indexOf(r.reagent)>=0&&passFilter(r);
       });
     });
-    /* 主答案永远排在次要解释之前；同一层内闭壳层优先。 */
     candList.sort(function(a,b){
       if(a.tier!==b.tier)return a.tier==="primary"?-1:1;
       if(a.radical!==b.radical)return a.radical?1:-1;
@@ -1686,13 +1700,9 @@ function runQueryInner(){
   }else if(iv.route==="mass"){
     renderMassInterp(iv,c,ppm);
   }
-  renderVerdict(iv.route==="ion"?iv.ionStr:null,candList,restoredFrom,dLit,dPk,repLabel);
 
-  var groups={};   // formula -> {records:[], via:{}, atoms, mass}
+  var groups={};
   function push(rec,via){
-    /* 分组键必须用规范形式：若库里混进未规范化的写法，
-       裸用 rec.formula 会让同一个分子分裂成两组，
-       并在结果里凭空多出一条标着「库中无记录」的幽灵条目。*/
     var k=canon(rec.formula);
     var g=groups[k]||(groups[k]={records:[],via:{},atoms:parseFormula(k),ghost:false});
     g.records.push(rec);g.via[via]=1;
@@ -1702,24 +1712,17 @@ function runQueryInner(){
   if(c.mode==="formula"){
     var qf=hill(c.value);
     target=fmass(c.value);anchorNominal=Math.round(target);
-    DB.filter(passFilter).forEach(function(r){ if(canon(r.formula)===qf)push(r,"formula"); });
+    /* 同一中性分子的跨试剂离子记录不受 filtR 限制（仍服从场景/环境筛选 passSceneEnv），
+       使单一试剂离子勾选下仍能展示跨试剂离子互证记录。 */
+    DB.filter(passSceneEnv).forEach(function(r){ if(canon(r.formula)===qf)push(r,"formula"); });
     if(!groups[qf])groups[qf]={records:[],via:{formula:1},atoms:c.value,ghost:true};
-    /* 同名义质量干扰（§4.2）。
-       正确定义：**在同一次测量里，还有哪些分子也落在我读到的那个 m/z 上**。
-       所以比的是「库中记录在其自身试剂离子下的离子 m/z」对「查询峰的名义 m/z」。
-
-       曾经写成拿查询分子去配 REAGENTS 里的**每一种**试剂离子，看是否撞上库中记录的离子 m/z。
-       那会产生纯粹的假阳性：查 C10H15NO8（277.08）时，277.08 + Br⁻ = 356 撞上了
-       C10H14O10 的硝酸根加合 356.047，于是把它列成干扰——可用户做的是硝酸根 CIMS，
-       他这个分子的溴加合物根本不存在。同理 277.08 + I⁻ = 404 撞上 C10H14O13。
-       两条都不是真干扰，而且质量差 0.047 Da，任何分辨率下都分得开。*/
+    /* 同名义质量干扰仍在当前勾选试剂离子下比对（passFilter） */
     var qIonNominal=restoredFrom?Math.round(fmass(parseFormula(restoredFrom.ion)))
                                 :anchorNominal;
     DB.filter(passFilter).forEach(function(r){
       var a=parseFormula(r.formula);if(!a)return;
       var f=hill(a);if(f===qf)return;
       var nIon=Math.round(ionMz(fmass(a),r.reagent,r.detection));
-      /* 没走还原时（直接输中性式），中性质量同名义也算干扰 */
       var nNeu=Math.round(fmass(a));
       if(nIon===qIonNominal||(!restoredFrom&&nNeu===anchorNominal))push(r,"interference");
     });
@@ -1738,6 +1741,9 @@ function runQueryInner(){
     });
   }
 
+  var crossLit=(c.mode==="formula"&&groups[hill(c.value)])?groups[hill(c.value)].records:[];
+  renderVerdict(qIonStr,candList,restoredFrom,dLit,dPk,repLabel,crossLit);
+
   // 生成数据库以外的可能分子式
   var gen=[];
   if(document.getElementById("optGen").checked&&anchorNominal!==null){
@@ -1747,12 +1753,6 @@ function runQueryInner(){
           .filter(function(g){return !groups[g.formula];});
   }
 
-  /* ---- 标尺 ----
-     横轴锚在**用户实际读到的那个 m/z** 上。输入的是离子式时，那就是离子的名义质量，
-     不是还原出的中性质量——标尺要回答的是「我这台仪器分辨率下这个峰跟邻峰分得开吗」，
-     而用户面对的峰在离子的位置。曾经锚在中性质量上（还原后 c 被替换所致），
-     结果所有库中记录的离子 m/z 都被 round(mz)!==anchor 过滤掉，
-     标尺上一根带试剂离子颜色的实线都不剩，功能形同虚设。*/
   var axis=null,rulerAnchor=anchorNominal;
   if(restoredFrom){
     axis={reagent:restoredFrom.cand.reagents[0],detection:restoredFrom.cand.det};
@@ -1760,10 +1760,6 @@ function runQueryInner(){
   }
   drawRuler(groups,gen,rulerAnchor,c,axis);
 
-  /* ---- 结果 ----
-     分两拨：直接对应查询式的一拨照常展开；同名义质量干扰与生成候选折进 <details>。
-     折叠不等于藏起来——它们仍**整根画在标尺上**，扫干扰改用标尺而不是翻卡片堆。
-     这么做是因为字号最大的曾经是最不可信的内容（干扰项与生成候选和真命中同样式）。*/
   var keys=Object.keys(groups).sort(function(a,b){
     var A=groups[a],B=groups[b];
     var pa=(A.via.formula?0:A.via.ion?1:A.via.neutral?1:2);
@@ -1773,31 +1769,32 @@ function runQueryInner(){
   });
   var primary=keys.filter(function(k){return !groups[k].via.interference;});
   var interf =keys.filter(function(k){return  groups[k].via.interference;});
-  var nRec=0;keys.forEach(function(k){nRec+=groups[k].records.length;});
-  var nPrimRec=0;primary.forEach(function(k){nPrimRec+=groups[k].records.length;});
 
-  /* 与 Reported 区重复的记录不再重复列一遍。
-     Reported 已经按「输入的那个离子式」列全了命中；这里只保留**它列不到**的部分——
-     同一个中性分子在**别的试剂离子或检测方式**下被检出。那是跨仪器查询的核心价值，
-     Reported 因为只匹配单一离子式而看不见它。 */
-  if(qIonStr){
+  var shownLitIds={};
+  dLit.forEach(function(r){if(r.id)shownLitIds[r.id]=1;});
+  if(qIonStr||dLit.length){
     primary.forEach(function(k){
       var g=groups[k];
       g.records=g.records.filter(function(r){
-        var ia=recIonAtoms(r);
-        return !(ia&&hill(ia)===qIonStr);
+        if(r.id&&shownLitIds[r.id])return false;
+        if(qIonStr){
+          var ia=recIonAtoms(r);
+          if(ia&&hill(ia)===qIonStr)return false;
+        }
+        return true;
       });
     });
     primary=primary.filter(function(k){return groups[k].records.length;});
-    nRec=0;primary.forEach(function(k){nRec+=groups[k].records.length;});
   }
+  var nRec=0;primary.forEach(function(k){nRec+=groups[k].records.length;});
+  interf.forEach(function(k){nRec+=groups[k].records.length;});
 
   if(primary.length){
     var head=document.createElement("div");
     head.className="rescount";
-    head.innerHTML=qIonStr
+    head.innerHTML=(qIonStr||dLit.length)
       ? "Also detected as another ion <span style=\"text-transform:none;letter-spacing:0\">— same neutral formula, different reagent ion or detection mode</span>"
-      : "Records for "+pretty(restoredFrom?restoredFrom.cand.formula:"")+"";
+      : "Records for "+pretty(restoredFrom?restoredFrom.cand.formula:(c.mode==="formula"?hill(c.value):""));
     res.appendChild(head);
   }
 
@@ -1817,7 +1814,6 @@ function runQueryInner(){
     res.appendChild(renderHit(k,g,c));
   });
 
-  /* 干扰与生成候选：默认折叠，摘要行说明数量，展开后用更小的字号 */
   if(interf.length||gen.length){
     var det=document.createElement("details");
     det.className="secondary";
@@ -1846,7 +1842,7 @@ function renderHit(formula,g,c){
   box.className="hit"+(g.records.length?"":" ghost");
   var oc=atoms.C?((atoms.O||0)/atoms.C):0, hc=atoms.C?((atoms.H||0)/atoms.C):0;
   var badge="";
-  if(g.via.formula&&g.records.length)badge='<span class="badge">Query formula</span>';
+  if(g.via.formula&&g.records.length)badge='<span class="badge">Same neutral formula</span>';
   else if(g.via.interference)badge='<span class="badge g">Same nominal mass</span>';
   else if(g.via.generated)badge='<span class="badge g">No record</span>';
   else if(g.via.ion&&!g.via.neutral)badge='<span class="badge">Matched on ion m/z</span>';
@@ -1880,39 +1876,79 @@ function renderHit(formula,g,c){
   sum.innerHTML=provSummary(g.records);
   box.appendChild(sum);
 
+  var colCount=MAINT?6:5;
   var t=document.createElement("table");
   t.className="recs";
-  t.innerHTML='<tr><th>Reagent</th><th>Detected ion / m&#8202;/&#8202;z</th><th>Instrument</th><th>Environment</th><th>Reference</th><th>Assignment</th><th></th></tr>';
+  t.innerHTML='<tr><th>Reagent</th><th>Detected ion / m&#8202;/&#8202;z</th><th>Phase</th><th>Reference &amp; Locator</th><th>Scene &amp; Instrument</th>'+(MAINT?'<th></th>':'')+'</tr>';
+  var htmlRows=[];
   g.records.forEach(function(r){
     var R=reagent(r.reagent),mz=ionMz(neu,r.reagent,r.detection);
-    var tr=document.createElement("tr");
-    var pv=provenance(r.note);
-    if(pv)tr.className="derived"+(pv.k==="box"?" box":"");
-    var refHtml=(r.doi
-      ? '<a href="https://doi.org/'+r.doi+'" target="_blank" rel="noopener">'+escapeHtml(r.reference)+'</a>'
-      : escapeHtml(r.reference||"—"));
-    refHtml=provTag(r.note)+refHtml;
-    tr.innerHTML=
-      '<td><span class="rion" style="color:'+R.color+'">'+r.reagent+'</span></td>'+
-      '<td class="mz">'+mz.toFixed(4)+'<br><small>'+ionLabel(formula,r.reagent,r.detection)+'</small></td>'+
-      '<td class="note">'+escapeHtml(r.instrument||"—")+'</td>'+
-      '<td class="env">'+escapeHtml(r.environment||"—")+'</td>'+
-      '<td class="ref">'+refHtml+'</td>'+
-      '<td class="note">'+escapeHtml((r.note||"").split("｜")[0])+'</td>'+
-      '<td class="rowact"><button title="Delete this record" onclick="delRecord(\''+r.id+'\')">del</button></td>';
-    t.appendChild(tr);
+    var pv=provenance(r);
+    var dcls=pv?(" derived"+(pv.k==="box"?" box":"")):"";
+    var pl=recPhases(r);
+    var ph=pl.length
+      ? '<span class="ph ph-'+(pl.length>1?"both":pl[0])+'">'+escapeHtml(pl.join(" / "))+'</span>'
+      : '<span style="color:var(--muted)">—</span>';
+    var refHtml=provTag(r)+(r.doi
+      ? '<a class="doi" href="'+doiHref(r.doi)+'" target="_blank" rel="noopener">'+escapeHtml(r.reference)+'</a>'
+      : escapeHtml(r.reference||"—"))+(r.locator?' <span class="loc">'+escapeHtml(r.locator)+'</span>':'');
+    var scene=[r.environment,r.instrument].filter(Boolean).join(" · ")||"—";
+    var strip=renderInterpStrip({kind:"lit",rec:r});
+    htmlRows.push(
+      '<tr class="'+(strip?'r-main':'')+dcls+'">'+
+        '<td><span class="rion" style="color:'+R.color+'">'+escapeHtml(r.reagent)+'</span></td>'+
+        '<td class="mz">'+mz.toFixed(4)+'<br><small>'+escapeHtml(ionLabel(formula,r.reagent,r.detection))+'</small></td>'+
+        '<td>'+ph+'</td>'+
+        '<td class="ref">'+refHtml+'</td>'+
+        '<td class="env" style="color:var(--muted)">'+escapeHtml(scene)+'</td>'+
+        (MAINT?'<td class="rowact"><button title="Delete this record" onclick="delRecord(\''+r.id+'\')">del</button></td>':'')+
+      '</tr>'
+    );
+    if(strip){
+      htmlRows.push('<tr class="r-interp'+dcls+'"><td></td><td colspan="'+(colCount-1)+'">'+strip+'</td></tr>');
+    }
   });
+  t.innerHTML+=htmlRows.join("");
   box.appendChild(t);
   return box;
 }
-/* 证据构成带。**只报可核验的事实，不给结论、不给置信度评分。**
-   用户（本领域研究者）明确要求：不替他做化学判断。所以这里写的是
-   「2 篇文献 / 4 个峰表 / 1 位贡献者 / 其中 1 条为系列展开」这类可以自己去核的数字，
-   而不是「这就是 C10H15NO8」。库小的时候，一个结论比没有结论更危险。 */
-function renderVerdict(qIonStr,cands,restoredFrom,lit,pk,massLabel){
+/* 跨文献事实摘要：严格提取已命中论文记录的 identity / precursor / reagent / caveat，零主观外推 */
+function buildConsensusHtml(lit,crossLit){
+  var pool=[],seen={};
+  (lit||[]).concat(crossLit||[]).forEach(function(r){
+    if(!r)return;
+    var k=r.id||(r.formula+"|"+r.reagent+"|"+r.reference);
+    if(seen[k])return;seen[k]=1;
+    pool.push(r);
+  });
+  if(!pool.length)return "";
+  var forms={};pool.forEach(function(r){if(r.formula)forms[r.formula]=1;});
+  if(Object.keys(forms).length>1)return "";
+
+  var ids=[],idSeen={},precs=[],precSeen={},reags={},cavs=[],cavSeen={};
+  pool.slice().sort(function(a,b){
+    return (a.basis==="explicit"?0:1)-(b.basis==="explicit"?0:1);
+  }).forEach(function(r){
+    if(r.identity&&!idSeen[r.identity]&&ids.length<3){idSeen[r.identity]=1;ids.push(r.identity);}
+    if(r.precursor&&!precSeen[r.precursor]&&precs.length<3){precSeen[r.precursor]=1;precs.push(r.precursor);}
+    if(r.reagent)reags[r.reagent]=1;
+    if(r.caveat&&!cavSeen[r.caveat]&&cavs.length<2){cavSeen[r.caveat]=1;cavs.push(r.caveat);}
+  });
+  var segs=[];
+  if(ids.length)segs.push('<b>'+ids.map(escapeHtml).join(" / ")+'</b>');
+  if(precs.length)segs.push('Precursor system: '+precs.map(escapeHtml).join("; "));
+  var rlist=Object.keys(reags);
+  if(rlist.length>1)segs.push('Confirmed across <b>'+rlist.length+' reagent ions</b> ('+rlist.map(escapeHtml).join(", ")+')');
+  if(cavs.length)segs.push('<span style="color:var(--warn)">&#9888; '+cavs.map(escapeHtml).join("; ")+'</span>');
+  if(!segs.length)return "";
+  return '<div class="vconsensus"><span class="vclab">Literature summary</span>'+segs.join(" · ")+'</div>';
+}
+
+/* 证据构成带。**只报可核验的事实，不给结论、不给置信度评分。** */
+function renderVerdict(qIonStr,cands,restoredFrom,lit,pk,massLabel,crossLit){
   var box=document.getElementById("verdict");
   box.innerHTML="";
-  lit=lit||[];pk=pk||[];
+  lit=lit||[];pk=pk||[];crossLit=crossLit||[];
   if(!qIonStr&&!massLabel)return;
   var direct=(pk.length||lit.length);
 
@@ -1925,31 +1961,37 @@ function renderVerdict(qIonStr,cands,restoredFrom,lit,pk,massLabel){
     var forms={};lit.forEach(function(r){forms[r.formula]=1;});
     var fl=Object.keys(forms);
     var shown=fl.slice(0,4).map(function(f){return pretty(f);}).join(" / ")+(fl.length>4?" …":"");
-    if(!qIonStr){                       /* 质量查询 */
-      formula=fl.length?shown:'<span style="color:var(--muted)">'+massLabel+'</span>';
-      mzLine=massLabel+(fl.length>1?"　"+fl.length+" distinct neutral formulas":"");
+    if(!qIonStr){
+      formula=fl.length?shown:'<span style="color:var(--muted)">'+escapeHtml(massLabel)+'</span>';
+      mzLine=escapeHtml(massLabel)+(fl.length>1?"　"+fl.length+" distinct neutral formulas":"");
       if(fl.length>1)note="Several formulas fall inside this mass window. Which one it is cannot be decided from the mass alone — that is what the mass-defect ruler below is for.";
       else if(!fl.length)note="Peaks exist at this m/z in measured peak lists, but no literature record assigns a formula there.";
     }else{
       formula=fl.length?shown
-                       :pretty(qIonStr)+' <span style="font-size:15px;color:var(--muted)">(ion; no neutral assigned)</span>';
-      var mzs={};pk.forEach(function(r){if(r.mz)mzs[(+r.mz).toFixed(4)]=1;});
+                       :(restoredFrom&&restoredFrom.cand?pretty(restoredFrom.cand.formula)+' <span style="font-size:15px;color:var(--muted)">(in peak lists; restored neutral)</span>'
+                                                        :pretty(qIonStr)+' <span style="font-size:15px;color:var(--muted)">(ion; no neutral assigned)</span>');
+      var mzs={};
+      pk.forEach(function(r){if(r.mz)mzs[(+r.mz).toFixed(4)]=1;});
+      if(!Object.keys(mzs).length&&lit.length){
+        var a0=parseFormula(lit[0].formula);
+        if(a0)mzs[ionMz(fmass(a0),lit[0].reagent,lit[0].detection).toFixed(4)]=1;
+      }
       var mzk=Object.keys(mzs);
       mzLine="ion "+pretty(qIonStr)+(mzk.length?"　m/z <b>"+mzk[0]+"</b>":"");
       if(fl.length>1)note="Several neutral formulas in the database map onto this same ion. They are all listed below — the choice between them is yours.";
-      else if(!fl.length)note="This ion appears in measured peak lists, but no literature record assigns a neutral formula to it.";
+      else if(!fl.length)note="This ion appears in measured peak lists; no literature record reports this exact reagent-ion form.";
     }
   }else if(cands&&cands.length){
     var top=cands[0];
     stamp='<span class="vstamp restored">Restored · contains inference</span>';
     formula=pretty(top.formula)+(top.radical?'<span class="dot">•</span>':"");
     mzLine="from ion "+pretty(qIonStr)+"　as "+DET_LABEL[top.det];
-    note="No record for this ion in either database. The formula above is what it would be if the assignment is "+
-         DET_LABEL[top.det]+" — that is an inference, not evidence."+
-         (cands.length>1?" "+(cands.length-1)+" other restoration"+(cands.length>2?"s are":" is")+" chemically possible; see the right-hand column.":"");
+    note="No direct record for this ion in either database. The formula above is what it would be if the assignment is "+
+         DET_LABEL[top.det]+" — that is an inference, not direct ion-mode evidence."+
+         (cands.length>1?" "+(cands.length-1)+" other restoration"+(cands.length>2?"s are":" is")+" arithmetically possible below.":"");
   }else{
     stamp='<span class="vstamp none">No match</span>';
-    formula='<span style="color:var(--muted)">'+(qIonStr?pretty(qIonStr):massLabel)+'</span>';
+    formula='<span style="color:var(--muted)">'+(qIonStr?pretty(qIonStr):escapeHtml(massLabel))+'</span>';
     mzLine=qIonStr?"no valid restoration under the selected reagent ion":"nothing at this mass in either database";
     note=qIonStr
       ? "Nothing in either database, and no chemically valid restoration. Check the reagent ion selection, or this may already be a neutral formula."
@@ -1958,47 +2000,61 @@ function renderVerdict(qIonStr,cands,restoredFrom,lit,pk,massLabel){
 
   /* 证据构成 chip：每一项都可以自己去核对 */
   var chips=[];
-  var papers={},plists={},contribs={},nDerived=0;
-  lit.forEach(function(r){if(r.reference)papers[r.reference]=1;if(provenance(r.note))nDerived++;});
+  var papers={},plists={},contribs={},nDerived=0,otherReags={};
+  lit.forEach(function(r){if(r.reference)papers[r.reference]=1;if(provenance(r))nDerived++;});
+  var litIds={};lit.forEach(function(r){if(r.id)litIds[r.id]=1;});
+  crossLit.forEach(function(r){if(r&&!litIds[r.id]&&r.reagent)otherReags[r.reagent]=1;});
   pk.forEach(function(r){plists[r.peaklist_file]=1;if(r.contributor)contribs[r.contributor]=1;});
   var np=Object.keys(papers).length,nl=Object.keys(plists).length,nc=Object.keys(contribs).length;
+  var no=Object.keys(otherReags).length;
   chips.push('<span class="vchip'+(np?"":" zero")+'"><b>'+np+'</b> paper'+(np===1?"":"s")+'</span>');
   chips.push('<span class="vchip'+(nl?"":" zero")+'"><b>'+nl+'</b> peak list'+(nl===1?"":"s")+'</span>');
   chips.push('<span class="vchip'+(nc?"":" zero")+'"><b>'+nc+'</b> contributor'+(nc===1?"":"s")+'</span>');
   if(nDerived)chips.push('<span class="vchip derived"><b>'+nDerived+'</b> of '+lit.length+' expanded, not written out</span>');
+  if(no)chips.push('<span class="vchip">+<b>'+no+'</b> other reagent ion'+(no>1?'s':'')+'</span>');
   if(nc===1&&nl>1)chips.push('<span class="vchip">peak lists share one contributor — not independent</span>');
+
+  var consensusHtml=buildConsensusHtml(lit,crossLit);
 
   w.innerHTML=stamp+'<div class="vmain"><div class="vformula">'+formula+'</div>'+
     '<div class="vmz">'+mzLine+'</div>'+
     (note?'<div class="vnote">'+note+'</div>':"")+
-    '<div class="vchips">'+chips.join("")+'</div></div>';
+    '<div class="vchips">'+chips.join("")+'</div>'+
+    consensusHtml+'</div>';
   box.appendChild(w);
 }
 
-/* 记录来源强度：文献逐条写出 / 由同系物系列展开 / 由多指数范围框展开。
-   不新增数据库字段（用户明确不要加列），改为识别 note 里的约定前缀。
-   这么做是因为 HANDOFF §4.4：推演出来的条目绝不能和文献原文写出的看起来同等可信。
-   展开条目占比可能远超显式条目，不加区分会让整个库的可信度被稀释。 */
-function provenance(note){
-  note=String(note||"");
-  if(note.indexOf("范围展开")>=0||note.indexOf("range-expanded")>=0)return {k:"box",cls:"box",label:"Range-expanded",
-    tip:"Derived by taking the Cartesian product of the C/H/O ranges the paper states. May include combinations that were never actually measured. NOT written out in the paper."};
-  if(note.indexOf("系列展开")>=0||note.indexOf("series-expanded")>=0)return {k:"series",cls:"exp",label:"Series-expanded",
-    tip:"Derived by enumerating a homologous series the paper states (C and H fixed, only O varies). NOT written out in the paper."};
+/* 记录来源强度：同时兼容结构化记录对象 r（读 r.basis）与旧版纯字符串 note。 */
+function provenance(x){
+  var basis=(x&&typeof x==="object")?String(x.basis||"").toLowerCase():"";
+  var note=(x&&typeof x==="object")?String(x.note||""):String(x||"");
+  if(basis==="range"||note.indexOf("范围展开")>=0||note.indexOf("range-expanded")>=0)
+    return {k:"box",cls:"box",label:"Range-expanded",
+      tip:"Derived by taking the Cartesian product of the C/H/O ranges the paper states. May include combinations that were never actually measured. NOT written out in the paper."};
+  if(basis==="series"||note.indexOf("系列展开")>=0||note.indexOf("series-expanded")>=0)
+    return {k:"series",cls:"exp",label:"Series-expanded",
+      tip:"Derived by enumerating a homologous series the paper states. NOT individually written out in the main text."};
   return null;
 }
-function provTag(note){
-  var p=provenance(note);
-  return p?'<span class="prov '+p.cls+'" title="'+escapeHtml(p.tip)+'">'+p.label+'</span><br>':"";
+function provTag(x,inline){
+  var p=provenance(x);
+  if(!p)return "";
+  return '<span class="prov '+p.cls+'" title="'+escapeHtml(p.tip)+'">'+p.label+'</span>'+(inline?' ':'<br>');
 }
 /* 构成计数放在表格之上：展开条目占多少比例，在读任何一行之前就该知道 */
 function provSummary(recs){
-  var n=recs.length,d=0,b=0;
-  recs.forEach(function(r){var p=provenance(r.note);if(p){d++;if(p.k==="box")b++;}});
+  var n=recs.length,d=0,b=0,tOnly=0;
+  recs.forEach(function(r){
+    var p=provenance(r);
+    if(p){d++;if(p.k==="box")b++;}
+    else if(r&&r.basis==="table_only")tOnly++;
+  });
   if(!n)return "";
-  if(!d)return '<div class="provsum"><b>'+n+'</b> record'+(n>1?'s':'')+', all written out in the paper</div>';
-  return '<div class="provsum"><b>'+n+'</b> record'+(n>1?'s':'')+' — <b>'+(n-d)+
-    '</b> written out in the paper, <i>'+d+' expanded'+(b?' ('+b+' range-expanded)':'')+'</i></div>';
+  var written=n-d;
+  var tTxt=tOnly?(' ('+tOnly+' from SI peak tables)'):'';
+  if(!d)return '<div class="provsum"><b>'+n+'</b> record'+(n>1?'s':'')+', all written out in the paper'+tTxt+'</div>';
+  return '<div class="provsum"><b>'+n+'</b> record'+(n>1?'s':'')+' — <b>'+written+
+    '</b> written out in the paper'+tTxt+', <i>'+d+' expanded'+(b?' ('+b+' range-expanded)':'')+'</i></div>';
 }
 function escapeHtml(s){return String(s==null?"":s).replace(/[&<>"']/g,function(ch){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
@@ -2475,62 +2531,108 @@ function toggleBatch(i,on){
   if(tr)tr.className=on?"":"off";
 }
 
+var LIT_COLS=["formula","reagent","detection","instrument","phase","setting","biome",
+              "environment","reference","doi","basis","identity","precursor",
+              "mechanism","locator","caveat","audit_note","note"];
+var ION_COLS=["ion_formula","charge","mz","class","reagent","phase","instrument",
+              "contributor","site","setting","biome","campaign","reference",
+              "peaklist_file","source_tags"];
+function valOf(id){var el=document.getElementById(id);return el?String(el.value||"").trim():"";}
+function composeCompatNote(r){
+  if(r.note)return r.note;
+  var pfx=(r.basis==="series")?"series-expanded: ":(r.basis==="range"?"range-expanded: ":"");
+  var ps=[];
+  if(r.identity)ps.push(r.identity);
+  else if(r.basis==="table_only")ps.push("Peak-list formula");
+  if(r.precursor)ps.push("Precursor: "+r.precursor);
+  if(r.mechanism)ps.push(r.mechanism);
+  if(r.locator)ps.push("["+r.locator+"]");
+  return pfx+ps.join(" | ");
+}
+
 function commitBatch(){
   var msg=document.getElementById("b_msg");
-  var ref=document.getElementById("a_ref").value.trim();
-  var env=document.getElementById("a_env").value.trim();
+  if(!msg)return;
+  var ref=valOf("a_ref"),env=valOf("a_env");
   if(!ref){msg.className="msg err";msg.textContent="Fill in the reference first — provenance is what this database is for";return;}
   if(!env){msg.className="msg err";msg.textContent="Fill in the environment first";return;}
   var out=(batchRows._parsed||[]).filter(function(o){return o.on&&o.formula;});
   if(!out.length){msg.className="msg err";msg.textContent="No rows selected";return;}
-  var rid=document.getElementById("a_reagent").value;
-  var det=document.getElementById("a_detect").value;
-  var instr=document.getElementById("a_instr").value.trim();
-  var doi=document.getElementById("a_doi").value.trim();
+  var rid=valOf("a_reagent")||"NO3-";
+  var det=valOf("a_detect")||"adduct";
+  var instr=valOf("a_instr"),doi=valOf("a_doi");
+  var ph=valOf("a_phase").toLowerCase(),st=valOf("a_setting").toLowerCase(),bi=valOf("a_biome").toLowerCase();
+  var prec=valOf("a_shared_prec");
   out.forEach(function(o,k){
-    DB.push({
+    var nt=o.note||"";
+    var pv=provenance(nt);
+    var b=pv?(pv.k==="box"?"range":"series"):(nt?"explicit":"table_only");
+    var rec={
       id:"b"+Date.now().toString(36)+k+Math.random().toString(36).slice(2,5),
       formula:o.formula,reagent:rid,detection:det,
-      instrument:instr,environment:env,reference:ref,doi:doi,note:o.note||""
-    });
+      instrument:instr,phase:ph,setting:st,biome:bi,
+      environment:env,reference:ref,doi:doi,
+      basis:b,identity:"",precursor:prec,
+      mechanism:nt||(b==="table_only"?"Reported in source peak list; no individual assignment specified.":""),
+      locator:"",caveat:"",audit_note:"",note:nt
+    };
+    rec.note=composeCompatNote(rec);
+    DB.push(rec);
   });
   save();buildFilters();renderDB();
-  document.getElementById("b_paste").value="";
+  var bp=document.getElementById("b_paste");if(bp)bp.value="";
   parseBatch();
   msg.className="msg";
-  msg.textContent="Committed "+out.length+" record"+(out.length>1?"s":"")+" — remember to export the CSV under Data &amp; updates";
+  msg.textContent="Committed "+out.length+" record"+(out.length>1?"s":"")+" — remember to export the CSV under Data & updates";
 }
 
 /* ---------------- 增删 ---------------- */
 function addRecord(){
-  var f=parseFormula(document.getElementById("a_formula").value);
+  var f=parseFormula(valOf("a_formula"));
   var msg=document.getElementById("a_msg");
+  if(!msg)return;
   if(!f){msg.className="msg err";msg.textContent="Formula could not be parsed — check the notation (e.g. C10H16O8)";return;}
+  var mech=valOf("a_note"),ident=valOf("a_identity"),prec=valOf("a_precursor")||valOf("a_shared_prec");
+  var loc=valOf("a_locator"),cav=valOf("a_caveat"),bas=(valOf("a_basis")||"explicit").toLowerCase();
   var rec={
     id:"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
     formula:hill(f),
-    reagent:document.getElementById("a_reagent").value,
-    detection:document.getElementById("a_detect").value,
-    instrument:document.getElementById("a_instr").value.trim(),
-    environment:document.getElementById("a_env").value.trim(),
-    reference:document.getElementById("a_ref").value.trim(),
-    doi:document.getElementById("a_doi").value.trim(),
-    note:document.getElementById("a_note").value.trim()
+    reagent:valOf("a_reagent")||"NO3-",
+    detection:valOf("a_detect")||"adduct",
+    instrument:valOf("a_instr"),
+    phase:valOf("a_phase").toLowerCase(),
+    setting:valOf("a_setting").toLowerCase(),
+    biome:valOf("a_biome").toLowerCase(),
+    environment:valOf("a_env"),
+    reference:valOf("a_ref"),
+    doi:valOf("a_doi"),
+    basis:bas,
+    identity:ident,
+    precursor:prec,
+    mechanism:mech||(bas==="table_only"?"Reported in source peak list; not individually discussed in the main text.":""),
+    locator:loc,
+    caveat:cav,
+    audit_note:"",
+    note:""
   };
+  rec.note=composeCompatNote(rec);
   if(!rec.reference){msg.className="msg err";msg.textContent="Fill in the reference — provenance is what this database is for";return;}
   var dup=DB.some(function(r){return canon(r.formula)===rec.formula&&r.reagent===rec.reagent&&r.reference===rec.reference;});
   if(dup){msg.className="msg err";msg.textContent="This record already exists (same formula + reagent ion + reference)";return;}
   DB.push(rec);save();buildFilters();
   msg.className="msg";
-  msg.textContent="Added "+rec.formula+" — remember to export the CSV under Data &amp; updates";
-  document.getElementById("a_formula").value="";
-  document.getElementById("a_note").value="";
-  var neu=fmass(f);
-  document.getElementById("a_preview").innerHTML=
-    '<div class="hit"><div class="hit-head"><span class="f">'+pretty(rec.formula)+
-    '</span><span class="m">neutral <b>'+neu.toFixed(4)+'</b> ｜ detected ion <b>'+
-    ionMz(neu,rec.reagent,rec.detection).toFixed(4)+'</b> '+ionLabel(rec.formula,rec.reagent,rec.detection)+
-    '</span></div></div>';
+  msg.textContent="Added "+rec.formula+" — remember to export the CSV under Data & updates";
+  ["a_formula","a_identity","a_precursor","a_locator","a_caveat","a_note"].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value="";
+  });
+  var neu=fmass(f),pvEl=document.getElementById("a_preview");
+  if(pvEl){
+    pvEl.innerHTML=
+      '<div class="hit"><div class="hit-head"><span class="f">'+pretty(rec.formula)+
+      '</span><span class="m">neutral <b>'+neu.toFixed(4)+'</b> ｜ detected ion <b>'+
+      ionMz(neu,rec.reagent,rec.detection).toFixed(4)+'</b> '+ionLabel(rec.formula,rec.reagent,rec.detection)+
+      '</span></div><div style="padding:8px 14px 12px">'+renderInterpStrip({kind:"lit",rec:rec})+'</div></div>';
+  }
 }
 function delRecord(id){
   if(!window.confirm("Delete this record?"))return;
@@ -2551,17 +2653,23 @@ function renderDB(){
     return;
   }
   var rows=DB.slice().sort(function(a,b){return a.formula.localeCompare(b.formula)||a.reagent.localeCompare(b.reagent);});
-  var html='<tr><th>Formula</th><th>Neutral mass</th><th>Reagent</th><th>Ion m/z</th><th>Instrument</th><th>Environment</th><th>Reference</th><th>Assignment</th><th></th></tr>';
+  var html='<tr><th>Formula</th><th>Neutral mass</th><th>Reagent</th><th>Ion m/z</th><th>Phase</th><th>Scene</th><th>Reference &amp; Locator</th><th>Chemical Interpretation</th><th></th></tr>';
   rows.forEach(function(r){
     var a=parseFormula(r.formula)||{},neu=fmass(a);
-    html+='<tr'+(provenance(r.note)?' class="derived"':'')+'><td class="mono">'+escapeHtml(r.formula)+'</td>'+
+    var sumParts=[];
+    if(r.identity)sumParts.push('<b>'+escapeHtml(r.identity)+'</b>');
+    if(r.precursor)sumParts.push('<span class="iprec">'+escapeHtml(r.precursor)+'</span>');
+    if(r.caveat)sumParts.push('<span class="icaveat">&#9888; '+escapeHtml(r.caveat)+'</span>');
+    var sumLine=sumParts.length?('<div style="margin-bottom:2px">'+sumParts.join(" ")+'</div>'):"";
+    var bodyTxt=r.mechanism||r.note||"";
+    html+='<tr'+(provenance(r)?' class="derived"':'')+'><td class="mono">'+escapeHtml(r.formula)+'</td>'+
       '<td class="mono">'+neu.toFixed(4)+'</td>'+
       '<td class="mono" style="color:'+reagent(r.reagent).color+'">'+escapeHtml(r.reagent)+'</td>'+
       '<td class="mono">'+ionMz(neu,r.reagent,r.detection).toFixed(4)+'</td>'+
-      '<td>'+escapeHtml(r.instrument||"—")+'</td>'+
-      '<td>'+escapeHtml(r.environment||"—")+'</td>'+
-      '<td>'+provTag(r.note)+escapeHtml(r.reference||"—")+'</td>'+
-      '<td>'+escapeHtml(r.note||"")+'</td>'+
+      '<td class="mono">'+escapeHtml(r.phase||"—")+'</td>'+
+      '<td>'+escapeHtml([r.environment,r.instrument].filter(Boolean).join(" · ")||"—")+'</td>'+
+      '<td>'+provTag(r)+escapeHtml(r.reference||"—")+(r.locator?'<br><span class="loc" style="margin-left:0">'+escapeHtml(r.locator)+'</span>':'')+'</td>'+
+      '<td>'+sumLine+'<span style="color:var(--muted);font-size:12px">'+escapeHtml(bodyTxt)+'</span></td>'+
       '<td class="rowact"><button onclick="delRecord(\''+r.id+'\')">del</button></td></tr>';
   });
   t.innerHTML=html;
@@ -2570,16 +2678,20 @@ function renderDB(){
 /* ---------------- CSV ---------------- */
 function csvEscape(s){s=String(s==null?"":s);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
 function exportCSV(){
-  var cols=["formula","reagent","detection","instrument","environment","reference","doi","note"];
-  var lines=[cols.join(",")];
-  DB.forEach(function(r){lines.push(cols.map(function(c){return csvEscape(r[c]);}).join(","));});
+  var lines=[LIT_COLS.join(",")];
+  DB.forEach(function(r){
+    var rowObj={};
+    LIT_COLS.forEach(function(c){rowObj[c]=r[c]||"";});
+    rowObj.note=composeCompatNote(rowObj);
+    lines.push(LIT_COLS.map(function(c){return csvEscape(rowObj[c]);}).join(","));
+  });
   var blob=new Blob(["\ufeff"+lines.join("\n")],{type:"text/csv;charset=utf-8"});
   var a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
   a.download="cims_peaklist.csv";a.click();
   setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
-  document.getElementById("i_msg").className="msg";
-  document.getElementById("i_msg").textContent="Exported "+DB.length+" records";
+  var m=document.getElementById("i_msg");
+  if(m){m.className="msg";m.textContent="Exported "+DB.length+" records";}
 }
 function parseCSV(text){
   var rows=[],row=[],cur="",q=false;
@@ -2599,6 +2711,68 @@ function parseCSV(text){
   if(cur!==""||row.length){row.push(cur);rows.push(row);}
   return rows.filter(function(r){return r.some(function(c){return c.trim()!=="";});});
 }
+function parseLitRow(r,ix,idStr){
+  function get(k){return ix[k]>=0&&r[ix[k]]!=null?String(r[ix[k]]).trim():"";}
+  var f=parseFormula(get("formula"));
+  if(!f)return null;
+  var det=(get("detection")||"adduct").toLowerCase();
+  if(["adduct","deprot","prot"].indexOf(det)<0)det="adduct";
+  var note=get("note"),bas=get("basis").toLowerCase();
+  if(!bas){
+    var pv=provenance(note);
+    bas=pv?(pv.k==="box"?"range":"series"):"explicit";
+  }
+  var rec={
+    id:idStr,
+    formula:hill(f),
+    reagent:get("reagent")||"NO3-",
+    detection:det,
+    instrument:get("instrument"),
+    phase:get("phase").toLowerCase(),
+    setting:get("setting").toLowerCase(),
+    biome:get("biome").toLowerCase(),
+    environment:get("environment"),
+    reference:get("reference"),
+    doi:get("doi"),
+    basis:bas,
+    identity:get("identity"),
+    precursor:get("precursor"),
+    mechanism:get("mechanism"),
+    locator:get("locator"),
+    caveat:get("caveat"),
+    audit_note:get("audit_note"),
+    note:note
+  };
+  if(!rec.note&&(rec.identity||rec.precursor||rec.mechanism))rec.note=composeCompatNote(rec);
+  return rec;
+}
+function buildLitColIndex(head){
+  function col(name,alts){
+    var i=head.indexOf(name);
+    if(i<0&&alts)alts.some(function(a){var j=head.indexOf(a);if(j>=0){i=j;return true;}return false;});
+    return i;
+  }
+  return {
+    formula:col("formula",["分子式","molecular formula","neutral formula"]),
+    reagent:col("reagent",["试剂离子","reagent ion","ci reagent"]),
+    detection:col("detection",["检测方式","mode","ion mode"]),
+    instrument:col("instrument",["仪器","instrument type","ms type"]),
+    phase:col("phase",["相态"]),
+    setting:col("setting",["场景"]),
+    biome:col("biome",["生态类型"]),
+    environment:col("environment",["环境","env","site"]),
+    reference:col("reference",["文献","ref","citation","paper"]),
+    doi:col("doi",[]),
+    basis:col("basis",["依据","evidence basis"]),
+    identity:col("identity",["物种","compound","proposed identity"]),
+    precursor:col("precursor",["前体","precursor system"]),
+    mechanism:col("mechanism",["机理","pathway","role"]),
+    locator:col("locator",["原文位置","source locator"]),
+    caveat:col("caveat",["警示","warning"]),
+    audit_note:col("audit_note",["核验备注","audit"]),
+    note:col("note",["归属","notes","comment","备注"])
+  };
+}
 function importCSV(ev,replace){
   var file=ev.target.files[0];if(!file)return;
   var fr=new FileReader();
@@ -2608,47 +2782,24 @@ function importCSV(ev,replace){
       var rows=parseCSV(fr.result);
       if(rows.length<2)throw new Error("no data rows in the file");
       var head=rows[0].map(function(h){return h.trim().toLowerCase();});
-      function col(name,alts){
-        var i=head.indexOf(name);
-        if(i<0&&alts)alts.some(function(a){var j=head.indexOf(a);if(j>=0){i=j;return true;}return false;});
-        return i;
-      }
-      var ix={
-        formula:col("formula",["分子式","molecular formula","neutral formula"]),
-        reagent:col("reagent",["试剂离子","reagent ion","ci reagent"]),
-        detection:col("detection",["检测方式","mode","ion mode"]),
-        instrument:col("instrument",["仪器","instrument type","ms type"]),
-        environment:col("environment",["环境","env","site"]),
-        reference:col("reference",["文献","ref","citation","paper"]),
-        doi:col("doi",[]),
-        note:col("note",["归属","notes","comment","备注"])
-      };
+      var ix=buildLitColIndex(head);
       if(ix.formula<0)throw new Error("missing the formula column");
       var added=0,skipped=0,bad=0;
       var base=replace?[]:DB.slice();
       for(var i=1;i<rows.length;i++){
-        var r=rows[i];
-        function get(k){return ix[k]>=0&&r[ix[k]]!=null?String(r[ix[k]]).trim():"";}
-        var f=parseFormula(get("formula"));
-        if(!f){bad++;continue;}
-        var rec={
-          id:"r"+Date.now().toString(36)+i+Math.random().toString(36).slice(2,5),
-          formula:hill(f),
-          reagent:get("reagent")||"NO3-",
-          detection:(get("detection")||"adduct").toLowerCase(),
-          instrument:get("instrument"),environment:get("environment"),
-          reference:get("reference"),doi:get("doi"),note:get("note")
-        };
-        if(["adduct","deprot","prot"].indexOf(rec.detection)<0)rec.detection="adduct";
+        var rec=parseLitRow(rows[i],ix,"r"+Date.now().toString(36)+i+Math.random().toString(36).slice(2,5));
+        if(!rec){bad++;continue;}
         var dup=base.some(function(x){return canon(x.formula)===rec.formula&&x.reagent===rec.reagent&&x.reference===rec.reference;});
         if(dup){skipped++;continue;}
         base.push(rec);added++;
       }
       DB=base;save();buildFilters();renderDB();
-      msg.className="msg";
-      msg.textContent="Imported "+added+" record"+(added===1?"":"s")+(skipped?", "+skipped+" duplicate"+(skipped>1?"s":"")+" skipped":"")+(bad?", "+bad+" row"+(bad>1?"s":"")+" unparseable":"");
+      if(msg){
+        msg.className="msg";
+        msg.textContent="Imported "+added+" record"+(added===1?"":"s")+(skipped?", "+skipped+" duplicate"+(skipped>1?"s":"")+" skipped":"")+(bad?", "+bad+" row"+(bad>1?"s":"")+" unparseable":"");
+      }
     }catch(e){
-      msg.className="msg err";msg.textContent="Import failed: "+e.message;
+      if(msg){msg.className="msg err";msg.textContent="Import failed: "+e.message;}
     }
     ev.target.value="";
   };
@@ -2664,8 +2815,7 @@ function importIonCSV(ev){
       var rows=parseCSV(fr.result);
       if(rows.length<2)throw new Error("no data rows in the file");
       var head=rows[0].map(function(h){return h.trim().toLowerCase();});
-      var need=["ion_formula","charge","mz","class","reagent","phase","instrument","contributor","site","campaign","reference","peaklist_file"];
-      var ix={};need.forEach(function(k){ix[k]=head.indexOf(k);});
+      var ix={};ION_COLS.forEach(function(k){ix[k]=head.indexOf(k);});
       if(ix.ion_formula<0||ix.reagent<0)throw new Error("missing the ion_formula or reagent column");
       var out=[],bad=0;
       for(var i=1;i<rows.length;i++){
@@ -2677,42 +2827,45 @@ function importIonCSV(ev){
         out.push({ion_formula:f?canon(f):"",charge:g("charge"),mz:g("mz"),
           "class":g("class")||"organic",reagent:g("reagent"),phase:g("phase"),
           instrument:g("instrument"),contributor:g("contributor"),site:g("site"),
-          campaign:g("campaign"),reference:g("reference"),peaklist_file:g("peaklist_file")});
+          setting:g("setting").toLowerCase(),biome:g("biome").toLowerCase(),
+          campaign:g("campaign"),reference:g("reference"),peaklist_file:g("peaklist_file"),
+          source_tags:g("source_tags")});
       }
       IONDB=out;saveIons();buildFilters();
       var pls={};out.forEach(function(r){pls[r.peaklist_file]=1;});
-      msg.className="msg";
-      msg.textContent="Ion library loaded: "+out.length+" ions from "+Object.keys(pls).length+" peak lists";
+      if(msg){
+        msg.className="msg";
+        msg.textContent="Ion library loaded: "+out.length+" ions from "+Object.keys(pls).length+" peak lists";
+      }
     }catch(e){
-      msg.className="msg err";msg.textContent="Import failed: "+e.message;
+      if(msg){msg.className="msg err";msg.textContent="Import failed: "+e.message;}
     }
     ev.target.value="";
   };
   fr.readAsText(file,"utf-8");
 }
 function exportIonCSV(){
-  var cols=["ion_formula","charge","mz","class","reagent","phase","instrument","contributor","site","campaign","reference","peaklist_file"];
-  var lines=[cols.join(",")];
-  IONDB.forEach(function(r){lines.push(cols.map(function(c){return csvEscape(r[c]);}).join(","));});
-  var blob=new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8"});
+  var lines=[ION_COLS.join(",")];
+  IONDB.forEach(function(r){lines.push(ION_COLS.map(function(c){return csvEscape(r[c]);}).join(","));});
+  var blob=new Blob(["\ufeff"+lines.join("\n")],{type:"text/csv;charset=utf-8"});
   var a=document.createElement("a");
   a.href=URL.createObjectURL(blob);a.download="cims_ionlist.csv";a.click();
   setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
-  document.getElementById("n_msg").className="msg";
-  document.getElementById("n_msg").textContent="Exported "+IONDB.length+" ions";
+  var m=document.getElementById("n_msg");
+  if(m){m.className="msg";m.textContent="Exported "+IONDB.length+" ions";}
 }
 function clearIons(){
   if(!window.confirm("Clear all "+IONDB.length+" ion records? Exported CSVs are unaffected."))return;
   IONDB=[];saveIons();buildFilters();runQuery();
-  document.getElementById("n_msg").className="msg";
-  document.getElementById("n_msg").textContent="Ion library cleared";
+  var m=document.getElementById("n_msg");
+  if(m){m.className="msg";m.textContent="Ion library cleared";}
 }
 
 function clearAll(){
   if(!window.confirm("Clear all "+DB.length+" literature records? Exported CSVs are unaffected."))return;
   DB=[];save();buildFilters();renderDB();runQuery();
-  document.getElementById("i_msg").className="msg";
-  document.getElementById("i_msg").textContent="Literature database cleared";
+  var m=document.getElementById("i_msg");
+  if(m){m.className="msg";m.textContent="Literature database cleared";}
 }
 
 /* ================= 数据加载与联网更新 =================
@@ -2738,19 +2891,12 @@ function applyLitCSV(text){
   var rows=parseCSV(text);
   if(rows.length<2)return 0;
   var head=rows[0].map(function(h){return h.trim().toLowerCase();});
-  var ix={};["formula","reagent","detection","instrument","phase","setting","biome","environment","reference","doi","note"]
-    .forEach(function(k){ix[k]=head.indexOf(k);});
+  var ix=buildLitColIndex(head);
   if(ix.formula<0)return 0;
   var out=[];
   for(var i=1;i<rows.length;i++){
-    var r=rows[i];
-    function g(k){return ix[k]>=0&&r[ix[k]]!=null?String(r[ix[k]]).trim():"";}
-    var f=parseFormula(g("formula"));if(!f)continue;
-    out.push({id:"s"+i,formula:hill(f),reagent:g("reagent")||"NO3-",
-      detection:(g("detection")||"adduct").toLowerCase(),instrument:g("instrument"),
-      phase:(g("phase")||"").toLowerCase(),
-      setting:(g("setting")||"").toLowerCase(),biome:(g("biome")||"").toLowerCase(),
-      environment:g("environment"),reference:g("reference"),doi:g("doi"),note:g("note")});
+    var rec=parseLitRow(rows[i],ix,"s"+i);
+    if(rec)out.push(rec);
   }
   if(out.length){DB=out;save();}
   return out.length;
@@ -2759,9 +2905,7 @@ function applyIonCSV(text){
   var rows=parseCSV(text);
   if(rows.length<2)return 0;
   var head=rows[0].map(function(h){return h.trim().toLowerCase();});
-  var ix={};["ion_formula","charge","mz","class","reagent","phase","instrument",
-    "contributor","site","campaign","reference","peaklist_file"]
-    .forEach(function(k){ix[k]=head.indexOf(k);});
+  var ix={};ION_COLS.forEach(function(k){ix[k]=head.indexOf(k);});
   if(ix.ion_formula<0)return 0;
   var out=[],skipped=[];
   for(var i=1;i<rows.length;i++){
@@ -2774,7 +2918,9 @@ function applyIonCSV(text){
     out.push({ion_formula:f?canon(f):"",charge:g("charge"),mz:g("mz"),
       "class":g("class")||"organic",reagent:g("reagent"),phase:g("phase"),
       instrument:g("instrument"),contributor:g("contributor"),site:g("site"),
-      campaign:g("campaign"),reference:g("reference"),peaklist_file:g("peaklist_file")});
+      setting:g("setting").toLowerCase(),biome:g("biome").toLowerCase(),
+      campaign:g("campaign"),reference:g("reference"),peaklist_file:g("peaklist_file"),
+      source_tags:g("source_tags")});
   }
   if(out.length){IONDB=out;saveIons();}
   if(skipped.length){

@@ -1,19 +1,25 @@
 {
-  "version": "2026-11-25",
-  "updated": "2026-11-25T13:32:54",
+  "version": "2026-11-26-3c4f35",
+  "updated": "2026-11-26T22:20:46",
   "includes_unpublished": false,
   "files": [
     {
       "name": "cims_peaklist.csv",
-      "rows": 2402,
-      "bytes": 1041844,
-      "sha256": "b0a30f3e3d57f24587a909047a98c1b08430df185650bf299b831a04b97871a0"
+      "rows": 2936,
+      "bytes": 2325528,
+      "sha256": "73513c19c4a98bd5c60d184d58ea463c9359b771eca5736d2bd2a1cae2e11d5a"
     },
     {
       "name": "cims_ionlist.csv",
       "rows": 8906,
       "bytes": 1752057,
       "sha256": "f0520691135f4fda04522c3b4dd0cebd9e2edecb9c13ba0314475462c11719c7"
+    },
+    {
+      "name": "cims_refspectra.csv",
+      "rows": 302,
+      "bytes": 153759,
+      "sha256": "dac2c16abb8cf3676b33ca89e09073bd79528ed0cdcc067ad5c5bbd4a1b1819b"
     }
   ]
 }
