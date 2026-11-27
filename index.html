@@ -461,6 +461,74 @@ a.doi:hover{border-bottom-color:var(--accent)}
   color:#384B28;padding:1px 7px;border-radius:3px;display:inline-block;margin:2px 5px 2px 0}
 .audit-btn{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-left:auto;
   cursor:help;border-bottom:1px dotted var(--line)}
+/* ---------- v2: Cluster Verdict, Pure-English Overview, Channels & Mass Window ---------- */
+.mono sub,.vformula sub{font-size:.68em}
+.mono sup,.vformula sup{font-size:.68em}
+.vhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+.varrow{font-family:var(--mono);font-size:17px;color:var(--muted);margin:0 2px}
+.vcluster{font-family:var(--mono);font-size:20px;font-weight:650;color:var(--ink);
+  background:#EEF4FB;border:1px solid #C9DCF2;padding:2px 10px;border-radius:4px;line-height:1.22}
+.vcluster small{font-size:12.5px;font-weight:500;color:var(--muted);margin-left:7px}
+.vident{font-size:15.5px;font-weight:600;color:var(--accent)}
+.vprops{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.55}
+.vprops b{color:var(--ink);font-weight:600}
+.vchip.cross{background:#F3ECF8;color:var(--r-iodide);border:1px solid #DFCEF0}
+.vchip.warn{background:#FFF6E6;color:var(--warn);border:1px solid #EAD8B8}
+.vnarrative{margin-top:13px;padding:12px 15px;background:linear-gradient(180deg,#F6FAFB 0%,#F9FCFC 100%);
+  border:1px solid #CFE3E5;border-left:3.5px solid var(--accent);border-radius:0 5px 5px 0}
+.vnar-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:7px;flex-wrap:wrap}
+.vnar-title{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--accent);font-weight:700;display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.vnar-badge{font-family:var(--sans);font-size:11px;letter-spacing:0;text-transform:none;font-weight:400;color:var(--muted)}
+.vnar-p{font-size:13px;line-height:1.65;color:#1D262B;margin:0}
+.vnar-p+.vnar-p{margin-top:6px}
+.vnar-p b{color:var(--ink);font-weight:600}
+.vnar-tag{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;
+  background:#E3F1F2;color:#0F5257;padding:1px 6px;border-radius:2px;margin-right:6px;font-weight:600}
+.chan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:10px}
+.chan-card{border:1px solid var(--line);border-radius:4px;padding:10px 13px;background:#FAFCFD;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;transition:border-color .12s}
+.chan-card:hover{border-color:var(--ink)}
+.chan-card.active-ax{border:1.5px solid var(--ink);background:#F3F8FE;box-shadow:inset 0 0 0 1px #D0E2F8}
+.chan-card.other{background:#FCF9FE;border-color:#E4D7F0;border-style:dashed;cursor:default}
+.chan-ion{font-family:var(--mono);font-size:14.5px;font-weight:600;color:var(--ink)}
+.chan-sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.chan-mz{text-align:right;font-family:var(--mono)}
+.chan-mz .mval{font-size:14.5px;font-weight:600;color:var(--ink);display:block}
+.chan-mz .mcnt{font-size:11px;color:var(--accent)}
+.sec-h{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);margin:22px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-weight:600}
+.sec-h .sub{text-transform:none;letter-spacing:0;font-family:var(--sans);font-weight:400;font-size:12px;color:var(--muted)}
+.det-pill{font-family:var(--mono);font-size:10px;color:var(--muted);background:#F2F5F7;
+  padding:1px 6px;border-radius:2px;margin-left:5px;white-space:nowrap}
+.rad-pill{font-family:var(--mono);font-size:10px;color:#5B3E86;background:#F3EEF8;
+  padding:1px 6px;border-radius:2px;margin-left:5px;white-space:nowrap}
+.pk-group{border:1px solid var(--line);border-radius:4px;margin-bottom:10px;overflow:hidden;background:#fff}
+.pk-ghead{background:#F7F9FA;padding:8px 12px;border-bottom:1px solid var(--line-soft);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px}
+.pk-ghead .ionf{font-family:var(--mono);font-weight:650;font-size:14px}
+.subtags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;align-items:center}
+details.more-tags{display:inline}
+details.more-tags>summary{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--accent);
+  cursor:pointer;padding:1px 6px;list-style:none}
+details.more-tags>summary::-webkit-details-marker{display:none}
+.mz-card{border:1px solid var(--line);border-radius:5px;margin-bottom:10px;background:#fff;overflow:hidden}
+.mz-card.active-focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.mz-head{background:#F7F9FA;padding:9px 13px;border-bottom:1px solid var(--line-soft);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;cursor:pointer}
+.mz-head:hover{background:#F0F5F6}
+.mz-head .mz-val{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ink)}
+.mz-head .mz-ion{font-family:var(--mono);font-size:14px;font-weight:600}
+.mz-head .mz-neu{font-family:var(--mono);font-size:13px;color:var(--ink)}
+.mz-head .mz-right{margin-left:auto;display:flex;gap:7px;align-items:center;font-family:var(--mono);font-size:11px;flex-wrap:wrap}
+.rpresets{display:inline-flex;gap:4px;align-items:center}
+.rpbtn{font-family:var(--mono);font-size:11px;padding:3px 7px;border:1px solid var(--line);
+  background:#fff;border-radius:3px;cursor:pointer;color:var(--muted);line-height:1.15}
+.rpbtn:hover{border-color:var(--ink);color:var(--ink)}
+.rpbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+#rulerWrap .rulerctl{margin-top:16px}
+#rulerWrap .ruler{margin-top:10px}
 @media (max-width:640px){
   .wrap{padding:14px 12px 60px}
   .qfield input{font-size:17px}
@@ -571,27 +639,36 @@ a.doi:hover{border-bottom-color:var(--accent)}
        它决定了下面所有结果该怎么读，看晚了等于白看。 -->
   <div id="warnings"></div>
   <div id="verdict"></div>
-  <div id="reported"></div>
-  <div id="inferred">
-    <div id="cands"></div>
-    <div id="results"></div>
+  <div id="cands"></div>
+
+  <!-- 质量亏损标尺紧接结论卡与预期离子通道之后；无数据时自动隐藏 -->
+  <div id="rulerWrap" hidden>
+    <div class="rulerctl">
+      <label class="tog"><span class="flabel">Tolerance</span>
+        <input type="number" id="ppm" value="20" min="1" max="500" step="1" onchange="runQuery()"> ppm</label>
+      <label class="tog"><span class="flabel">Resolving power</span>
+        <input type="number" id="res" value="5000" min="500" max="200000" step="500" onchange="syncResPresets();redrawRuler()"></label>
+      <span class="rpresets" id="rpresets">
+        <button type="button" class="rpbtn" data-r="4000" onclick="setResPower(4000)">4k HTOF</button>
+        <button type="button" class="rpbtn on" data-r="5000" onclick="setResPower(5000)">5k</button>
+        <button type="button" class="rpbtn" data-r="10000" onclick="setResPower(10000)">10k LTOF</button>
+        <button type="button" class="rpbtn" data-r="15000" onclick="setResPower(15000)">15k HR</button>
+      </span>
+      <span class="zoom">
+        <span class="flabel">Zoom</span>
+        <button type="button" onclick="rulerZoom(1/1.6)" title="Zoom in">＋</button>
+        <button type="button" onclick="rulerZoom(1.6)" title="Zoom out">−</button>
+        <button type="button" onclick="rulerZoom(0)" title="Fit to data">fit</button>
+        <span class="zlev" id="zlev"></span>
+      </span>
+    </div>
+    <div id="ruler"></div>
   </div>
 
-  <!-- ppm 与 resolution 是高频控件，直接放在图上方，不折叠 -->
-  <div class="rulerctl">
-    <label class="tog"><span class="flabel">Tolerance</span>
-      <input type="number" id="ppm" value="20" min="1" max="500" step="1" onchange="runQuery()"> ppm</label>
-    <label class="tog"><span class="flabel">Resolving power</span>
-      <input type="number" id="res" value="5000" min="500" max="200000" step="500" onchange="runQuery()"></label>
-    <span class="zoom">
-      <span class="flabel">Zoom</span>
-      <button type="button" onclick="rulerZoom(1/1.6)" title="Zoom in">＋</button>
-      <button type="button" onclick="rulerZoom(1.6)" title="Zoom out">−</button>
-      <button type="button" onclick="rulerZoom(0)" title="Fit to data">fit</button>
-      <span class="zlev" id="zlev"></span>
-    </span>
+  <div id="reported"></div>
+  <div id="inferred">
+    <div id="results"></div>
   </div>
-  <div id="ruler"></div>
 </section>
 
 <!-- ============ ADD ============ -->
@@ -1040,7 +1117,11 @@ document.getElementById("q").addEventListener("input",function(){
   else if(c.mode==="bad"){txt="unrecognised";warn=true;}
   else if(c.mode==="nominal"||c.mode==="exact")txt="ion m/z";
   else if(c.isIon)txt="ion formula "+(c.charge>0?"(+)":"(−)");
-  else {txt="neutral molecule — no charge sign";warn=true;}
+  else{
+    var d0=rdbe(c.value,dbeOpts(selectedReagents()[0]));
+    warn=(d0<0||Math.abs(d0-Math.round(d0))>1e-9||!!(c.value.I||c.value.Br));
+    txt=warn?"neutral — check charge sign":"neutral formula";
+  }
   el.textContent=txt;
   el.style.background=(c.mode==="bad")?"#FBEAE8":(warn?"#FBF3E4":"var(--accent-soft)");
   el.style.color   =(c.mode==="bad")?"#B3261E":(warn?"#8A5A00":"var(--accent)");
@@ -1147,7 +1228,34 @@ function exactLitHits(qf){
 var CLS_LABEL={organic:"organic",inorganic:"inorganic",reagent:"reagent ion",
                unassigned:"unassigned",contaminant:"contaminant"};
 
-/* Rima Master_RB 汇总表 28 个保留子峰表标签的可读英文释义（严格对照 _Rima_source_map.csv） */
+/* 离子电荷上标与纯文本符号（杜绝 C3H3O4 无上标与中性分子混淆） */
+function chargeSign(chgOrReagent){
+  if(chgOrReagent===1||chgOrReagent==="+1"||chgOrReagent==="+")return "+";
+  if(chgOrReagent===-1||chgOrReagent==="-1"||chgOrReagent==="-"||chgOrReagent==="−")return "−";
+  if(typeof chgOrReagent==="string"&&chgOrReagent.length){
+    var tail=chgOrReagent.slice(-1);
+    if(tail==="+"||tail==="⁺")return "+";
+    if(tail==="-"||tail==="⁻"||tail==="−")return "−";
+  }
+  return "";
+}
+function prettyIon(f,chgOrReagent){
+  if(!f||f==="—")return "—";
+  var s=chargeSign(chgOrReagent);
+  return pretty(String(f))+(s?"<sup>"+s+"</sup>":"");
+}
+function plainIon(f,chgOrReagent){
+  if(!f||f==="—")return "—";
+  var s=chargeSign(chgOrReagent);
+  return String(f)+(s==="+"?"⁺":(s==="−"?"⁻":""));
+}
+function prettyReagent(rid){
+  var s=String(rid||""),tail=s.slice(-1);
+  if(tail==="+"||tail==="-")return pretty(s.slice(0,-1))+"<sup>"+(tail==="+"?"+":"−")+"</sup>";
+  return escapeHtml(s);
+}
+
+/* Rima Master_RB 汇总表 28 个保留子峰表标签的可读英文释义与结构化场景元数据（严格对照 _Rima_source_map.csv） */
 var SOURCE_TAG_LABELS={
   "peakList_HOMs_Budapest_Lei.db":"Budapest HOMs (Lei Yao, nitrate LTOF)",
   "Brean_etal_2020":"Barcelona urban HOMs (Brean et al., 2020)",
@@ -1178,12 +1286,42 @@ var SOURCE_TAG_LABELS={
   "peakList_teflon contaminants.db":"Teflon background contaminants (Jokinen)",
   "peaklist_benzene_Olga.db":"Benzene multi-gen OH (Garmash et al., 2020)"
 };
+var SOURCE_TAG_META={
+  "peakList_HOMs_Budapest_Lei.db":{cat:"urban",site:"Budapest"},
+  "Brean_etal_2020":{cat:"urban",site:"Barcelona"},
+  "peakList_Hyde_2016.db":{cat:"forest",site:"Hyytiälä SMEAR II"},
+  "Kurten_acp_2016":{cat:"forest",site:"rural central Germany"},
+  "PeakList_Raty_acp_2021":{cat:"chamber",site:"cyclohexene chamber"},
+  "peakList_APINENE.db":{cat:"chamber",site:"α-pinene chamber"},
+  "peakList_a-pinene.db":{cat:"chamber",site:"α-pinene chamber"},
+  "peakList_b-pinene.db":{cat:"chamber",site:"β-pinene chamber"},
+  "peakList_limonene_with_dimers.db":{cat:"chamber",site:"limonene chamber"},
+  "peakList_limonene_FULL_IfT.db":{cat:"chamber",site:"TROPOS Leipzig"},
+  "peakList_myrcene.db":{cat:"chamber",site:"myrcene chamber"},
+  "peakList_isoprene.db":{cat:"chamber",site:"isoprene chamber"},
+  "peakList_cloud7.db":{cat:"chamber",site:"CERN CLOUD"},
+  "peakList_cloud7_no_homos.db":{cat:"chamber",site:"CERN CLOUD"},
+  "peakList_TOLUENE_cloud11_nox_with_nitro.db":{cat:"chamber",site:"CERN CLOUD11"},
+  "peakList_TMB_cloud11_nox_with_nitro.db":{cat:"chamber",site:"CERN CLOUD11"},
+  "Molteni_acp_2016_ethylbenzene (C8H10) oxidation products":{cat:"chamber",site:"aromatic OH flow tube"},
+  "Molteni_acp_2016_biphenyl (C12H10) oxidation products":{cat:"chamber",site:"aromatic OH flow tube"},
+  "Molteni_acp_2016_benzene (C6H6) oxidation products":{cat:"chamber",site:"aromatic OH flow tube"},
+  "Molteni_acp_2016_toluene (C7H8) oxidation products":{cat:"chamber",site:"aromatic OH flow tube"},
+  "Molteni_acp_2016_naphthalene (C10H8) oxidation products":{cat:"chamber",site:"aromatic OH flow tube"},
+  "Molteni_acp_2016_xylene (C8H10) oxidation products":{cat:"chamber",site:"aromatic OH flow tube"},
+  "Molteni_acp_2016_mesitylene (C9H12) oxidation products":{cat:"chamber",site:"aromatic OH flow tube"},
+  "peaklist_benzene_Olga.db":{cat:"chamber",site:"JPAC / benzene OH"},
+  "peakList__PNNL15_Chaos_contamination_peaks.db":{cat:"bg"},
+  "peakList_amiinit_hom_teflon.db":{cat:"bg"},
+  "peakList_teflon_cloud7.db":{cat:"bg"},
+  "peakList_teflon contaminants.db":{cat:"bg"}
+};
 function parseSourceTags(s){
   var out=[],seen={};
   String(s||"").split(";").forEach(function(t){
     t=t.trim();if(!t||seen[t])return;
     seen[t]=1;
-    out.push({raw:t,label:SOURCE_TAG_LABELS[t]||t});
+    out.push({raw:t,label:SOURCE_TAG_LABELS[t]||t,meta:SOURCE_TAG_META[t]||null});
   });
   return out;
 }
@@ -1193,14 +1331,45 @@ function fmtContributor(s){
   }).join(" / ");
 }
 
+/* 为峰表离子推导对应的中性分子与电离通道（若提供已知中性式 hintNeutral 则严格对齐加合/脱氢通道） */
+function derivePeakChannel(ionFormula,rid,hintNeutral){
+  var ia=ionFormula?parseFormula(ionFormula):null;
+  if(!ia)return {neutral:"",det:"",pill:"",derived:true};
+  if(hintNeutral){
+    var na=parseFormula(hintNeutral),nf=na?hill(na):"";
+    if(na){
+      var ra=REAGENT_ATOMS[rid];
+      if(ra&&hill(atomsAdd(na,ra))===hill(ia))
+        return {neutral:nf,det:"adduct",pill:ionLabel(nf,rid,"adduct"),derived:false};
+      if(rid&&rid.slice(-1)==="+"){
+        if(hill(atomsAdd(na,{H:1}))===hill(ia))
+          return {neutral:nf,det:"prot",pill:ionLabel(nf,rid,"prot"),derived:false};
+      }else{
+        var da=atomsSub(na,{H:1});
+        if(da&&hill(da)===hill(ia))
+          return {neutral:nf,det:"deprot",pill:ionLabel(nf,rid,"deprot"),derived:false};
+      }
+    }
+  }
+  var rs=restoreForReagent(ia,rid);
+  if(rs&&rs.primary){
+    return {neutral:rs.primary.formula,det:rs.primary.det,
+            pill:ionLabel(rs.primary.formula,rid,rs.primary.det),derived:true};
+  }
+  return {neutral:"",det:"",pill:"",derived:true};
+}
+
 /* 单峰化学释义条（主从双层卡片的下层 .ibox），统一供 renderReported / renderHit / addRecord 预览调用 */
 function renderInterpStrip(row){
   if(!row)return "";
   if(row.kind==="peak"){
     var tags=row.tags||parseSourceTags(row.source_tags||(row.rec&&row.rec.source_tags));
     if(!tags.length)return "";
+    var head4=tags.slice(0,4),restTags=tags.slice(4);
     return '<div class="ibox peak-tags"><div class="itop"><span class="taglab">Measured sub-lists ('+tags.length+'):</span>'+
-      tags.map(function(t){return '<span class="tagpill" title="'+escapeHtml(t.raw)+'">'+escapeHtml(t.label)+'</span>';}).join("")+
+      head4.map(function(t){return '<span class="tagpill" title="'+escapeHtml(t.raw)+'">'+escapeHtml(t.label)+'</span>';}).join("")+
+      (restTags.length?'<details class="more-tags"><summary>+'+restTags.length+' more sub-list'+(restTags.length>1?'s':'')+'</summary> '+
+        restTags.map(function(t){return '<span class="tagpill" title="'+escapeHtml(t.raw)+'">'+escapeHtml(t.label)+'</span>';}).join("")+'</details>':'')+
       '</div></div>';
   }
   var r=row.rec||row;
@@ -1226,7 +1395,7 @@ function renderInterpStrip(row){
     '</div>';
 }
 
-/* Reported 区：一份统一的实测证据表（文献行 + 峰表行）。*/
+/* Reported 区：一份统一的实测证据表数据结构（保留向后兼容供 test_query.js 与导出逻辑调用） */
 function evidenceRows(lit,pk){
   var rows=[];
   lit.forEach(function(r){
@@ -1276,100 +1445,590 @@ function evidenceRows(lit,pk){
   return rows;
 }
 
-function renderReported(lit,pk,label){
-  var box=document.getElementById("reported");
-  box.innerHTML="";
-  if(!lit.length&&!pk.length)return;
-  var rows=evidenceRows(lit,pk);
+/* 提取论文 Author et al. (Year) 可点击引用标签 */
+function citePaperHtml(r){
+  var ref=String(r&&r.reference||"").trim();
+  if(!ref)return "published CIMS work";
+  var m=ref.match(/^([^,]+),\s*(\d{4}[a-z]?)/);
+  var label=m?(m[1].trim().replace(/\band\b/g,"&")+" ("+m[2]+")"):ref;
+  if(r.doi)return '<a class="doi" href="'+doiHref(r.doi)+'" target="_blank" rel="noopener">'+escapeHtml(label)+'</a>';
+  return escapeHtml(label);
+}
 
-  var head=document.createElement("h4");
-  head.className="colhead";
-  head.textContent="Reported"+(label?" · "+label:"");
-  box.appendChild(head);
+/* 从记录文本中提取精简地名/站点名，用于纯英文自动环境综述（零主观臆造） */
+function extractSiteToken(txt,cat){
+  var t=String(txt||"");
+  if(!t)return "";
+  var rules=[
+    [/Hyyti[aä]l[aä]|SMEAR\s*II/i,"Hyytiälä SMEAR II"],
+    [/SOAS|Centreville|Alabama/i,"Alabama SOAS"],
+    [/Georgia|SEARCH/i,"Georgia SEARCH"],
+    [/Vielbrunn|rural central Germany|central Germany/i,"rural central Germany"],
+    [/Beijing|BUCT/i,"Beijing"],
+    [/Guangzhou/i,"Guangzhou"],
+    [/Shanghai/i,"Shanghai"],
+    [/Xiamen/i,"Xiamen"],
+    [/Barcelona/i,"Barcelona"],
+    [/Budapest/i,"Budapest"],
+    [/New Delhi|Delhi/i,"New Delhi"],
+    [/Helsinki/i,"Helsinki"],
+    [/Mace Head/i,"Mace Head"],
+    [/Ny-[AÅ]lesund|Svalbard|Arctic/i,"Arctic Ny-Ålesund"],
+    [/Atlantic/i,"Atlantic MBL"],
+    [/Southern Ocean|Antarctic/i,"Southern Ocean"],
+    [/Pacific|Scripps/i,"coastal Pacific"],
+    [/East China Sea/i,"East China Sea"],
+    [/CLOUD/i,"CERN CLOUD"],
+    [/JPAC|J[uü]lich/i,"Jülich JPAC"],
+    [/TROPOS|IfT|Leipzig/i,"TROPOS Leipzig"],
+    [/UT Austin/i,"UT Austin chamber"],
+    [/flow[- ]tube/i,"oxidation flow tube"]
+  ];
+  for(var i=0;i<rules.length;i++)if(rules[i][0].test(t))return rules[i][1];
+  var first=t.split(/[;·(]/)[0].trim();
+  if(first.length>0&&first.length<=30&&!/multi-campaign|compiled/i.test(first))return first;
+  return "";
+}
 
-  var body=document.createElement("div");
-  body.className="ebody";
-  body.style.padding="0";
-
-  var papers={},contribs={};
-  rows.forEach(function(r){ (r.kind==="lit"?papers:contribs)[r.source]=1; });
-  var np=Object.keys(papers).length,nc=Object.keys(contribs).length;
-  var parts=[];
-  if(np)parts.push("<b>"+np+"</b> publication"+(np>1?"s":""));
-  if(nc)parts.push("<b>"+nc+"</b> peak-list contributor"+(nc>1?"s":""));
-  var p=document.createElement("div");
-  p.className="eline";
-  p.innerHTML='<b>'+rows.length+'</b> record'+(rows.length>1?'s':'')+' from '+parts.join(" and ")+
-    '. Literature rows pair forward-computed ion stoichiometry with the <b>chemical assignment, precursor system, and mechanistic role</b> stated in each source paper.'+
-    (nc===1?'<br><span style="color:#8A5A00">Peak lists from a single contributor may share a common ancestor — that is not independent confirmation. Agreement <i>across</i> contributors is the strong evidence.</span>':'');
-  body.appendChild(p);
-
-  rows.sort(function(a,b){
-    if(a.prank!==b.prank)return a.prank-b.prank;
-    return (a.kind===b.kind)?0:(a.kind==="lit"?-1:1);
+/* 检索某一中性分子在全部试剂离子下的实测峰表行（服从场景筛选 passScene），供自动综述完整统计通道 */
+function allPeakHitsForNeutral(neutralAtoms){
+  if(!neutralAtoms)return [];
+  var map={};
+  REAGENTS.forEach(function(R){
+    var rid=R.id,ra=REAGENT_ATOMS[rid];
+    if(ra)map[rid+"|"+hill(atomsAdd(neutralAtoms,ra))]="adduct";
+    if(rid.slice(-1)==="+")map[rid+"|"+hill(atomsAdd(neutralAtoms,{H:1}))]="prot";
+    else{var da=atomsSub(neutralAtoms,{H:1});if(da)map[rid+"|"+hill(da)]="deprot";}
   });
+  return IONDB.filter(function(r){
+    if(!r.ion_formula||!r.reagent||!passScene(r))return false;
+    return !!map[r.reagent+"|"+canon(r.ion_formula)];
+  });
+}
+
+/* 纯英文、零幻觉的「Molecular & Literature Overview」双段自动综述生成器：
+   第 1 段 Where Observed：汇总外场生态区/代表站点、实验室烟雾箱/流动管、气/粒相态及各试剂离子检出通道；
+   第 2 段 Literature Portrait：汇总物种化学定性、前体物体系、显式论文的核心机理/挥发性/PMF 结论及同分异构/热裂解警示。*/
+function buildMolecularOverview(opts){
+  opts=opts||{};
+  var lit=(opts.lit||[]).slice(),pk=(opts.pk||[]).slice();
+  if(!lit.length&&!pk.length)return "";
+  var formula=opts.formula||"",ionFormula=opts.ionFormula||"";
+  var fAtoms=formula?parseFormula(formula):null;
+  var isRad=false;
+  if(fAtoms){
+    var d0=rdbe(fAtoms,dbeOpts(selectedReagents()[0]||(lit[0]&&lit[0].reagent)));
+    isRad=Math.abs(d0-Math.round(d0))>1e-9;
+  }
+
+  /* 1. 聚合观测场景、代表站点与相态 */
+  var buckets={forest:[],urban:[],marine:[],chamber:[]},bSeen={forest:{},urban:{},marine:{},chamber:{}};
+  function addSite(cat,s){
+    if(!buckets[cat])return;
+    if(s&&!bSeen[cat][s]&&buckets[cat].length<4){bSeen[cat][s]=1;buckets[cat].push(s);}
+    else if(!s&&!bSeen[cat]._any){bSeen[cat]._any=1;}
+  }
+  var hasBucket={forest:false,urban:false,marine:false,chamber:false};
+  function markCat(cat,txt){if(!buckets[cat])return;hasBucket[cat]=true;addSite(cat,extractSiteToken(txt,cat));}
+
+  var phases={gas:false,particle:false};
+  lit.forEach(function(r){
+    recPhases(r).forEach(function(p){if(p==="gas")phases.gas=true;if(p==="particle")phases.particle=true;});
+    var st=splitSceneVals(recSetting(r)),bm=splitSceneVals(recBiome(r));
+    var envTxt=[r.environment,r.instrument].filter(Boolean).join(" ");
+    if(st.indexOf("chamber")>=0)markCat("chamber",envTxt);
+    bm.forEach(function(b){if(buckets[b])markCat(b,envTxt);});
+    if(st.indexOf("atmosphere")>=0&&!bm.length){
+      if(/rural|forest|boreal/i.test(envTxt))markCat("forest",envTxt);
+      else if(/coastal|marine|sea/i.test(envTxt))markCat("marine",envTxt);
+      else markCat("urban",envTxt);
+    }
+  });
+  pk.forEach(function(r){
+    recPhases(r).forEach(function(p){if(p==="gas")phases.gas=true;if(p==="particle")phases.particle=true;});
+    var tags=parseSourceTags(r.source_tags);
+    if(tags.length){
+      tags.forEach(function(t){
+        if(t.meta&&t.meta.cat&&t.meta.cat!=="bg")markCat(t.meta.cat,t.meta.site||t.label);
+      });
+    }else{
+      var st=splitSceneVals(recSetting(r)),bm=splitSceneVals(recBiome(r));
+      var siteTxt=[r.site,r.campaign].filter(Boolean).join(" ");
+      if(st.indexOf("chamber")>=0)markCat("chamber",siteTxt);
+      bm.forEach(function(b){if(buckets[b])markCat(b,siteTxt);});
+    }
+  });
+
+  var envClauses=[];
+  if(hasBucket.forest)envClauses.push("<b>forest &amp; rural atmospheres</b>"+(buckets.forest.length?" ("+buckets.forest.map(escapeHtml).join(", ")+")":""));
+  if(hasBucket.urban)envClauses.push("<b>urban air</b>"+(buckets.urban.length?" ("+buckets.urban.map(escapeHtml).join(", ")+")":""));
+  if(hasBucket.marine)envClauses.push("<b>coastal &amp; marine boundary-layer air</b>"+(buckets.marine.length?" ("+buckets.marine.map(escapeHtml).join(", ")+")":""));
+  if(hasBucket.chamber)envClauses.push("<b>laboratory oxidation chambers &amp; flow tubes</b>"+(buckets.chamber.length?" ("+buckets.chamber.map(escapeHtml).join(", ")+")":""));
+
+  function joinOxford(arr){
+    if(!arr.length)return "";
+    if(arr.length===1)return arr[0];
+    if(arr.length===2)return arr[0]+" and "+arr[1];
+    return arr.slice(0,-1).join(", ")+", and "+arr[arr.length-1];
+  }
+  var phTxt=(phases.gas&&phases.particle)?" across both <b>gas and particle phases</b>"
+           :(phases.gas?" in the <b>gas phase</b>":(phases.particle?" in the <b>particle phase</b>":""));
+
+  /* 2. 聚合各试剂离子与检出离子式通道 */
+  var rStats={},rOrder=[];
+  function touchR(rid){
+    if(!rid)return null;
+    if(!rStats[rid]){rStats[rid]={papers:{},plists:{},ions:{}};rOrder.push(rid);}
+    return rStats[rid];
+  }
+  selectedReagents().forEach(function(rid){
+    if(lit.some(function(r){return r.reagent===rid;})||pk.some(function(r){return r.reagent===rid;}))touchR(rid);
+  });
+  lit.forEach(function(r){
+    var st=touchR(r.reagent);if(!st)return;
+    if(r.reference)st.papers[r.reference]=1;
+    var a=parseFormula(r.formula),ia=recIonAtoms(r);
+    if(a&&ia){
+      var iform=hill(ia),mz=ionMz(fmass(a),r.reagent,r.detection).toFixed(4);
+      st.ions[iform]={ion:iform,mz:mz,det:r.detection||"adduct"};
+    }
+  });
+  pk.forEach(function(r){
+    var st=touchR(r.reagent);if(!st)return;
+    if(r.peaklist_file)st.plists[r.peaklist_file]=1;
+    if(r.ion_formula){
+      var iform=canon(r.ion_formula);
+      var ch=derivePeakChannel(iform,r.reagent,formula);
+      if(!st.ions[iform])st.ions[iform]={ion:iform,mz:r.mz?(+r.mz).toFixed(4):"",det:ch.det||""};
+    }
+  });
+
+  var rClauses=rOrder.map(function(rid){
+    var st=rStats[rid],np=Object.keys(st.papers).length,nl=Object.keys(st.plists).length;
+    var counts=[];
+    if(np)counts.push(np+" publication"+(np>1?"s":""));
+    if(nl)counts.push(nl+" peak list"+(nl>1?"s":""));
+    var ionItems=Object.keys(st.ions).map(function(k){
+      var info=st.ions[k];
+      var role=(info.det==="deprot")?"deprotonated ":(info.det==="prot"?"protonated ":(Object.keys(st.ions).length>1?"cluster adduct ":""));
+      return role+"<b>"+prettyIon(info.ion,rid)+"</b>"+(info.mz?" ("+info.mz+" Th)":"");
+    });
+    return "<b>"+prettyReagent(rid)+" CIMS</b> ("+counts.join(", ")+
+      (ionItems.length?"; as "+joinOxford(ionItems):"")+")";
+  });
+
+  var prefix=opts.focusPrefix?(opts.focusPrefix+" "):"";
+  var p1=prefix+(envClauses.length?("Observed across "+joinOxford(envClauses)+phTxt+".")
+                                  :("Recorded in measured CIMS datasets"+phTxt+"."))+
+         (rClauses.length?(" Detected via "+joinOxford(rClauses)+"."):"");
+
+  /* 3. 第 2 段：Literature Portrait（严格基于文献库字段，零外推） */
+  var p2="";
+  if(lit.length){
+    var expR=[],serR=[],tabR=[],rngR=[];
+    lit.forEach(function(r){
+      var b=String(r.basis||"explicit").toLowerCase();
+      if(b==="range")rngR.push(r);
+      else if(b==="series")serR.push(r);
+      else if(b==="table_only")tabR.push(r);
+      else expR.push(r);
+    });
+    var ordered=expR.concat(serR,tabR,rngR);
+    var ids=[],idSeen={},precs=[],precSeen={},cavs=[],cavSeen={};
+    ordered.forEach(function(r){
+      var idv=String(r.identity||"").trim();
+      if(idv&&!/^peak-?list formula$/i.test(idv)&&!idSeen[idv.toLowerCase()]&&ids.length<3){
+        idSeen[idv.toLowerCase()]=1;ids.push(idv);
+      }
+      var prv=String(r.precursor||"").trim();
+      if(prv&&!precSeen[prv.toLowerCase()]&&precs.length<3){
+        precSeen[prv.toLowerCase()]=1;precs.push(prv);
+      }
+      var cv=String(r.caveat||"").trim();
+      if(cv&&!cavSeen[cv.toLowerCase()]&&cavs.length<2){
+        cavSeen[cv.toLowerCase()]=1;cavs.push(cv);
+      }
+    });
+
+    var subj=formula?("<b>"+pretty(formula)+(isRad?'<span class="dot">•</span>':'')+"</b>"):"This species";
+    var sLead="";
+    if(ids.length){
+      sLead="Across peer-reviewed CIMS studies, "+subj+" is assigned to <b>"+
+        ids.map(escapeHtml).join(" / ")+"</b>"+
+        (precs.length?(", associated with "+precs.map(escapeHtml).join("; ")):"")+".";
+    }else{
+      sLead=subj+" is catalogued in <b>"+lit.length+"</b> published CIMS record"+(lit.length>1?"s":"")+
+        (precs.length?(" ("+precs.map(escapeHtml).join("; ")+")"):"")+
+        ", without a specific constitutional isomer name assigned in the source text.";
+    }
+
+    /* 提取最多 3 条具体研究结论（优先 explicit，不足时补 series） */
+    var detailPool=expR.slice(0,3);
+    if(detailPool.length<2){
+      serR.slice(0,2-detailPool.length).forEach(function(r){detailPool.push(r);});
+    }
+    var usedRefs={};
+    var findings=[];
+    detailPool.forEach(function(r){
+      var mech=String(r.mechanism||"").trim().replace(/\.$/,"");
+      if(!mech||/^reported in source peak list/i.test(mech))return;
+      usedRefs[r.reference]=1;
+      mech=mech.charAt(0).toLowerCase()+mech.slice(1);
+      findings.push(citePaperHtml(r)+" report it as "+escapeHtml(mech).replace(/^report(?:ed|s)?\s+(?:as\s+)?/i,""));
+    });
+    /* 对英文动词做自然润色，避免 "report it as rank #2..." 生硬拼接 */
+    findings=detailPool.map(function(r){
+      var mech=String(r.mechanism||"").trim().replace(/\.$/,"");
+      if(!mech||/^reported in source peak list/i.test(mech))return "";
+      usedRefs[r.reference]=1;
+      return citePaperHtml(r)+": "+escapeHtml(mech);
+    }).filter(Boolean);
+
+    var restSer=serR.filter(function(r){return !usedRefs[r.reference];});
+    var restTab=tabR.filter(function(r){return !usedRefs[r.reference];});
+    var restRng=rngR.filter(function(r){return !usedRefs[r.reference];});
+    function uniqCites(arr){
+      var out=[],s={};
+      arr.forEach(function(r){if(r.reference&&!s[r.reference]){s[r.reference]=1;out.push(citePaperHtml(r));}});
+      return out;
+    }
+    var rollups=[];
+    var sc=uniqCites(restSer),tc=uniqCites(restTab),rc=uniqCites(restRng);
+    if(sc.length)rollups.push("homologous-series member in "+joinOxford(sc));
+    if(tc.length)rollups.push("SI peak tables of "+joinOxford(tc));
+    if(rc.length)rollups.push("range-expanded formula bounds in "+joinOxford(rc));
+
+    var parts=[sLead];
+    if(findings.length)parts.push(findings.join("; ")+".");
+    if(rollups.length)parts.push("Also recorded via "+joinOxford(rollups)+".");
+    if(cavs.length)parts.push('<span style="color:var(--warn)">Analytical note: '+cavs.map(escapeHtml).join("; ")+'.</span>');
+    p2=parts.join(" ");
+  }else{
+    var pfiles={},bgOnly=true;
+    pk.forEach(function(r){
+      if(r.peaklist_file)pfiles[r.peaklist_file]=1;
+      var ts=parseSourceTags(r.source_tags);
+      if(!ts.length||ts.some(function(t){return !t.meta||t.meta.cat!=="bg";}))bgOnly=false;
+    });
+    var nfCnt=Object.keys(pfiles).length;
+    var targetLbl=formula?("<b>"+pretty(formula)+"</b>"):(ionFormula?("<b>"+prettyIon(ionFormula,pk[0]&&pk[0].reagent)+"</b>"):"this species");
+    p2="No peer-reviewed paper in the curated literature database currently assigns an individual chemical identity to "+
+       targetLbl+"; evidence here comes from <b>"+nfCnt+"</b> measured instrument peak list"+(nfCnt>1?"s":"")+
+       (bgOnly?" (flagged in Teflon/background sub-lists — verify against chamber blank)":"")+".";
+  }
+
+  return '<div class="vnarrative">'+
+    '<div class="vnar-head"><span class="vnar-title">Molecular &amp; Literature Overview '+
+      '<span class="vnar-badge">— synthesized strictly from matched database records</span></span></div>'+
+    '<p class="vnar-p"><span class="vnar-tag">Where Observed</span>'+p1+'</p>'+
+    (p2?'<p class="vnar-p"><span class="vnar-tag">Literature Portrait</span>'+p2+'</p>':'')+
+  '</div>';
+}
+
+/* 渲染统一文献表（当前勾选试剂离子优先、explicit 优先，其后无缝衔接跨试剂互证文献，不再拆成两处） */
+function renderLiteratureSection(host,selLit,crossLit,hintNeutral){
+  var seen={},all=[];
+  function basisRank(r){
+    var b=String(r.basis||"explicit").toLowerCase();
+    return b==="explicit"?0:(b==="series"?1:(b==="table_only"?2:3));
+  }
+  var s1=(selLit||[]).slice().sort(function(a,b){
+    var pa=phaseRank(a),pb=phaseRank(b);
+    if(pa!==pb)return pa-pb;
+    return basisRank(a)-basisRank(b);
+  });
+  s1.forEach(function(r){var k=r.id||(r.formula+"|"+r.reagent+"|"+r.reference);seen[k]=1;all.push({r:r,cross:false});});
+  var s2=(crossLit||[]).filter(function(r){
+    var k=r.id||(r.formula+"|"+r.reagent+"|"+r.reference);
+    if(seen[k])return false;seen[k]=1;return true;
+  }).sort(function(a,b){
+    var pa=phaseRank(a),pb=phaseRank(b);
+    if(pa!==pb)return pa-pb;
+    return basisRank(a)-basisRank(b);
+  });
+  s2.forEach(function(r){all.push({r:r,cross:true});});
+  if(!all.length)return;
+
+  var papers={};all.forEach(function(x){if(x.r.reference)papers[x.r.reference]=1;});
+  var np=Object.keys(papers).length;
+  var hdr=document.createElement("div");
+  hdr.className="sec-h";
+  hdr.innerHTML='<span>Peer-Reviewed Literature · '+np+' Paper'+(np>1?'s':'')+
+    (s2.length&&s1.length?' ('+s1.length+' under selected reagent + '+s2.length+' cross-reagent)':'')+'</span>'+
+    '<span class="sub">Explicit main-text assignments shown first</span>';
+  host.appendChild(hdr);
+
+  var sumDiv=document.createElement("div");
+  sumDiv.innerHTML=provSummary(all.map(function(x){return x.r;}));
+  host.appendChild(sumDiv);
+
+  var colCount=MAINT?7:6;
   var t=document.createElement("table");
   t.className="rep";
-  var htmlRows=['<tr><th>Ion</th><th>Neutral</th><th>m/z</th><th>Phase</th><th>Reagent</th>'+
-                '<th>Source &amp; Locator</th><th>Scene &amp; Instrument</th></tr>'];
-  var lastRank=-1;
-  rows.forEach(function(r){
-    if(PHASE&&r.prank!==lastRank&&lastRank>=0){
-      htmlRows.push('<tr class="phsep"><td colspan="7">'+
-        (r.prank===2?('Not observed in the '+PHASE+' phase')
-                    :'Phase not recorded')+'</td></tr>');
+  var htmlRows=['<tr><th>Detected Ion</th><th>Neutral</th><th>m/z</th><th>Phase</th><th>Reagent</th>'+
+                '<th>Reference &amp; Locator</th><th>Scene &amp; Instrument</th>'+(MAINT?'<th></th>':'')+'</tr>'];
+  var addedCrossSep=false;
+  all.forEach(function(item){
+    var r=item.r;
+    if(item.cross&&s1.length&&!addedCrossSep){
+      addedCrossSep=true;
+      htmlRows.push('<tr class="phsep"><td colspan="'+colCount+'">Cross-reagent confirmation — same neutral molecule ('+pretty(r.formula)+') under other CIMS reagent ions</td></tr>');
     }
-    lastRank=r.prank;
-    var R=reagent(r.reagent);
-    var pv=(r.kind==="lit")?provenance(r.rec):null;
-    var src;
-    if(r.kind==="lit"){
-      src='<span class="src lit">Literature</span> '+provTag(r.rec,true)+
-          (r.doi?'<a class="doi" href="'+doiHref(r.doi)+'" target="_blank" rel="noopener">'+
-                 escapeHtml(r.source)+'</a>':escapeHtml(r.source))+
-          (r.locator?' <span class="loc">'+escapeHtml(r.locator)+'</span>':'');
-    }else{
-      src='<span class="src peak">Peak list</span> '+escapeHtml(r.source)+
-          (r.peakfile?'<br><span style="color:var(--muted);font-size:11.5px">'+escapeHtml(r.peakfile)+'</span>':'')+
-          (r.reference?'<br><span style="color:var(--muted);font-size:11.5px">'+escapeHtml(r.reference)+'</span>':'');
-    }
-    var neu=r.neutral
-      ? (r.neutralDerived?'<span style="color:var(--muted)" title="Derived by subtracting the reagent ion from the assigned ion formula">'+pretty(r.neutral)+'</span>'
-                         :pretty(r.neutral))
-      : '<span style="color:var(--muted)">—</span>';
-    var cls=(r.kind==="peak"&&r.cls&&r.cls!=="organic")
-      ? ' <span class="cls '+r.cls+'">'+(CLS_LABEL[r.cls]||r.cls)+'</span>' : '';
-    var pl=r.phases||[];
-    var ph=pl.length
-      ? '<span class="ph ph-'+(pl.length>1?"both":pl[0])+'">'+escapeHtml(pl.join(" / "))+'</span>'
-      : '<span style="color:var(--muted)">—</span>';
-    var strip=renderInterpStrip(r);
+    var a=parseFormula(r.formula),ia=recIonAtoms(r),iform=ia?hill(ia):"—";
+    var mz=a?ionMz(fmass(a),r.reagent,r.detection).toFixed(4):"—";
+    var R=reagent(r.reagent),pv=provenance(r);
+    var pl=recPhases(r);
+    var ph=pl.length?'<span class="ph ph-'+(pl.length>1?"both":pl[0])+'">'+escapeHtml(pl.join(" / "))+'</span>':'<span style="color:var(--muted)">—</span>';
+    var src=provTag(r,true)+(r.doi?'<a class="doi" href="'+doiHref(r.doi)+'" target="_blank" rel="noopener">'+escapeHtml(r.reference)+'</a>':escapeHtml(r.reference||"—"))+
+            (r.locator?' <span class="loc">'+escapeHtml(r.locator)+'</span>':'');
+    var scene=[r.environment,r.instrument].filter(Boolean).join(" · ")||"—";
+    var strip=renderInterpStrip({kind:"lit",rec:r});
     var rCls=[];
     if(strip)rCls.push("r-main");
     if(pv)rCls.push(pv.k==="box"?"derived box":"derived");
-    if(r.prank===2)rCls.push("offphase");
-    htmlRows.push('<tr'+(rCls.length?' class="'+rCls.join(" ")+'"':'')+'><td class="mono">'+pretty(r.ion)+cls+'</td>'+
-      '<td class="mono">'+neu+'</td>'+
-      '<td class="mono">'+escapeHtml(String(r.mz))+'</td>'+
+    if(phaseRank(r)===2)rCls.push("offphase");
+    var detShort=(r.detection==="deprot")?"[M−H]⁻":(r.detection==="prot"?"[M+H]⁺":("[M·"+r.reagent.replace(/[-+]$/,"")+"]"+(r.reagent.slice(-1)==="+"?"⁺":"⁻")));
+    htmlRows.push('<tr'+(rCls.length?' class="'+rCls.join(" ")+'"':'')+(item.cross?' style="background:#FDFBFF"':'')+'>'+
+      '<td class="mono">'+prettyIon(iform,r.reagent)+'<span class="det-pill">'+escapeHtml(detShort)+'</span></td>'+
+      '<td class="mono">'+pretty(r.formula)+'</td>'+
+      '<td class="mono">'+mz+'</td>'+
       '<td>'+ph+'</td>'+
-      '<td class="mono" style="color:'+R.color+';font-weight:600">'+escapeHtml(r.reagent)+
-        (r.detection&&r.detection!=="adduct"?'<br><span style="color:var(--muted);font-weight:400;font-size:11px">'+
-          escapeHtml(DET_LABEL[r.detection]||r.detection)+'</span>':'')+'</td>'+
+      '<td class="mono" style="color:'+R.color+';font-weight:600">'+escapeHtml(r.reagent)+'</td>'+
       '<td>'+src+'</td>'+
-      '<td style="color:var(--muted)">'+escapeHtml(r.context||"—")+'</td></tr>');
+      '<td style="color:var(--muted)">'+escapeHtml(scene)+'</td>'+
+      (MAINT?'<td class="rowact"><button title="Delete this record" onclick="delRecord(\''+r.id+'\')">del</button></td>':'')+
+      '</tr>');
     if(strip){
       var iCls=["r-interp"];
       if(pv)iCls.push(pv.k==="box"?"derived box":"derived");
-      if(r.prank===2)iCls.push("offphase");
-      htmlRows.push('<tr class="'+iCls.join(" ")+'"><td></td><td colspan="6">'+strip+'</td></tr>');
+      if(phaseRank(r)===2)iCls.push("offphase");
+      htmlRows.push('<tr class="'+iCls.join(" ")+'"'+(item.cross?' style="background:#FDFBFF"':'')+'><td></td><td colspan="'+(colCount-1)+'">'+strip+'</td></tr>');
     }
   });
   t.innerHTML=htmlRows.join("");
-  body.appendChild(t);
+  host.appendChild(t);
+}
 
-  var w=document.createElement("div");
-  w.appendChild(body);
-  box.appendChild(w);
+/* 渲染按离子通道归组的实测峰表区（全英文元数据 + Master_RB 子峰表折叠徽章 + 上标电荷） */
+function renderPeakGroupsSection(host,pk,hintNeutral){
+  if(!pk||!pk.length)return;
+  var groups={},order=[];
+  pk.forEach(function(r){
+    var key=(r.ion_formula||"—")+"|"+r.reagent;
+    if(!groups[key]){groups[key]={ion:r.ion_formula||"—",reagent:r.reagent,rows:[]};order.push(key);}
+    groups[key].rows.push(r);
+  });
+  /* 团簇加合通道排在去质子通道前 */
+  order.sort(function(ka,kb){
+    var ga=groups[ka],gb=groups[kb];
+    var ca=derivePeakChannel(ga.ion,ga.reagent,hintNeutral);
+    var cb=derivePeakChannel(gb.ion,gb.reagent,hintNeutral);
+    var ra=(ca.det==="adduct"?0:1),rb=(cb.det==="adduct"?0:1);
+    if(ra!==rb)return ra-rb;
+    return parseFloat(gb.rows[0].mz||0)-parseFloat(ga.rows[0].mz||0);
+  });
+
+  var pfiles={},contribs={};
+  pk.forEach(function(r){if(r.peaklist_file)pfiles[r.peaklist_file]=1;if(r.contributor)contribs[r.contributor]=1;});
+  var hdr=document.createElement("div");
+  hdr.className="sec-h";
+  hdr.innerHTML='<span>Measured Peak Lists · '+Object.keys(pfiles).length+' Instrument List'+(Object.keys(pfiles).length>1?'s':'')+'</span>'+
+    '<span class="sub">'+(Object.keys(contribs).length===1&&Object.keys(pfiles).length>1
+      ? 'Single contributor across lists — check independent studies for confirmation'
+      : 'Grouped by detected ion formula')+'</span>';
+  host.appendChild(hdr);
+
+  order.forEach(function(key){
+    var g=groups[key],R=reagent(g.reagent);
+    var ch=derivePeakChannel(g.ion,g.reagent,hintNeutral);
+    var mzs=g.rows.map(function(r){return parseFloat(r.mz);}).filter(function(v){return isFinite(v);});
+    var mzTxt="";
+    if(mzs.length){
+      var lo=Math.min.apply(null,mzs),hi=Math.max.apply(null,mzs);
+      mzTxt=(hi-lo>0.0002)?("m/z "+lo.toFixed(4)+" – "+hi.toFixed(4)):("m/z "+lo.toFixed(4));
+    }
+    var phSet={};g.rows.forEach(function(r){recPhases(r).forEach(function(p){phSet[p]=1;});});
+    var phArr=Object.keys(phSet);
+    var phHtml=phArr.length?'<span class="ph ph-'+(phArr.length>1?"both":phArr[0])+'">'+escapeHtml(phArr.join(" / "))+'</span>':'';
+    var cls0=g.rows[0]["class"]||"organic";
+    var clsHtml=(cls0!=="organic")?'<span class="cls '+cls0+'">'+(CLS_LABEL[cls0]||cls0)+'</span>':'';
+
+    var card=document.createElement("div");
+    card.className="pk-group";
+    var headHtml='<div class="pk-ghead">'+
+      '<span class="ionf" style="color:'+R.color+'">'+prettyIon(g.ion,g.reagent)+'</span>'+
+      (ch.pill?'<span class="det-pill">'+escapeHtml(ch.pill)+(ch.derived?' (restored)':'')+'</span>':'')+
+      clsHtml+
+      (mzTxt?'<span class="mono" style="color:var(--muted);font-size:12px">'+mzTxt+'</span>':'')+
+      phHtml+
+      '<span class="mono" style="margin-left:auto;font-size:11.5px;color:var(--muted)">'+escapeHtml(g.reagent)+' · '+g.rows.length+' list'+(g.rows.length>1?'s':'')+'</span>'+
+    '</div>';
+
+    var trs=g.rows.slice().sort(function(a,b){return phaseRank(a)-phaseRank(b);}).map(function(r){
+      var tags=parseSourceTags(r.source_tags);
+      var contrib=fmtContributor(r.contributor);
+      var refPart=r.reference?(' · <span style="color:var(--muted)">'+escapeHtml(r.reference)+'</span>'):'';
+      if(tags.length){
+        var h4=tags.slice(0,4),rest=tags.slice(4);
+        return '<tr'+(phaseRank(r)===2?' class="offphase"':'')+'>'+
+          '<td style="width:30%"><b>Compiled Multi-Campaign List</b><br><span style="color:var(--muted);font-size:11.5px">'+escapeHtml(contrib)+'</span></td>'+
+          '<td colspan="2"><div style="color:var(--muted);font-size:12px">Matched in <b>'+tags.length+'</b> field &amp; chamber sub-list'+(tags.length>1?'s':'')+' · '+escapeHtml(r.instrument||"")+'</div>'+
+          '<div class="subtags">'+h4.map(function(t){return '<span class="tagpill" title="'+escapeHtml(t.raw)+'">'+escapeHtml(t.label)+'</span>';}).join("")+
+          (rest.length?'<details class="more-tags"><summary>+'+rest.length+' more sub-list'+(rest.length>1?'s':'')+'</summary> '+
+            rest.map(function(t){return '<span class="tagpill" title="'+escapeHtml(t.raw)+'">'+escapeHtml(t.label)+'</span>';}).join("")+'</details>':'')+
+          '</div></td></tr>';
+      }
+      var ctx=[r.site,r.campaign,r.instrument].filter(Boolean).join(" · ")||"—";
+      return '<tr'+(phaseRank(r)===2?' class="offphase"':'')+'>'+
+        '<td style="width:30%"><b>'+escapeHtml(contrib)+'</b>'+refPart+'</td>'+
+        '<td style="color:var(--muted)">'+escapeHtml(ctx)+'</td>'+
+        '<td class="mono" style="color:var(--muted);text-align:right;font-size:11.5px">'+escapeHtml(r.peaklist_file||"")+'</td></tr>';
+    });
+    card.innerHTML=headHtml+'<table class="rep" style="margin-top:0">'+trs.join("")+'</table>';
+    host.appendChild(card);
+  });
+}
+
+/* 纯数字质量查询（Mode 3）：按精确 m/z 聚类文献候选卡 + 去重后的邻峰实测离子表 */
+function renderMassWindowSection(host,dLit,dPk,focusMz){
+  var litClusters={},cOrder=[];
+  dLit.forEach(function(r){
+    var a=parseFormula(r.formula),ia=recIonAtoms(r);
+    if(!a||!ia)return;
+    var iform=hill(ia),mz=ionMz(fmass(a),r.reagent,r.detection);
+    var k=r.formula+"|"+r.reagent+"|"+(r.detection||"adduct");
+    if(!litClusters[k]){
+      var dbe=rdbe(a,dbeOpts(r.reagent));
+      litClusters[k]={key:k,formula:r.formula,atoms:a,ion:iform,reagent:r.reagent,
+        det:r.detection||"adduct",mz:mz,dbe:dbe,radical:Math.abs(dbe-Math.round(dbe))>1e-9,recs:[]};
+      cOrder.push(litClusters[k]);
+    }
+    litClusters[k].recs.push(r);
+  });
+  cOrder.sort(function(a,b){return a.mz-b.mz;});
+
+  var litIonMap={};
+  if(cOrder.length){
+    var hdr=document.createElement("div");
+    hdr.className="sec-h";
+    hdr.innerHTML='<span>Literature-Assigned Candidates in Window · '+cOrder.length+' Species</span>'+
+      '<span class="sub">Click any candidate header to focus the FWHM band &amp; overview above</span>';
+    host.appendChild(hdr);
+
+    cOrder.forEach(function(cl){
+      litIonMap[cl.ion+"|"+cl.reagent]=1;
+      var nPk=dPk.filter(function(p){return canon(p.ion_formula)===cl.ion&&p.reagent===cl.reagent;}).length;
+      var isFocus=(focusMz!==null&&Math.abs(cl.mz-focusMz)<0.0006);
+      var R=reagent(cl.reagent);
+      var card=document.createElement("div");
+      card.className="mz-card"+(isFocus?" active-focus":"");
+      var detShort=ionLabel(cl.formula,cl.reagent,cl.det);
+      var head=document.createElement("div");
+      head.className="mz-head";
+      head.onclick=function(){setMassFocus(cl.mz);};
+      head.innerHTML=
+        '<span class="mz-val">'+cl.mz.toFixed(4)+' Th</span>'+
+        '<span class="mz-ion" style="color:'+R.color+'">'+prettyIon(cl.ion,cl.reagent)+'</span>'+
+        '<span class="mz-neu">&larr; <b>'+pretty(cl.formula)+(cl.radical?'<span class="dot">•</span>':'')+'</b>'+
+          '<span class="det-pill">'+escapeHtml(detShort)+'</span>'+
+          (cl.radical?'<span class="rad-pill">radical · DBE '+dbeText(cl.dbe)+'</span>'
+                     :'<span class="det-pill">DBE '+dbeText(cl.dbe)+'</span>')+
+        '</span>'+
+        '<span class="mz-right">'+
+          '<span class="vchip"><b>'+cl.recs.length+'</b> paper'+(cl.recs.length>1?'s':'')+'</span>'+
+          (nPk?'<span class="vchip"><b>'+nPk+'</b> peak list'+(nPk>1?'s':'')+'</span>':'')+
+        '</span>';
+      card.appendChild(head);
+
+      var t=document.createElement("table");
+      t.className="rep";
+      t.style.marginTop="0";
+      var rowsHtml=[];
+      cl.recs.forEach(function(r){
+        var pv=provenance(r),pl=recPhases(r);
+        var ph=pl.length?'<span class="ph ph-'+(pl.length>1?"both":pl[0])+'">'+escapeHtml(pl.join(" / "))+'</span>':'<span style="color:var(--muted)">—</span>';
+        var src=provTag(r,true)+(r.doi?'<a class="doi" href="'+doiHref(r.doi)+'" target="_blank" rel="noopener">'+escapeHtml(r.reference)+'</a>':escapeHtml(r.reference||"—"))+
+                (r.locator?' <span class="loc">'+escapeHtml(r.locator)+'</span>':'');
+        var scene=[r.environment,r.instrument].filter(Boolean).join(" · ")||"—";
+        var strip=renderInterpStrip({kind:"lit",rec:r});
+        rowsHtml.push('<tr class="'+(strip?'r-main':'')+(pv?(pv.k==="box"?" derived box":" derived"):"")+'">'+
+          '<td style="width:34%">'+src+'</td>'+
+          '<td style="width:12%">'+ph+'</td>'+
+          '<td style="color:var(--muted)">'+escapeHtml(scene)+'</td></tr>');
+        if(strip){
+          rowsHtml.push('<tr class="r-interp'+(pv?(pv.k==="box"?" derived box":" derived"):"")+'"><td colspan="3">'+strip+'</td></tr>');
+        }
+      });
+      t.innerHTML=rowsHtml.join("");
+      card.appendChild(t);
+      host.appendChild(card);
+    });
+  }
+
+  /* 汇总窗口内的实测峰表离子：每个 (ion_formula, reagent) 合并为一行并按精确 m/z 排序 */
+  if(dPk.length){
+    var pkMap={},pkList=[];
+    dPk.forEach(function(r){
+      var k=(r.ion_formula||("mz_"+r.mz))+"|"+r.reagent;
+      if(!pkMap[k]){pkMap[k]={ion:r.ion_formula||"",reagent:r.reagent,rows:[]};pkList.push(pkMap[k]);}
+      pkMap[k].rows.push(r);
+    });
+    pkList.forEach(function(g){
+      var mzs=g.rows.map(function(r){return parseFloat(r.mz);}).filter(function(v){return isFinite(v);});
+      g.mz=mzs.length?(mzs.reduce(function(a,b){return a+b;},0)/mzs.length):0;
+    });
+    pkList.sort(function(a,b){return a.mz-b.mz;});
+
+    var hdr2=document.createElement("div");
+    hdr2.className="sec-h";
+    hdr2.innerHTML='<span>Measured Peak-List Ions in Window · '+pkList.length+' Distinct Ion'+(pkList.length>1?'s':'')+'</span>'+
+      '<span class="sub">Deduplicated across '+dPk.length+' peak-list entries · click any row to focus on the ruler</span>';
+    host.appendChild(hdr2);
+
+    var t2=document.createElement("table");
+    t2.className="rep";
+    var h2=['<tr><th>Exact m/z</th><th>Measured Ion</th><th>Restored Neutral</th><th>Phase</th><th>Reagent</th><th>Contributors &amp; Lists</th></tr>'];
+    pkList.forEach(function(g){
+      var R=reagent(g.reagent),ch=derivePeakChannel(g.ion,g.reagent,"");
+      var phSet={},cSet={},fSet={},tagCnt=0;
+      g.rows.forEach(function(r){
+        recPhases(r).forEach(function(p){phSet[p]=1;});
+        if(r.contributor)cSet[fmtContributor(r.contributor)]=1;
+        if(r.peaklist_file)fSet[r.peaklist_file]=1;
+        tagCnt+=parseSourceTags(r.source_tags).length;
+      });
+      var phArr=Object.keys(phSet);
+      var phHtml=phArr.length?'<span class="ph ph-'+(phArr.length>1?"both":phArr[0])+'">'+escapeHtml(phArr.join(" / "))+'</span>':'<span style="color:var(--muted)">—</span>';
+      var isF=(focusMz!==null&&Math.abs(g.mz-focusMz)<0.0006);
+      var hasLit=!!litIonMap[g.ion+"|"+g.reagent];
+      h2.push('<tr style="cursor:pointer'+(isF?';background:#EEF7F8':'')+'" onclick="setMassFocus('+g.mz.toFixed(5)+')">'+
+        '<td class="mono"><b>'+g.mz.toFixed(4)+'</b></td>'+
+        '<td class="mono">'+(g.ion?prettyIon(g.ion,g.reagent):'<span class="cls unassigned">unassigned</span>')+
+          (hasLit?' <span class="src lit">in lit</span>':'')+'</td>'+
+        '<td class="mono">'+(ch.neutral?(pretty(ch.neutral)+' <span class="det-pill">'+escapeHtml(ch.det==="adduct"?"adduct":ch.det)+'</span>'):'<span style="color:var(--muted)">—</span>')+'</td>'+
+        '<td>'+phHtml+'</td>'+
+        '<td class="mono" style="color:'+R.color+';font-weight:600">'+escapeHtml(g.reagent)+'</td>'+
+        '<td style="color:var(--muted)"><b>'+Object.keys(fSet).length+'</b> list'+(Object.keys(fSet).length>1?'s':'')+
+          (tagCnt?' ('+tagCnt+' master sub-lists)':'')+' · '+escapeHtml(Object.keys(cSet).slice(0,2).join("; "))+'</td></tr>');
+    });
+    t2.innerHTML=h2.join("");
+    host.appendChild(t2);
+  }
+}
+
+function renderReported(lit,pk,label,opts){
+  var box=document.getElementById("reported");
+  if(!box)return;
+  box.innerHTML="";
+  opts=opts||{};
+  var crossLit=opts.crossLit||[];
+  if(!lit.length&&!pk.length&&!crossLit.length)return;
+  if(opts.route==="mass"){
+    renderMassWindowSection(box,lit,pk,opts.focusMz);
+    return;
+  }
+  renderLiteratureSection(box,lit,crossLit,opts.hintNeutral||"");
+  renderPeakGroupsSection(box,pk,opts.hintNeutral||"");
 }
 
 /* ---------------- 还原候选的呈现 ---------------- */
@@ -1377,12 +2036,18 @@ function renderCands(list,ionAtoms){
   var box=document.getElementById("cands");
   box.innerHTML="";
   if(!selectedReagents().length)return;
+  var prim=list.filter(function(c){return c.tier!=="secondary";});
+  var sec =list.filter(function(c){return c.tier==="secondary";});
+  /* 单一确定性主还原且仅有一个次要脱氢解释时，主还原已在 Verdict 卡完整展示，
+     仅在多主候选（如勾选多个试剂离子）或无有效还原时展开候选卡栏 */
+  if(prim.length===1&&!sec.length)return;
+
   var wrap=document.createElement("div");
   wrap.className="cands";
   var ionF=hill(ionAtoms);
-  wrap.innerHTML='<h3>Neutral molecule restored from '+pretty(ionF)+'</h3>';
 
   if(!list.length){
+    wrap.innerHTML='<h3>Neutral molecule restored from '+prettyIon(ionF,selectedReagents()[0])+'</h3>';
     var w=document.createElement("div");
     w.className="cnote";
     w.innerHTML="<b>No valid restoration</b> under the selected reagent ion — subtracting it would give a negative atom count, or a negative DBE.";
@@ -1390,13 +2055,6 @@ function renderCands(list,ionAtoms){
     box.appendChild(wrap);
     return;
   }
-
-  /* 主答案与次要解释分层显示。
-     用户 2026-08-09 选了「保留，但收起来」：给定离子式与试剂离子，中性分子是确定的，
-     主答案只该有一个；脱氢那支在算术上也成立，但把它和主答案平级摆出来正是
-     「容易引起误解」的来源。所以折叠——不丢信息，也不制造歧义。*/
-  var prim=list.filter(function(c){return c.tier!=="secondary";});
-  var sec =list.filter(function(c){return c.tier==="secondary";});
 
   function card(c,i){
     var b=document.createElement("button");
@@ -1415,24 +2073,25 @@ function renderCands(list,ionAtoms){
     return b;
   }
 
-  var grid=document.createElement("div");
-  grid.className="cgrid";
-  prim.forEach(function(c){grid.appendChild(card(c,list.indexOf(c)));});
-  wrap.appendChild(grid);
+  if(prim.length>1){
+    wrap.innerHTML='<h3>Restored neutral candidates from '+prettyIon(ionF,selectedReagents()[0])+'</h3>';
+    var grid=document.createElement("div");
+    grid.className="cgrid";
+    prim.forEach(function(c){grid.appendChild(card(c,list.indexOf(c)));});
+    wrap.appendChild(grid);
+  }
 
   if(sec.length){
     var det=document.createElement("details");
     det.className="secalt";
+    if(prim.length<=1)det.style.marginTop="6px";
     var sum=document.createElement("summary");
     sum.innerHTML='Other arithmetically possible reading'+(sec.length>1?'s':'')+
-      ' ('+sec.map(function(c){return pretty(c.formula)+", "+DET_LABEL[c.det];}).join("; ")+')';
+      ': '+sec.map(function(c){return '<b>'+pretty(c.formula)+'</b> via '+DET_LABEL[c.det]+' ('+c.hits.length+' record'+(c.hits.length===1?'':'s')+')';}).join("; ");
     det.appendChild(sum);
     var note=document.createElement("div");
     note.className="cnote";
-    note.innerHTML='The composition fits, but the mechanism is different. Under nitrate the reagent ion '+
-      'is only displaced by acids stronger than HNO<sub>3</sub>, so ordinary HOMs rarely deprotonate — '+
-      'that is why the cluster adduct is given as the answer. If your compound <i>is</i> a strong acid, '+
-      'this reading may be the right one. The call is yours.';
+    note.innerHTML='Under nitrate CIMS, NO<sub>3</sub><sup>−</sup> is only displaced by acids stronger than HNO<sub>3</sub>, so ordinary HOMs form [M·NO<sub>3</sub>]<sup>−</sup> adducts rather than [M−H]<sup>−</sup>. Click below if you want to inspect the deprotonated restoration:';
     det.appendChild(note);
     var g2=document.createElement("div");
     g2.className="cgrid";
@@ -1444,94 +2103,143 @@ function renderCands(list,ionAtoms){
   if(prim.length&&prim.every(function(c){return c.radical;})){
     var rn=document.createElement("div");
     rn.className="cnote";
-    rn.innerHTML='Every restoration here has a half-integer DBE, i.e. an <b>odd-electron species</b> (a radical). '+
-      'That is a legitimate result — RO<sub>2</sub> radicals are a core target of nitrate CIMS — but if you '+
-      'expected a closed-shell molecule, check the reagent ion you ticked.';
+    rn.innerHTML='Odd-electron restoration (half-integer DBE, e.g. RO<sub>2</sub>• peroxy radical). If you expected a closed-shell species, verify the reagent ion selection.';
     wrap.appendChild(rn);
   }
   box.appendChild(wrap);
 }
 
-/* 中性式输入：正向算出它在各试剂离子下会以什么离子被看到。这一步是**精确的**，
-   不含任何推断——中性 + 试剂离子 → 离子，方向上没有歧义。
-   （反方向「离子 → 中性」才有歧义，那是 restoreForReagent 处理的事。）*/
-function renderForward(neutralAtoms){
-  var box=document.getElementById("cands");
-  box.innerHTML="";
-  var sel=selectedReagents();
-  if(!sel.length)return;
-  var nf=hill(neutralAtoms),nm=fmass(neutralAtoms);
-  var wrap=document.createElement("div");
-  wrap.className="cands";
-  wrap.innerHTML='<h3>How '+pretty(nf)+' would appear in your spectrum</h3>';
-  var t=document.createElement("table");
-  t.innerHTML='<tr><th>Reagent</th><th>Detection</th><th>Ion formula</th><th>Ion m/z</th><th>Peak lists</th></tr>';
+/* 构建中性分子在当前勾选试剂离子下的所有正向预期离子通道 + 库内跨试剂通道 */
+function buildNeutralChannels(neutralAtoms){
+  var sel=selectedReagents(),nf=hill(neutralAtoms),nm=fmass(neutralAtoms);
+  var selected=[],selReagMap={};
   sel.forEach(function(rid){
+    selReagMap[rid]=1;
     var R=reagent(rid),ra=REAGENT_ATOMS[rid],positive=rid.slice(-1)==="+";
     var forms=[];
     if(ra)forms.push({det:"adduct",atoms:atomsAdd(neutralAtoms,ra),mz:nm+R.mass});
     if(positive)forms.push({det:"prot",atoms:atomsAdd(neutralAtoms,{H:1}),mz:nm+MP});
-    else{var da=atomsSub(neutralAtoms,{H:1});
-         if(da)forms.push({det:"deprot",atoms:da,mz:nm-MP});}
+    else{var da=atomsSub(neutralAtoms,{H:1});if(da)forms.push({det:"deprot",atoms:da,mz:nm-MP});}
     forms.forEach(function(f){
       var fi=hill(f.atoms);
-      var n=IONDB.filter(function(r){
-        return r.ion_formula&&canon(r.ion_formula)===fi&&ionPassFilter(r);}).length;
-      t.innerHTML+='<tr><td class="mono" style="color:'+R.color+'">'+escapeHtml(rid)+'</td>'+
-        '<td>'+DET_LABEL[f.det]+'</td>'+
-        '<td class="mono">'+pretty(fi)+'</td>'+
-        '<td class="mono">'+f.mz.toFixed(4)+'</td>'+
-        '<td>'+(n?('<b>'+n+'</b>'):'<span style="color:var(--muted)">—</span>')+'</td></tr>';
+      var nLit=DB.filter(function(r){return passSceneEnv(r)&&canon(r.formula)===nf&&r.reagent===rid&&(r.detection||"adduct")===f.det;}).length;
+      var nPk=IONDB.filter(function(r){return r.ion_formula&&canon(r.ion_formula)===fi&&r.reagent===rid&&passScene(r);}).length;
+      selected.push({reagent:rid,det:f.det,ionFormula:fi,ionAtoms:f.atoms,mz:f.mz,
+        pill:ionLabel(nf,rid,f.det),nLit:nLit,nPk:nPk,color:R.color});
     });
   });
-  wrap.appendChild(t);
-  var note=document.createElement("div");
-  note.className="cnote";
-  note.innerHTML='Neutral mass '+nm.toFixed(4)+' · DBE '+dbeText(rdbe(neutralAtoms,dbeOpts(selectedReagents()[0])))+
-    '. These ion formulas are computed forward from the neutral — exact, not inferred.';
-  wrap.appendChild(note);
-  box.appendChild(wrap);
+  /* 检查跨试剂离子在库中真实存在的通道 */
+  var cross=[];
+  REAGENTS.forEach(function(R){
+    var rid=R.id;if(selReagMap[rid])return;
+    var ra=REAGENT_ATOMS[rid],positive=rid.slice(-1)==="+",forms=[];
+    if(ra)forms.push({det:"adduct",atoms:atomsAdd(neutralAtoms,ra),mz:nm+R.mass});
+    if(positive)forms.push({det:"prot",atoms:atomsAdd(neutralAtoms,{H:1}),mz:nm+MP});
+    else{var da=atomsSub(neutralAtoms,{H:1});if(da)forms.push({det:"deprot",atoms:da,mz:nm-MP});}
+    forms.forEach(function(f){
+      var fi=hill(f.atoms);
+      var nLit=DB.filter(function(r){return passSceneEnv(r)&&canon(r.formula)===nf&&r.reagent===rid&&(r.detection||"adduct")===f.det;}).length;
+      var nPk=IONDB.filter(function(r){return r.ion_formula&&canon(r.ion_formula)===fi&&r.reagent===rid&&passScene(r);}).length;
+      if(nLit||nPk){
+        cross.push({reagent:rid,det:f.det,ionFormula:fi,ionAtoms:f.atoms,mz:f.mz,
+          pill:ionLabel(nf,rid,f.det),nLit:nLit,nPk:nPk,color:R.color});
+      }
+    });
+  });
+  return {selected:selected,cross:cross};
 }
 
-/* 质量输入：输进来的数字是**离子的 m/z**，不是中性分子的质量。
-   （用户 2026-08-09：「339 为例，如果用户选择 NO3⁻，那么带 NO3⁻ 的离子质量是 339，
-     中性分子不是 339，而是 339 − m/z(NO3⁻) = 339 − 62 = 277」）
-   所以这里按每种勾选的试剂离子，把中性质量倒算出来一并给出。*/
-function renderMassInterp(iv,c,ppm){
+/* 中性式输入：可点击切换质量亏损轴的预期离子通道卡片栏 */
+function renderForward(neutralAtoms,chanBundle,activeIdx){
   var box=document.getElementById("cands");
+  if(!box)return;
   box.innerHTML="";
-  var sel=selectedReagents();
-  if(!sel.length)return;
+  chanBundle=chanBundle||buildNeutralChannels(neutralAtoms);
+  if(!chanBundle.selected.length&&!chanBundle.cross.length)return;
+  var nf=hill(neutralAtoms);
   var wrap=document.createElement("div");
   wrap.className="cands";
-  wrap.innerHTML='<h3>Read as an ion m/z of '+
-    (c.mode==="nominal"?c.value:c.value.toFixed(4))+'</h3>';
-  var t=document.createElement("table");
-  t.innerHTML='<tr><th>Reagent</th><th>If cluster adduct</th><th>If deprotonated / protonated</th></tr>';
-  iv.restos.forEach(function(e){
-    var R=reagent(e.reagent);
-    t.innerHTML+='<tr><td class="mono" style="color:'+R.color+'">'+escapeHtml(e.reagent)+'</td>'+
-      '<td class="mono">'+(e.adduct!=null
-        ? 'neutral '+e.adduct.toFixed(4)+'<br><span style="color:var(--muted)">'+
-          (c.mode==="nominal"?c.value:c.value.toFixed(4))+' − '+R.mass.toFixed(4)+'</span>'
-        : '<span style="color:var(--muted)">no adduct for this reagent</span>')+'</td>'+
-      '<td class="mono">neutral '+e.transfer.toFixed(4)+'</td></tr>';
+  wrap.innerHTML='<div class="sec-h" style="margin-top:16px"><span>Expected CIMS Ions &amp; Mass-Defect Axis for '+pretty(nf)+'</span>'+
+    (chanBundle.selected.length>1?'<span class="sub">Click a channel card to switch the mass-defect ruler axis below</span>':'')+'</div>';
+  var grid=document.createElement("div");
+  grid.className="chan-grid";
+  chanBundle.selected.forEach(function(ch,idx){
+    var d=document.createElement("div");
+    var on=(idx===activeIdx);
+    d.className="chan-card"+(on?" active-ax":"");
+    d.onclick=function(){pickNeuChan(idx);};
+    var cnts=[];
+    if(ch.nLit)cnts.push(ch.nLit+" paper"+(ch.nLit>1?"s":""));
+    if(ch.nPk)cnts.push(ch.nPk+" peak list"+(ch.nPk>1?"s":""));
+    d.innerHTML='<div><div class="chan-ion" style="color:'+ch.color+'">'+prettyIon(ch.ionFormula,ch.reagent)+
+      ' <span style="font-weight:400;font-size:12px;color:var(--muted)">('+escapeHtml(ch.pill)+')</span></div>'+
+      '<div class="chan-sub">'+escapeHtml(ch.reagent)+' '+escapeHtml(DET_LABEL[ch.det])+(on?' · <b>shown on ruler below</b>':' · click to inspect '+Math.round(ch.mz)+' Th axis')+'</div></div>'+
+      '<div class="chan-mz"><span class="mval">'+ch.mz.toFixed(4)+'</span><span class="mcnt">'+(cnts.length?cnts.join(" · "):"0 in DB")+'</span></div>';
+    grid.appendChild(d);
   });
-  wrap.appendChild(t);
-  var note=document.createElement("div");
-  note.className="cnote";
-  note.innerHTML='A number typed here is taken to be the <b>m/z you read off the spectrum</b>, i.e. the ion — '+
-    'not the neutral mass. The neutral masses above are worked back from it using the reagent ion you ticked. '+
-    'Both the ion m/z and the neutral masses are searched.';
-  wrap.appendChild(note);
+  chanBundle.cross.forEach(function(ch){
+    var d=document.createElement("div");
+    d.className="chan-card other";
+    var cnts=[];
+    if(ch.nLit)cnts.push(ch.nLit+" paper"+(ch.nLit>1?"s":""));
+    if(ch.nPk)cnts.push(ch.nPk+" list"+(ch.nPk>1?"s":""));
+    d.innerHTML='<div><div class="chan-ion" style="color:'+ch.color+'">'+prettyIon(ch.ionFormula,ch.reagent)+
+      ' <span style="font-weight:400;font-size:12px;color:var(--muted)">('+escapeHtml(ch.pill)+')</span></div>'+
+      '<div class="chan-sub">'+escapeHtml(ch.reagent)+' '+escapeHtml(DET_LABEL[ch.det])+' (cross-reagent in DB)</div></div>'+
+      '<div class="chan-mz"><span class="mval">'+ch.mz.toFixed(4)+'</span><span class="mcnt" style="color:'+ch.color+'">'+cnts.join(" · ")+'</span></div>';
+    grid.appendChild(d);
+  });
+  wrap.appendChild(grid);
   box.appendChild(wrap);
 }
 
+/* 质量输入：仅在勾选了多种试剂离子时补充展示各试剂离子的倒算中性质量对照表 */
+function renderMassInterp(iv,c,ppm){
+  var box=document.getElementById("cands");
+  if(!box)return;
+  box.innerHTML="";
+  var sel=selectedReagents();
+  if(sel.length<=1)return;
+  var wrap=document.createElement("div");
+  wrap.className="cands";
+  wrap.innerHTML='<h3>Back-calculated neutral mass by selected reagent ion</h3>';
+  var t=document.createElement("table");
+  t.className="rep";
+  t.innerHTML='<tr><th>Reagent</th><th>If cluster adduct [M·R]</th><th>If deprotonated / protonated</th></tr>';
+  iv.restos.forEach(function(e){
+    var R=reagent(e.reagent);
+    t.innerHTML+='<tr><td class="mono" style="color:'+R.color+';font-weight:600">'+escapeHtml(e.reagent)+'</td>'+
+      '<td class="mono">'+(e.adduct!=null
+        ? 'neutral '+e.adduct.toFixed(4)+' Da <span style="color:var(--muted)">('+(c.mode==="nominal"?c.value:c.value.toFixed(4))+' − '+R.mass.toFixed(4)+')</span>'
+        : '<span style="color:var(--muted)">no adduct for this reagent</span>')+'</td>'+
+      '<td class="mono">neutral '+e.transfer.toFixed(4)+' Da</td></tr>';
+  });
+  wrap.appendChild(t);
+  box.appendChild(wrap);
+}
 
-/* ---------------- 查询 ---------------- */
-var lastHits=[],candIdx=0;
-function runQuery(){candIdx=0;runQueryInner();}
-function pickCand(i){candIdx=i;runQueryInner();}
+/* ---------------- 查询状态与入口 ---------------- */
+var lastHits=[],candIdx=0,NEU_CHAN_IDX=0,MASS_FOCUS_MZ=null;
+function runQuery(){candIdx=0;NEU_CHAN_IDX=0;MASS_FOCUS_MZ=null;RULER_CTR=null;RULER_SPAN=null;runQueryInner();}
+function pickCand(i){candIdx=i;RULER_CTR=null;RULER_SPAN=null;runQueryInner();}
+function pickNeuChan(i){NEU_CHAN_IDX=i;RULER_CTR=null;RULER_SPAN=null;runQueryInner();}
+function setMassFocus(mz){if(!isFinite(mz))return;MASS_FOCUS_MZ=mz;runQueryInner();}
+function syncResPresets(){
+  var rEl=document.getElementById("res");
+  var v=rEl?parseInt(rEl.value,10):0;
+  var bs=document.querySelectorAll("#rpresets .rpbtn");
+  for(var i=0;i<bs.length;i++){
+    var br=parseInt(bs[i].getAttribute("data-r"),10);
+    bs[i].className="rpbtn"+(br===v?" on":"");
+  }
+}
+function setResPower(r){
+  var rEl=document.getElementById("res");
+  if(rEl)rEl.value=String(r);
+  syncResPresets();
+  redrawRuler();
+}
+
 /* 输入解释的三条路。每一条的语义都是用户 2026-08-09 明确定下来的，
    改动前请先读 HANDOFF §4.9。核心是：**不要让程序去猜用户输入的是什么**——
    电荷符号说了算，纯数字一律当离子 m/z。*/
@@ -1563,16 +2271,18 @@ function interpret(c,ppm){
   }
 
   if(c.mode==="formula"){
-    /* ② 不带电荷符号 → 中性分子。正向算出它在各试剂离子下的离子式，零推断。
-       但要提醒：谱图上**读不到**中性分子，没写符号八成是漏了。*/
+    /* ② 不带电荷符号 → 中性分子。正向合成与所选试剂离子的团簇分子式，零推断。
+       闭壳层常规中性分子给温和灰底提示；奇电子或含 I/Br 原子的无符号式子给橙色强告警。*/
     out.route="neutral";
     out.neutralAtoms=c.value;
-    out.warnings.push({level:"warn",
-      text:"Read as a <b>neutral molecule</b> — there is no charge sign. "+
-           "A neutral cannot be observed directly in a mass spectrum, so if you copied this "+
-           "off your spectrum the sign is probably missing. "+
-           '<a href="#" onclick="addMinus();return false;">Add “−” and read it as an ion</a>'});
-    if(!sel.length)out.warnings.push({level:"warn",text:"Tick the reagent ion you used — without it the ion formula cannot be computed."});
+    var dbeN=rdbe(c.value,dbeOpts(sel[0]));
+    var suspicious=(dbeN<0||Math.abs(dbeN-Math.round(dbeN))>1e-9||!!(c.value.I||c.value.Br));
+    out.warnings.push({level:suspicious?"warn":"note",
+      text:(suspicious
+        ? "Read as a <b>neutral species</b> (no charge sign), though its composition looks like an uncharged radical or reagent-containing ion copied off a spectrum. "
+        : "Interpreted as neutral molecule <b>"+pretty(hill(c.value))+"</b> (no charge sign) and combined forward with your ticked reagent ion. Copied off a spectrum? ")+
+        '<a href="#" onclick="addMinus();return false;">Add “−” and read as an ion &rarr;</a>'});
+    if(!sel.length)out.warnings.push({level:"warn",text:"Tick the reagent ion you used — without it the cluster ion formula cannot be computed."});
     return out;
   }
 
@@ -1613,11 +2323,14 @@ function renderWarnings(list){
 
 function doiHref(d){return "https:"+"//doi.org/"+escapeHtml(d);}
 function runQueryInner(){
-  var c=classify(document.getElementById("q").value);
+  var origC=classify(document.getElementById("q").value);
+  var c=origC;
   var ppm=parseFloat(document.getElementById("ppm").value)||20;
   var res=document.getElementById("results"),rul=document.getElementById("ruler");
+  var rWrap=document.getElementById("rulerWrap");
   var cbox=document.getElementById("cands");
   res.innerHTML="";rul.innerHTML="";cbox.innerHTML="";
+  if(rWrap)rWrap.hidden=true;
   document.getElementById("reported").innerHTML="";
   document.getElementById("verdict").innerHTML="";lastHits=[];
   renderWarnings([]);
@@ -1662,10 +2375,9 @@ function runQueryInner(){
       return (c.mode==="nominal")?Math.round(ion)===c.value:Math.abs(ion-mq)<=tolDa;
     });
   }
-  renderReported(dLit,dPk,repLabel);
 
-  /* 其次是还原／正向计算的呈现。*/
-  var restoredFrom=null,candList=[];
+  /* 其次是还原／正向预期通道／质量换算的准备。*/
+  var restoredFrom=null,candList=[],neuChanBundle=null,activeNeuChan=null;
   if(iv.route==="ion"&&selectedReagents().length){
     var seen={};
     iv.restos.forEach(function(rr){
@@ -1696,9 +2408,53 @@ function runQueryInner(){
       c={mode:"formula",value:candList[candIdx].atoms};
     }
   }else if(iv.route==="neutral"){
-    renderForward(iv.neutralAtoms);
+    neuChanBundle=buildNeutralChannels(iv.neutralAtoms);
+    if(NEU_CHAN_IDX>=neuChanBundle.selected.length)NEU_CHAN_IDX=0;
+    activeNeuChan=neuChanBundle.selected[NEU_CHAN_IDX]||null;
+    renderForward(iv.neutralAtoms,neuChanBundle,NEU_CHAN_IDX);
   }else if(iv.route==="mass"){
     renderMassInterp(iv,c,ppm);
+  }
+
+  /* 决定质量亏损标尺的参考轴（axis）、名义质量锚点（rulerAnchor）与查询焦点（explicitQueryMass） */
+  var axis=null,rulerAnchor=null,explicitQueryMass=null;
+  if(iv.route==="ion"&&restoredFrom){
+    axis={reagent:restoredFrom.cand.reagents[0],detection:restoredFrom.cand.det};
+    explicitQueryMass=ionMz(restoredFrom.cand.mass,axis.reagent,axis.detection);
+    rulerAnchor=Math.round(explicitQueryMass);
+  }else if(iv.route==="neutral"){
+    if(activeNeuChan){
+      axis={reagent:activeNeuChan.reagent,detection:activeNeuChan.det};
+      explicitQueryMass=activeNeuChan.mz;
+      rulerAnchor=Math.round(activeNeuChan.mz);
+    }else{
+      explicitQueryMass=fmass(iv.neutralAtoms);
+      rulerAnchor=Math.round(explicitQueryMass);
+    }
+  }else if(iv.route==="mass"){
+    rulerAnchor=(c.mode==="nominal")?c.value:Math.round(c.value);
+    var selM=selectedReagents();
+    if(selM.length){
+      var rid0=selM[0];
+      axis={reagent:rid0,detection:REAGENT_ATOMS[rid0]?"adduct":(rid0.slice(-1)==="+"?"prot":"deprot")};
+    }
+    /* 默认聚焦：精确质量用输入值；名义质量取论文数最多的文献候选，无文献则取首个实测峰 */
+    if(MASS_FOCUS_MZ!==null&&Math.round(MASS_FOCUS_MZ)===rulerAnchor){
+      explicitQueryMass=MASS_FOCUS_MZ;
+    }else if(c.mode==="exact"){
+      explicitQueryMass=c.value;
+    }else if(dLit.length){
+      var cntByMz={},bestMz=null,bestCnt=-1;
+      dLit.forEach(function(r){
+        var a=parseFormula(r.formula);if(!a)return;
+        var m=ionMz(fmass(a),r.reagent,r.detection),key=m.toFixed(4);
+        cntByMz[key]=(cntByMz[key]||0)+1;
+        if(cntByMz[key]>bestCnt){bestCnt=cntByMz[key];bestMz=m;}
+      });
+      explicitQueryMass=bestMz;
+    }else if(dPk.length&&dPk[0].mz){
+      explicitQueryMass=parseFloat(dPk[0].mz);
+    }
   }
 
   var groups={};
@@ -1712,93 +2468,69 @@ function runQueryInner(){
   if(c.mode==="formula"){
     var qf=hill(c.value);
     target=fmass(c.value);anchorNominal=Math.round(target);
-    /* 同一中性分子的跨试剂离子记录不受 filtR 限制（仍服从场景/环境筛选 passSceneEnv），
-       使单一试剂离子勾选下仍能展示跨试剂离子互证记录。 */
     DB.filter(passSceneEnv).forEach(function(r){ if(canon(r.formula)===qf)push(r,"formula"); });
     if(!groups[qf])groups[qf]={records:[],via:{formula:1},atoms:c.value,ghost:true};
-    /* 同名义质量干扰仍在当前勾选试剂离子下比对（passFilter） */
-    var qIonNominal=restoredFrom?Math.round(fmass(parseFormula(restoredFrom.ion)))
-                                :anchorNominal;
+    /* 同名义质量干扰锚定在当前激活的离子轴名义质量（rulerAnchor）上 */
+    var qIonNominal=(rulerAnchor!==null)?rulerAnchor:anchorNominal;
     DB.filter(passFilter).forEach(function(r){
       var a=parseFormula(r.formula);if(!a)return;
       var f=hill(a);if(f===qf)return;
       var nIon=Math.round(ionMz(fmass(a),r.reagent,r.detection));
       var nNeu=Math.round(fmass(a));
-      if(nIon===qIonNominal||(!restoredFrom&&nNeu===anchorNominal))push(r,"interference");
+      if(axis?(nIon===qIonNominal):(nNeu===anchorNominal))push(r,"interference");
     });
   }else{
     var tol;
     if(c.mode==="nominal"){anchorNominal=c.value;}
     else{target=c.value;anchorNominal=Math.round(c.value);tol=c.value*ppm/1e6;}
+    var hasSelR=selectedReagents().length>0;
     DB.filter(passFilter).forEach(function(r){
       var a=parseFormula(r.formula);if(!a)return;
       var neu=fmass(a),ion=ionMz(neu,r.reagent,r.detection);
       var okNeu,okIon;
       if(c.mode==="nominal"){okNeu=Math.round(neu)===c.value;okIon=Math.round(ion)===c.value;}
       else{okNeu=Math.abs(neu-c.value)<=tol;okIon=Math.abs(ion-c.value)<=tol;}
-      if(okNeu)push(r,"neutral");
       if(okIon)push(r,"ion");
+      else if(!hasSelR&&okNeu)push(r,"neutral");
     });
   }
 
   var crossLit=(c.mode==="formula"&&groups[hill(c.value)])?groups[hill(c.value)].records:[];
-  renderVerdict(qIonStr,candList,restoredFrom,dLit,dPk,repLabel,crossLit);
-
-  // 生成数据库以外的可能分子式
-  var gen=[];
-  if(document.getElementById("optGen").checked&&anchorNominal!==null){
-    var tgt=(c.mode==="formula")?target:(c.mode==="exact"?c.value:anchorNominal);
-    var tolDa=(c.mode==="nominal")?0.5:tgt*ppm/1e6;
-    gen=generate(tgt,tolDa,dbeOpts(selectedReagents()[0]))
-          .filter(function(g){return !groups[g.formula];});
-  }
-
-  var axis=null,rulerAnchor=anchorNominal;
-  if(restoredFrom){
-    axis={reagent:restoredFrom.cand.reagents[0],detection:restoredFrom.cand.det};
-    rulerAnchor=Math.round(fmass(parseFormula(restoredFrom.ion)));
-  }
-  drawRuler(groups,gen,rulerAnchor,c,axis);
-
-  var keys=Object.keys(groups).sort(function(a,b){
-    var A=groups[a],B=groups[b];
-    var pa=(A.via.formula?0:A.via.ion?1:A.via.neutral?1:2);
-    var pb=(B.via.formula?0:B.via.ion?1:B.via.neutral?1:2);
-    if(pa!==pb)return pa-pb;
-    return fmass(A.atoms)-fmass(B.atoms);
+  var hintNeu=(iv.route==="neutral")?hill(iv.neutralAtoms):(restoredFrom?restoredFrom.cand.formula:"");
+  renderReported(dLit,dPk,repLabel,{
+    route:iv.route,crossLit:crossLit,hintNeutral:hintNeu,focusMz:explicitQueryMass
   });
-  var primary=keys.filter(function(k){return !groups[k].via.interference;});
-  var interf =keys.filter(function(k){return  groups[k].via.interference;});
+  renderVerdict(qIonStr,candList,restoredFrom,dLit,dPk,repLabel,crossLit,{
+    iv:iv,origC:origC,activeNeuChan:activeNeuChan,neuChanBundle:neuChanBundle,focusMz:explicitQueryMass
+  });
 
-  var shownLitIds={};
-  dLit.forEach(function(r){if(r.id)shownLitIds[r.id]=1;});
-  if(qIonStr||dLit.length){
-    primary.forEach(function(k){
-      var g=groups[k];
-      g.records=g.records.filter(function(r){
-        if(r.id&&shownLitIds[r.id])return false;
-        if(qIonStr){
-          var ia=recIonAtoms(r);
-          if(ia&&hill(ia)===qIonStr)return false;
-        }
-        return true;
-      });
-    });
-    primary=primary.filter(function(k){return groups[k].records.length;});
-  }
-  var nRec=0;primary.forEach(function(k){nRec+=groups[k].records.length;});
-  interf.forEach(function(k){nRec+=groups[k].records.length;});
-
-  if(primary.length){
-    var head=document.createElement("div");
-    head.className="rescount";
-    head.innerHTML=(qIonStr||dLit.length)
-      ? "Also detected as another ion <span style=\"text-transform:none;letter-spacing:0\">— same neutral formula, different reagent ion or detection mode</span>"
-      : "Records for "+pretty(restoredFrom?restoredFrom.cand.formula:(c.mode==="formula"?hill(c.value):""));
-    res.appendChild(head);
+  /* 生成数据库以外的可能分子式（质量查询下按倒算的中性质量生成，再投影回离子轴） */
+  var gen=[];
+  if(document.getElementById("optGen").checked&&rulerAnchor!==null){
+    var genTarget=null,tolDa=0.5;
+    if(c.mode==="formula"){
+      genTarget=target;
+      tolDa=target*ppm/1e6;
+    }else if(iv.restos.length){
+      var e0=iv.restos[0];
+      genTarget=(e0.adduct!=null&&e0.adduct>0)?e0.adduct:e0.transfer;
+      tolDa=(c.mode==="nominal")?0.5:(c.value*ppm/1e6);
+    }else{
+      genTarget=(c.mode==="exact")?c.value:anchorNominal;
+      tolDa=(c.mode==="nominal")?0.5:(genTarget*ppm/1e6);
+    }
+    if(genTarget&&genTarget>0){
+      gen=generate(genTarget,tolDa,dbeOpts(selectedReagents()[0]))
+            .filter(function(g){return !groups[g.formula];});
+    }
   }
 
-  if(!nRec&&!gen.length&&!interf.length){
+  drawRuler(groups,gen,rulerAnchor,c,axis,explicitQueryMass);
+
+  var interf=Object.keys(groups).filter(function(k){return groups[k].via.interference;})
+    .sort(function(a,b){return fmass(groups[a].atoms)-fmass(groups[b].atoms);});
+
+  if(!dLit.length&&!dPk.length&&!crossLit.length&&!gen.length&&!interf.length){
     if(!document.getElementById("reported").children.length){
       var e=document.createElement("div");
       e.className="empty";
@@ -1808,22 +2540,16 @@ function runQueryInner(){
     return;
   }
 
-  primary.forEach(function(k){
-    var g=groups[k];
-    if(!g.records.length&&!g.ghost)return;
-    res.appendChild(renderHit(k,g,c));
-  });
-
   if(interf.length||gen.length){
     var det=document.createElement("details");
     det.className="secondary";
     var nInt=0;interf.forEach(function(k){nInt+=groups[k].records.length;});
     det.innerHTML='<summary>'+
-      (interf.length?interf.length+' same-nominal-mass interference'+(interf.length>1?'s':'')+
+      (interf.length?interf.length+' same-nominal-mass literature interference'+(interf.length>1?'s':'')+
         ' ('+nInt+' record'+(nInt>1?'s':'')+')':'')+
       (interf.length&&gen.length?' · ':'')+
-      (gen.length?gen.length+' generated formula'+(gen.length>1?'s':'')+', no record':'')+
-      ' — all drawn on the ruler below</summary>';
+      (gen.length?gen.length+' generated formula candidate'+(gen.length>1?'s':'')+', no DB record':'')+
+      ' — all plotted on the mass-defect ruler above</summary>';
     var body=document.createElement("div");
     body.className="secbody";
     interf.forEach(function(k){body.appendChild(renderHit(k,groups[k],c));});
@@ -1912,7 +2638,7 @@ function renderHit(formula,g,c){
   box.appendChild(t);
   return box;
 }
-/* 跨文献事实摘要：严格提取已命中论文记录的 identity / precursor / reagent / caveat，零主观外推 */
+/* 跨文献事实摘要：严格提取已命中论文记录的 identity / precursor / reagent / caveat，零主观外推（保留供测试与轻量组件调用） */
 function buildConsensusHtml(lit,crossLit){
   var pool=[],seen={};
   (lit||[]).concat(crossLit||[]).forEach(function(r){
@@ -1944,83 +2670,178 @@ function buildConsensusHtml(lit,crossLit){
   return '<div class="vconsensus"><span class="vclab">Literature summary</span>'+segs.join(" · ")+'</div>';
 }
 
-/* 证据构成带。**只报可核验的事实，不给结论、不给置信度评分。** */
-function renderVerdict(qIonStr,cands,restoredFrom,lit,pk,massLabel,crossLit){
+/* 提取文献列表中的首选代表性物种名（优先 explicit） */
+function topIdentityLabel(recs){
+  var sorted=(recs||[]).slice().sort(function(a,b){return (a.basis==="explicit"?0:1)-(b.basis==="explicit"?0:1);});
+  for(var i=0;i<sorted.length;i++){
+    var idv=String(sorted[i].identity||"").trim();
+    if(idv&&!/^peak-?list formula$/i.test(idv))return idv.split("/")[0].trim();
+  }
+  return "";
+}
+
+/* 证据构成带（v2）：
+   ① 中性分子 + 勾选试剂离子直接合成团簇离子分子式；
+   ② 内嵌纯英文零幻觉「Molecular & Literature Overview」双段自动综述；
+   ③ 纯数字质量查询联动当前聚焦候选的综述与邻峰间距提醒。*/
+function renderVerdict(qIonStr,cands,restoredFrom,lit,pk,massLabel,crossLit,ctx){
   var box=document.getElementById("verdict");
+  if(!box)return;
   box.innerHTML="";
-  lit=lit||[];pk=pk||[];crossLit=crossLit||[];
+  lit=lit||[];pk=pk||[];crossLit=crossLit||[];ctx=ctx||{};
   if(!qIonStr&&!massLabel)return;
-  var direct=(pk.length||lit.length);
+  var iv=ctx.iv||{};
+  var allLit=[],seenL={};
+  lit.concat(crossLit).forEach(function(r){
+    if(!r)return;
+    var k=r.id||(r.formula+"|"+r.reagent+"|"+r.reference);
+    if(!seenL[k]){seenL[k]=1;allLit.push(r);}
+  });
+  var hasAny=(pk.length||allLit.length);
 
   var w=document.createElement("div");
-  w.className="verdict "+(direct?"direct":(cands&&cands.length?"":"none"));
+  w.className="verdict "+(hasAny?"direct":(cands&&cands.length||ctx.activeNeuChan?"":"none"));
 
-  var stamp,formula,mzLine,note="";
-  if(direct){
-    stamp='<span class="vstamp direct">Direct match · no inference</span>';
-    var forms={};lit.forEach(function(r){forms[r.formula]=1;});
-    var fl=Object.keys(forms);
-    var shown=fl.slice(0,4).map(function(f){return pretty(f);}).join(" / ")+(fl.length>4?" …":"");
-    if(!qIonStr){
-      formula=fl.length?shown:'<span style="color:var(--muted)">'+escapeHtml(massLabel)+'</span>';
-      mzLine=escapeHtml(massLabel)+(fl.length>1?"　"+fl.length+" distinct neutral formulas":"");
-      if(fl.length>1)note="Several formulas fall inside this mass window. Which one it is cannot be decided from the mass alone — that is what the mass-defect ruler below is for.";
-      else if(!fl.length)note="Peaks exist at this m/z in measured peak lists, but no literature record assigns a formula there.";
+  var stamp="",headHtml="",propsHtml="",note="",overviewHtml="";
+  var chips=[];
+
+  if(iv.route==="neutral"){
+    /* 模式 ②：中性分子 + 勾选试剂离子 → 直接组合成团簇分子式 */
+    var nf=hill(iv.neutralAtoms),nm=fmass(iv.neutralAtoms);
+    var dbeN=rdbe(iv.neutralAtoms,dbeOpts(selectedReagents()[0]));
+    var isRadN=Math.abs(dbeN-Math.round(dbeN))>1e-9;
+    var oc=iv.neutralAtoms.C?((iv.neutralAtoms.O||0)/iv.neutralAtoms.C):0;
+    var hc=iv.neutralAtoms.C?((iv.neutralAtoms.H||0)/iv.neutralAtoms.C):0;
+    var ch=ctx.activeNeuChan;
+    var ident=topIdentityLabel(allLit);
+    stamp='<span class="vstamp '+(hasAny?"direct":"restored")+'">'+(ch?("Neutral + "+escapeHtml(ch.reagent)):"Neutral Formula")+'</span>';
+    if(ch){
+      var R=reagent(ch.reagent);
+      headHtml='<div class="vhead">'+
+        '<span class="vformula">'+pretty(nf)+(isRadN?'<span class="dot">•</span>':'')+'</span>'+
+        '<span class="varrow">+ '+prettyReagent(ch.reagent)+' &rarr;</span>'+
+        '<span class="vcluster" style="color:'+R.color+'">'+prettyIon(ch.ionFormula,ch.reagent)+
+          '<small>'+escapeHtml(ch.pill)+' · m/z <b>'+ch.mz.toFixed(4)+'</b></small></span>'+
+        (ident?'<span class="vident">'+escapeHtml(ident)+'</span>':'')+
+      '</div>';
     }else{
-      formula=fl.length?shown
-                       :(restoredFrom&&restoredFrom.cand?pretty(restoredFrom.cand.formula)+' <span style="font-size:15px;color:var(--muted)">(in peak lists; restored neutral)</span>'
-                                                        :pretty(qIonStr)+' <span style="font-size:15px;color:var(--muted)">(ion; no neutral assigned)</span>');
-      var mzs={};
-      pk.forEach(function(r){if(r.mz)mzs[(+r.mz).toFixed(4)]=1;});
-      if(!Object.keys(mzs).length&&lit.length){
-        var a0=parseFormula(lit[0].formula);
-        if(a0)mzs[ionMz(fmass(a0),lit[0].reagent,lit[0].detection).toFixed(4)]=1;
-      }
-      var mzk=Object.keys(mzs);
-      mzLine="ion "+pretty(qIonStr)+(mzk.length?"　m/z <b>"+mzk[0]+"</b>":"");
-      if(fl.length>1)note="Several neutral formulas in the database map onto this same ion. They are all listed below — the choice between them is yours.";
-      else if(!fl.length)note="This ion appears in measured peak lists; no literature record reports this exact reagent-ion form.";
+      headHtml='<div class="vhead"><span class="vformula">'+pretty(nf)+(isRadN?'<span class="dot">•</span>':'')+'</span>'+
+        (ident?'<span class="vident">'+escapeHtml(ident)+'</span>':'')+'</div>';
     }
-  }else if(cands&&cands.length){
-    var top=cands[0];
-    stamp='<span class="vstamp restored">Restored · contains inference</span>';
-    formula=pretty(top.formula)+(top.radical?'<span class="dot">•</span>':"");
-    mzLine="from ion "+pretty(qIonStr)+"　as "+DET_LABEL[top.det];
-    note="No direct record for this ion in either database. The formula above is what it would be if the assignment is "+
-         DET_LABEL[top.det]+" — that is an inference, not direct ion-mode evidence."+
-         (cands.length>1?" "+(cands.length-1)+" other restoration"+(cands.length>2?"s are":" is")+" arithmetically possible below.":"");
+    var secChans=(ctx.neuChanBundle&&ctx.neuChanBundle.selected||[]).filter(function(x){return x!==ch;});
+    propsHtml='Neutral exact mass <b>'+nm.toFixed(4)+' Da</b> · DBE <b>'+dbeText(dbeN)+'</b>'+
+      (iv.neutralAtoms.C?(' · O/C <b>'+oc.toFixed(2)+'</b> · H/C <b>'+hc.toFixed(2)+'</b>'):'')+
+      (secChans.length?(' · Also forms '+secChans.map(function(s){return '<b>'+prettyIon(s.ionFormula,s.reagent)+'</b> ('+s.mz.toFixed(4)+' Th)';}).join(", ")):'');
+    var allPkN=allPeakHitsForNeutral(iv.neutralAtoms);
+    overviewHtml=buildMolecularOverview({formula:nf,lit:allLit,pk:allPkN.length?allPkN:pk});
+  }else if(iv.route==="ion"){
+    /* 模式 ①：带电荷离子式 → 还原中性分子 + 展示团簇关系与纯英文文献环境综述 */
+    var selR0=selectedReagents()[0]||"-";
+    var cand=restoredFrom&&restoredFrom.cand;
+    var identI=topIdentityLabel(allLit);
+    if(hasAny||cand){
+      stamp=hasAny?'<span class="vstamp direct">Direct match · Restored</span>'
+                  :'<span class="vstamp restored">Restored · Inferred</span>';
+      if(cand){
+        var Rc=reagent(cand.reagents[0]||selR0);
+        var ionMzVal=ionMz(cand.mass,cand.reagents[0]||selR0,cand.det);
+        var aC=cand.atoms||{};
+        var ocI=aC.C?((aC.O||0)/aC.C):0, hcI=aC.C?((aC.H||0)/aC.C):0;
+        headHtml='<div class="vhead">'+
+          '<span class="vformula">'+pretty(cand.formula)+(cand.radical?'<span class="dot">•</span>':'')+'</span>'+
+          '<span class="varrow">&larr;</span>'+
+          '<span class="vcluster" style="color:'+Rc.color+'">'+prettyIon(qIonStr,cand.reagents[0]||selR0)+
+            '<small>'+escapeHtml(ionLabel(cand.formula,cand.reagents[0]||selR0,cand.det))+' · m/z <b>'+ionMzVal.toFixed(4)+'</b></small></span>'+
+          (identI?'<span class="vident">'+escapeHtml(identI)+'</span>':'')+
+        '</div>';
+        propsHtml='Restored neutral mass <b>'+cand.mass.toFixed(4)+' Da</b> · DBE <b>'+dbeText(cand.dbe)+'</b>'+
+          (aC.C?(' · O/C <b>'+ocI.toFixed(2)+'</b> · H/C <b>'+hcI.toFixed(2)+'</b>'):'');
+        if(!hasAny)note='No direct entry for this ion in either database; neutral composition above assumes '+DET_LABEL[cand.det]+'.';
+        var allPkI=allPeakHitsForNeutral(cand.atoms);
+        overviewHtml=buildMolecularOverview({formula:cand.formula,ionFormula:qIonStr,lit:allLit,pk:allPkI.length?allPkI:pk});
+      }else{
+        var mz0=(pk[0]&&pk[0].mz)?(+pk[0].mz).toFixed(4):"";
+        headHtml='<div class="vhead"><span class="vformula">'+prettyIon(qIonStr,selR0)+'</span></div>';
+        propsHtml='Measured ion'+(mz0?(' · m/z <b>'+mz0+'</b>'):'')+' · no neutral restoration under selected reagent ion';
+        overviewHtml=buildMolecularOverview({formula:"",ionFormula:qIonStr,lit:allLit,pk:pk});
+      }
+    }else{
+      stamp='<span class="vstamp none">No match</span>';
+      headHtml='<div class="vhead"><span class="vformula" style="color:var(--muted)">'+prettyIon(qIonStr,selR0)+'</span></div>';
+      propsHtml='No valid restoration under the selected reagent ion';
+      note='Nothing in either database, and subtracting the selected reagent ion gives a negative atom count or negative DBE.';
+    }
   }else{
-    stamp='<span class="vstamp none">No match</span>';
-    formula='<span style="color:var(--muted)">'+(qIonStr?pretty(qIonStr):escapeHtml(massLabel))+'</span>';
-    mzLine=qIonStr?"no valid restoration under the selected reagent ion":"nothing at this mass in either database";
-    note=qIonStr
-      ? "Nothing in either database, and no chemically valid restoration. Check the reagent ion selection, or this may already be a neutral formula."
-      : "No literature record and no measured peak at this mass. Widen the tolerance, or tick the reagent ion you used.";
+    /* 模式 ③：纯数字质量窗口 → 展示离子 m/z 与倒算中性质量 + 当前聚焦候选的文献环境综述 */
+    var focusMz=ctx.focusMz;
+    stamp=hasAny?'<span class="vstamp direct">Mass Window</span>':'<span class="vstamp none">No match</span>';
+    headHtml='<div class="vhead"><span class="vformula">'+(ctx.origC&&ctx.origC.mode==="nominal"?('Ion m/z '+ctx.origC.value):escapeHtml(massLabel))+'</span>';
+    if(iv.restos&&iv.restos.length===1){
+      var e0=iv.restos[0];
+      headHtml+='<span class="vident" style="color:var(--ink);font-size:15px;font-weight:500">&rarr; '+
+        (e0.adduct!=null?('Neutral <b>&approx; '+e0.adduct.toFixed(1)+' Da</b> <span style="color:var(--muted);font-size:12.5px">(if [M·'+escapeHtml(e0.reagent.replace(/[-+]$/,""))+'])</span> · '):'')+
+        'or <b>&approx; '+e0.transfer.toFixed(1)+' Da</b> <span style="color:var(--muted);font-size:12.5px">(if '+(e0.reagent.slice(-1)==="+"?"[M+H]⁺":"[M−H]⁻")+' )</span></span>';
+    }
+    headHtml+='</div>';
+    var formsM={};lit.forEach(function(r){formsM[r.formula]=1;});
+    var nSpec=Object.keys(formsM).length;
+    if(!hasAny){
+      propsHtml='Nothing at this mass in either database';
+      note='Widen the ppm tolerance, or verify the ticked reagent ion.';
+    }else{
+      propsHtml=escapeHtml(massLabel)+(nSpec?(' · <b>'+nSpec+'</b> literature-assigned species in window'):' · measured peak-list ions only (no literature assignment at this m/z)');
+      /* 为当前聚焦的精确 m/z 提取对应候选并自动生成综述段落 */
+      if(focusMz!==null){
+        var fLit=lit.filter(function(r){
+          var a=parseFormula(r.formula);if(!a)return false;
+          return Math.abs(ionMz(fmass(a),r.reagent,r.detection)-focusMz)<0.0008;
+        });
+        if(fLit.length){
+          var fForm=fLit[0].formula,fA=parseFormula(fForm);
+          var fAllLit=DB.filter(function(r){return passSceneEnv(r)&&canon(r.formula)===fForm;});
+          var fAllPk=allPeakHitsForNeutral(fA);
+          var iaF=recIonAtoms(fLit[0]);
+          overviewHtml=buildMolecularOverview({
+            formula:fForm,ionFormula:iaF?hill(iaF):"",lit:fAllLit,pk:fAllPk,
+            focusPrefix:'Focused candidate at <b>'+focusMz.toFixed(4)+' Th</b> ('+prettyIon(iaF?hill(iaF):"",fLit[0].reagent)+' &larr; <b>'+pretty(fForm)+'</b>):'
+          });
+        }else{
+          var fPk=pk.filter(function(r){return r.mz&&Math.abs(parseFloat(r.mz)-focusMz)<0.0008;});
+          if(fPk.length){
+            var chF=derivePeakChannel(fPk[0].ion_formula,fPk[0].reagent,"");
+            overviewHtml=buildMolecularOverview({
+              formula:chF.neutral||"",ionFormula:fPk[0].ion_formula,lit:[],pk:fPk,
+              focusPrefix:'Focused measured peak at <b>'+focusMz.toFixed(4)+' Th</b> ('+prettyIon(fPk[0].ion_formula,fPk[0].reagent)+'):'
+            });
+          }
+        }
+      }
+    }
   }
 
   /* 证据构成 chip：每一项都可以自己去核对 */
-  var chips=[];
   var papers={},plists={},contribs={},nDerived=0,otherReags={};
   lit.forEach(function(r){if(r.reference)papers[r.reference]=1;if(provenance(r))nDerived++;});
   var litIds={};lit.forEach(function(r){if(r.id)litIds[r.id]=1;});
-  crossLit.forEach(function(r){if(r&&!litIds[r.id]&&r.reagent)otherReags[r.reagent]=1;});
-  pk.forEach(function(r){plists[r.peaklist_file]=1;if(r.contributor)contribs[r.contributor]=1;});
+  crossLit.forEach(function(r){if(r&&!litIds[r.id]&&r.reagent)otherReags[r.reagent]=(otherReags[r.reagent]||0)+1;});
+  pk.forEach(function(r){if(r.peaklist_file)plists[r.peaklist_file]=1;if(r.contributor)contribs[r.contributor]=1;});
   var np=Object.keys(papers).length,nl=Object.keys(plists).length,nc=Object.keys(contribs).length;
-  var no=Object.keys(otherReags).length;
-  chips.push('<span class="vchip'+(np?"":" zero")+'"><b>'+np+'</b> paper'+(np===1?"":"s")+'</span>');
+  var oKeys=Object.keys(otherReags);
+  chips.push('<span class="vchip'+(np?"":" zero")+'"><b>'+np+'</b> paper'+(np===1?"":"s")+(iv.route!=="mass"?' (selected reagent)':'')+'</span>');
   chips.push('<span class="vchip'+(nl?"":" zero")+'"><b>'+nl+'</b> peak list'+(nl===1?"":"s")+'</span>');
   chips.push('<span class="vchip'+(nc?"":" zero")+'"><b>'+nc+'</b> contributor'+(nc===1?"":"s")+'</span>');
-  if(nDerived)chips.push('<span class="vchip derived"><b>'+nDerived+'</b> of '+lit.length+' expanded, not written out</span>');
-  if(no)chips.push('<span class="vchip">+<b>'+no+'</b> other reagent ion'+(no>1?'s':'')+'</span>');
-  if(nc===1&&nl>1)chips.push('<span class="vchip">peak lists share one contributor — not independent</span>');
+  if(nDerived)chips.push('<span class="vchip derived"><b>'+nDerived+'</b> of '+lit.length+' expanded</span>');
+  if(oKeys.length){
+    var nCrossTot=oKeys.reduce(function(s,k){return s+otherReags[k];},0);
+    chips.push('<span class="vchip cross">+<b>'+nCrossTot+'</b> record'+(nCrossTot>1?'s':'')+' under <b>'+oKeys.map(escapeHtml).join(", ")+'</b></span>');
+  }
+  if(nc===1&&nl>1)chips.push('<span class="vchip warn">peak lists share one contributor</span>');
 
-  var consensusHtml=buildConsensusHtml(lit,crossLit);
-
-  w.innerHTML=stamp+'<div class="vmain"><div class="vformula">'+formula+'</div>'+
-    '<div class="vmz">'+mzLine+'</div>'+
+  w.innerHTML=stamp+'<div class="vmain">'+headHtml+
+    (propsHtml?'<div class="vprops">'+propsHtml+'</div>':'')+
     (note?'<div class="vnote">'+note+'</div>':"")+
     '<div class="vchips">'+chips.join("")+'</div>'+
-    consensusHtml+'</div>';
+    overviewHtml+'</div>';
   box.appendChild(w);
 }
 
@@ -2059,35 +2880,19 @@ function provSummary(recs){
 function escapeHtml(s){return String(s==null?"":s).replace(/[&<>"']/g,function(ch){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
 
-/* ---------------- Mass-defect ruler ----------------
-   本页最有辨识度、也最有用的部分：把某个名义质量附近的所有候选按小数部分画在一条横轴上，
-   一眼看出「在我这台仪器的分辨率下，这些峰分不分得开」。
-
-   横轴锚在**用户实际读到的 m/z** 上：
-     axis 非空  → 离子轴。库中记录按其离子 m/z 落点，用试剂离子的颜色。
-     axis 为空  → 中性质量轴（质量查询、未勾试剂离子时）。
-   曾经在还原查询下错误地锚在中性质量上，导致所有记录被 round(mz)!==anchor 滤掉，
-   彩色实线全部消失——标尺只剩空壳。改动此处务必回归验证颜色还在。 */
-/* ---- 视窗状态 ----
-   以前用「相对数据范围的缩放倍率」，中心永远是数据中心或查询峰，拖不动。
-   现在直接存**中心与跨度**（Da），可任意平移。null = 自适应。
-
-   跨度上限 1.0 Da、平移范围锁在 anchor ± 0.5：
-   名义质量 339 的峰不会出现在 338.4 或 339.6，让用户滑出去只会看到空白。
-   （用户 2026-08-10：「范围可以考虑 +/- 0.5 amu」）*/
+/* ---------------- Mass-defect ruler ---------------- */
 var RULER_CTR=null,RULER_SPAN=null;
 var RULER_MAXSPAN=1.0,RULER_MINSPAN=0.004,RULER_HALFRANGE=0.5;
-var LAST_RULER=null;         // 缓存绘图参数，拖动时只重画标尺、不重跑整个查询
-var RULER_VIEW=null,RULER_DRAG=null;   // 当前窗口（Da）与拖动状态；事件绑在容器上要用
+var LAST_RULER=null;
+var RULER_VIEW=null,RULER_DRAG=null;
 
 function rulerClamp(anchor){
   RULER_SPAN=Math.max(RULER_MINSPAN,Math.min(RULER_MAXSPAN,RULER_SPAN));
   var lo=anchor-RULER_HALFRANGE+RULER_SPAN/2;
   var hi=anchor+RULER_HALFRANGE-RULER_SPAN/2;
-  if(lo>hi){RULER_CTR=anchor;return;}          // 跨度已占满允许范围
+  if(lo>hi){RULER_CTR=anchor;return;}
   RULER_CTR=Math.max(lo,Math.min(hi,RULER_CTR));
 }
-/* f>1 看得更宽，f<1 放大；f=0 回到自适应。at 为可选的缩放轴心（Da）。*/
 function rulerZoom(f,at){
   if(!f){RULER_CTR=null;RULER_SPAN=null;redrawRuler();return;}
   if(RULER_SPAN===null||RULER_CTR===null){
@@ -2096,8 +2901,6 @@ function rulerZoom(f,at){
   }
   var ns=Math.max(RULER_MINSPAN,Math.min(RULER_MAXSPAN,RULER_SPAN*f));
   if(at!=null){
-    /* 以光标处为不动点缩放——这是「选择缩放中心」最自然的做法：
-       把想看的位置放到光标下，滚轮一推就以它为中心展开。*/
     var t=(at-(RULER_CTR-RULER_SPAN/2))/RULER_SPAN;
     RULER_CTR=at-(t-0.5)*ns;
   }
@@ -2111,14 +2914,16 @@ function rulerPan(dm){
 function redrawRuler(){
   if(!LAST_RULER)return;
   var L=LAST_RULER;
-  drawRuler(L.groups,L.gen,L.anchor,L.c,L.axis);
+  drawRuler(L.groups,L.gen,L.anchor,L.c,L.axis,L.explicitQueryMass);
 }
-function drawRuler(groups,gen,anchor,c,axis){
+function drawRuler(groups,gen,anchor,c,axis,explicitQueryMass){
   var host=document.getElementById("ruler");
+  var rWrap=document.getElementById("rulerWrap");
   host.innerHTML="";
-  if(anchor===null||anchor===undefined||!isFinite(anchor))return;
+  if(anchor===null||anchor===undefined||!isFinite(anchor)){if(rWrap)rWrap.hidden=true;return;}
   var ionMode=!!axis;
-  var pts=[],queryMass=null;
+  var pts=[],queryMass=(explicitQueryMass!==undefined&&explicitQueryMass!==null&&isFinite(explicitQueryMass))?explicitQueryMass:null;
+  var litMassSeen={};
 
   Object.keys(groups).forEach(function(k){
     var g=groups[k],neu=fmass(g.atoms||parseFormula(k)||{});
@@ -2129,41 +2934,54 @@ function drawRuler(groups,gen,anchor,c,axis){
         if(Math.round(mz)!==anchor)return;
         var key=r.reagent+"|"+r.detection;
         if(seen[key])return;seen[key]=1;
-        pts.push({mass:mz,label:k,color:reagent(r.reagent).color,strong:true});
+        var ia=recIonAtoms(r),lbl=ia?(plainIon(hill(ia),r.reagent)+" (←"+k+")"):k;
+        litMassSeen[ia?hill(ia):k]=1;
+        pts.push({mass:mz,label:lbl,color:reagent(r.reagent).color,strong:true});
       });
     }
-    /* 离子轴上不画中性质量——它在另一个数量级的位置，混在一起会误导 */
     if(!ionMode&&Math.round(neu)===anchor)
       pts.push({mass:neu,label:k,color:"var(--ink)",strong:g.records.length>0,dashed:true});
     if(ionMode&&g.via&&g.via.formula){
       var qm=ionMz(neu,axis.reagent,axis.detection);
-      if(Math.round(qm)===anchor)queryMass=qm;
+      if(Math.round(qm)===anchor){
+        if(queryMass===null)queryMass=qm;
+        /* 若该中性分子在当前所选试剂离子下暂无文献记录（例如 C3H4O4 勾选 NO3- 时），
+           依然要把目标合成团簇离子本身清晰画在标尺主位置上！ */
+        var qAtoms=g.atoms||parseFormula(k);
+        var qIonA=null;
+        if(qAtoms){
+          if(axis.detection==="deprot")qIonA=atomsSub(qAtoms,{H:1});
+          else if(axis.detection==="prot")qIonA=atomsAdd(qAtoms,{H:1});
+          else if(REAGENT_ATOMS[axis.reagent])qIonA=atomsAdd(qAtoms,REAGENT_ATOMS[axis.reagent]);
+        }
+        var qIonF=qIonA?hill(qIonA):"";
+        if(qIonF&&!litMassSeen[qIonF]){
+          litMassSeen[qIonF]=1;
+          pts.push({mass:qm,label:plainIon(qIonF,axis.reagent)+" ("+ionLabel(k,axis.reagent,axis.detection)+")",
+                    color:reagent(axis.reagent).color,strong:true,target:true});
+        }
+      }
     }
   });
   gen.forEach(function(gg){
-    /* 生成的候选是中性式；离子轴上要换算成对应的 m/z 才可比 */
     var m=ionMode?ionMz(gg.mass,axis.reagent,axis.detection):gg.mass;
     if(Math.round(m)===anchor)
-      pts.push({mass:m,label:gg.formula,color:"var(--muted)",strong:false,dashed:true});
+      pts.push({mass:m,label:gg.formula+" (gen)",color:"var(--muted)",strong:false,dashed:true});
   });
 
-  /* 实测峰表里落在同一名义质量上的峰。
-     这才是「同名义质量还有什么」的**经验答案**——文献库只收录了论文点名的少数分子，
-     而峰表是某次测量里真正拟合过的全部峰。标尺要回答「我这台仪器分得开吗」，
-     邻峰的来源就该是实测峰表。用细一点的实线画，与文献记录区分。*/
   var ionSeen={};
   IONDB.forEach(function(r){
     if(!r.ion_formula||!r.mz||!ionPassFilter(r))return;
     var m=parseFloat(r.mz);
     if(Math.round(m)!==anchor)return;
-    if(ionSeen[r.ion_formula])return;ionSeen[r.ion_formula]=1;
-    pts.push({mass:m,label:r.ion_formula,color:reagent(r.reagent).color,
+    var cf=canon(r.ion_formula);
+    if(ionSeen[cf]||litMassSeen[cf])return;ionSeen[cf]=1;
+    pts.push({mass:m,label:plainIon(cf,r.reagent),color:reagent(r.reagent).color,
               strong:false,measured:true});
   });
-  if(pts.length<1)return;
+  if(pts.length<1){if(rWrap)rWrap.hidden=true;return;}
+  if(rWrap)rWrap.hidden=false;
 
-  /* 窗口自适应：候选常常挤在 0.07 Da 内，固定 0.9 Da 宽会让 70% 的画布是空的。
-     但也不能贴着数据裁——留最小宽度，免得两根线离得太近时被放大成假的「分得很开」。*/
   var MINSPAN=0.12;
   var lo=Math.min.apply(null,pts.map(function(p){return p.mass;}));
   var hi=Math.max.apply(null,pts.map(function(p){return p.mass;}));
@@ -2172,8 +2990,7 @@ function drawRuler(groups,gen,anchor,c,axis){
   if(hi-lo<MINSPAN){var mid0=(lo+hi)/2;lo=mid0-MINSPAN/2;hi=mid0+MINSPAN/2;}
   var autoCtr=(queryMass!==null&&queryMass>=lo&&queryMass<=hi)?queryMass:(lo+hi)/2;
   var autoSpan=hi-lo;
-  /* 拖动与滚轮缩放只重画标尺，不重跑查询——所以把参数缓存下来。*/
-  LAST_RULER={groups:groups,gen:gen,anchor:anchor,c:c,axis:axis,
+  LAST_RULER={groups:groups,gen:gen,anchor:anchor,c:c,axis:axis,explicitQueryMass:queryMass,
               autoCtr:autoCtr,autoSpan:autoSpan};
   if(RULER_SPAN!==null&&RULER_CTR!==null){
     rulerClamp(anchor);
@@ -2188,23 +3005,31 @@ function drawRuler(groups,gen,anchor,c,axis){
   var R=parseFloat(document.getElementById("res")&&document.getElementById("res").value)||5000;
   var fwhm=anchor/R;
 
+  /* 计算最近邻峰间距（mDa），直观告知当前分辨率 R 下是否重叠 */
+  var nearestDelta=null;
+  if(queryMass!==null){
+    pts.forEach(function(p){
+      var dm=Math.abs(p.mass-queryMass);
+      if(dm>0.0004&&(nearestDelta===null||dm<nearestDelta))nearestDelta=dm;
+    });
+  }
+  var overlapped=(nearestDelta!==null&&fwhm>=nearestDelta);
+
   var svg=['<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" '+
            'aria-label="Mass defect distribution near nominal mass '+anchor+'">'];
 
-  /* 分辨率带：以查询峰为中心、宽度 = m/R 的 FWHM。
-     它把「分得开吗」从心算变成一眼可见——band 里挤着两根线就是分不开。*/
   if(queryMass!==null&&fwhm>0){
-    var x1=X(queryMass-fwhm/2),x2=X(queryMass+fwhm/2);
+    var x1=Math.max(padL,X(queryMass-fwhm/2)),x2=Math.min(W-padR,X(queryMass+fwhm/2));
     if(x2>x1){
       svg.push('<rect x="'+x1+'" y="8" width="'+(x2-x1)+'" height="'+(base-8)+
-               '" fill="var(--accent-soft)" opacity="0.75"/>');
-      svg.push('<text class="rband" x="'+((x1+x2)/2)+'" y="18" text-anchor="middle">FWHM '+
-               fwhm.toFixed(4)+' @ R='+R+'</text>');
+               '" fill="'+(overlapped?"#FFF0DB":"var(--accent-soft)")+'" opacity="0.85"/>');
+      var bandTxt="FWHM "+(fwhm*1000).toFixed(1)+" mDa @ R="+R+
+        (nearestDelta!==null?(" · nearest neighbor Δ="+(nearestDelta*1000).toFixed(1)+" mDa"+(overlapped?" (overlaps!)":" (resolved ✓)")):"");
+      svg.push('<text class="rband" style="fill:'+(overlapped?"#8A5A00":"var(--accent)")+';font-weight:600" x="'+((x1+x2)/2)+'" y="18" text-anchor="middle">'+escapeHtml(bandTxt)+'</text>');
     }
   }
   svg.push('<line x1="'+padL+'" y1="'+base+'" x2="'+(W-padR)+'" y2="'+base+
            '" stroke="var(--line)" stroke-width="1"/>');
-  /* 刻度步长随窗口宽度自适应 */
   var span=hi-lo;
   var step=span>0.6?0.1:span>0.25?0.05:span>0.1?0.02:0.01;
   var t0=Math.ceil(lo/step)*step;
@@ -2218,20 +3043,12 @@ function drawRuler(groups,gen,anchor,c,axis){
 
   pts.sort(function(a,b){return a.mass-b.mass;});
 
-  /* ---- 标签排布 ----
-     以前只有 3 行、且只在 x 间距 <70 时才换行，遇到二十来个峰挤在 0.02 Da 内
-     （实测峰表在同一名义质量上很常见）就叠成一团墨，一个字都读不出来。
-
-     现在做真正的避让：按行贪心找第一个放得下的行；行数用尽就**不画这个标签**，
-     竖线仍然保留（hover 有 tooltip）。画不下就不画，比叠成一团强——
-     叠出来的那团既读不出内容，还会盖住真正重要的文献标签。
-
-     优先级：文献记录 > 生成候选 > 实测峰表。文献标签一定画得出来。*/
-  var ROWS=6,ROWH=13,CHW=5.9;   // CHW：等宽字 10px 在 1240 宽 viewBox 下的近似字宽
+  var ROWS=6,ROWH=13,CHW=5.8;
   var rowEnd=[];for(var ri=0;ri<ROWS;ri++)rowEnd.push(-1e9);
   var order=pts.map(function(p,i){return {p:p,i:i};});
   order.sort(function(a,b){
-    var pa=a.p.strong?0:(a.p.measured?2:1),pb=b.p.strong?0:(b.p.measured?2:1);
+    var pa=a.p.target?-1:(a.p.strong?0:(a.p.measured?2:1));
+    var pb=b.p.target?-1:(b.p.strong?0:(b.p.measured?2:1));
     return pa!==pb?pa-pb:a.p.mass-b.p.mass;
   });
   var place={},hidden=0;
@@ -2243,20 +3060,24 @@ function drawRuler(groups,gen,anchor,c,axis){
     hidden++;
   });
 
+  var isMassMode=(c&&c.mode!=="formula");
   pts.forEach(function(p,i){
     var x=X(p.mass),h=p.strong?base-34:base-58;
-    svg.push('<line class="stick" x1="'+x+'" y1="'+base+'" x2="'+x+'" y2="'+h+'" stroke="'+p.color+
+    var focusAttr=isMassMode?(' data-focus-mz="'+p.mass.toFixed(5)+'"'):'';
+    svg.push('<g'+focusAttr+' class="stick">');
+    svg.push('<line x1="'+x+'" y1="'+base+'" x2="'+x+'" y2="'+h+'" stroke="'+p.color+
              '" stroke-width="'+(p.strong?3:p.measured?1.8:1.4)+'" stroke-dasharray="'+(p.dashed?"3 3":"0")+
-             '" opacity="'+(p.measured?0.72:1)+'"><title>'+
-             escapeHtml(p.label)+"  "+p.mass.toFixed(4)+(p.measured?"  (measured peak list)":"")+'</title></line>');
+             '" opacity="'+(p.measured?0.74:1)+'"><title>'+
+             escapeHtml(p.label)+"  "+p.mass.toFixed(4)+(p.measured?"  (measured peak list)":"")+
+             (isMassMode?"  — click to focus":"")+'</title></line>');
     svg.push('<circle cx="'+x+'" cy="'+h+'" r="'+(p.strong?3.5:2)+'" fill="'+p.color+
-             '" opacity="'+(p.measured?0.72:1)+'"/>');
+             '" opacity="'+(p.measured?0.74:1)+'"/>');
     if(place[i]!==undefined){
       svg.push('<text class="lbl'+(p.strong?"":" dim")+'" x="'+x+'" y="'+(h-9-place[i]*ROWH)+
                '" text-anchor="middle">'+escapeHtml(p.label)+'</text>');
     }
+    svg.push('</g>');
   });
-  /* 查询峰的位置标记 */
   if(queryMass!==null){
     var qx=X(queryMass);
     svg.push('<path d="M'+(qx-6)+' '+(base+7)+' L'+qx+' '+(base-1)+' L'+(qx+6)+' '+(base+7)+
@@ -2264,28 +3085,22 @@ function drawRuler(groups,gen,anchor,c,axis){
   }
   svg.push('</svg>');
 
+  var axText=ionMode?(axis.reagent+" "+(axis.detection==="adduct"?"cluster ion m/z axis":(DET_LABEL[axis.detection]||"ion m/z axis")))
+                    :"neutral mass + ion m/z";
   host.innerHTML=
-    '<div class="ruler"><h3>Mass defect · nominal '+anchor+
-      (ionMode?' <span class="axis">ion m/z axis</span>':' <span class="axis">neutral mass + ion m/z</span>')+'</h3>'+
-    '<p class="rsub">Thick solid = detected ion with a literature record, coloured by reagent ion. '+
-      'Thin solid = peak present in a measured peak list. '+
-      'Dashed = neutral mass or candidate with no record. '+
-      'Horizontal axis is the decimal part: further right means more hydrogen, less oxygen.'+
-      (queryMass!==null?' The shaded band is one FWHM at the stated resolving power — peaks inside it are not separable.':'')+
-      ' <b>Drag to pan, scroll to zoom where the cursor is.</b>'+
+    '<div class="ruler"><h3>Mass-Defect Ruler · Nominal '+anchor+
+      ' <span class="axis">'+escapeHtml(axText)+'</span></h3>'+
+    '<p class="rsub">Thick solid = target ion or literature-reported species. '+
+      'Thin solid = measured peak-list neighbor at nominal '+anchor+'. '+
+      'Dashed = generated composition with no DB record.'+
+      (queryMass!==null?(' Focused at <b>'+queryMass.toFixed(4)+' Th</b> (▲).'):'')+
+      (isMassMode?' <b>Click any peak stick to re-focus FWHM &amp; overview; drag to pan, scroll to zoom.</b>'
+                 :' <b>Drag to pan, scroll to zoom where the cursor is.</b>')+
       (hidden?' <span class="rhid">'+hidden+' label'+(hidden>1?'s':'')+' hidden for space — zoom in, or hover a line.</span>':'')+
     '</p>'+svg.join("")+'</div>';
   bindRulerDrag(anchor,lo,hi);
 }
 
-/* ---- 拖动平移 / 滚轮缩放 ----
-   用户 2026-08-10：「这个谱图能否左右滑动，选择缩放中心」。
-
-   都只重画标尺（redrawRuler），不重跑 runQueryInner——后者要重新过一遍两个库
-   并重排整份 report，拖动时每帧跑一次会卡。
-
-   坐标换算走 getBoundingClientRect：SVG 是 preserveAspectRatio="none" 拉伸的，
-   viewBox 单位和屏幕像素不是 1:1，只能按元素实际宽度折算。*/
 function bindRulerDrag(anchor,lo,hi){
   RULER_VIEW={anchor:anchor,lo:lo,hi:hi};
   var host=document.getElementById("ruler");
@@ -2295,10 +3110,6 @@ function bindRulerDrag(anchor,lo,hi){
   if(host.getAttribute("data-panbound")==="1")return;
   host.setAttribute("data-panbound","1");
 
-  /* ★ 事件绑在 #ruler 容器上，不能绑在 <svg> 上。
-     每次重画都会把 host.innerHTML 整个换掉，svg 元素随之销毁——
-     绑在它身上的话，拖动第一帧重画完监听器和指针捕获就一起没了，拖一下就断。
-     容器本身不会被替换，所以只绑一次、状态放在模块作用域里。*/
   function massAt(clientX){
     var el=host.querySelector("svg");if(!el||!RULER_VIEW)return null;
     var r=el.getBoundingClientRect();
@@ -2312,24 +3123,31 @@ function bindRulerDrag(anchor,lo,hi){
   }
   host.addEventListener("pointerdown",function(e){
     if(!host.querySelector("svg")||!RULER_VIEW)return;
-    if(e.target.closest&&e.target.closest("h3,p"))return;   // 别把选文字变成拖动
+    if(e.target.closest&&e.target.closest("h3,p"))return;
+    var stickEl=(e.target.closest)?e.target.closest("[data-focus-mz]"):null;
+    var focusMzAttr=stickEl?stickEl.getAttribute("data-focus-mz"):null;
     ensureManual();
     var w=host.querySelector("svg").getBoundingClientRect().width;
-    RULER_DRAG={x:e.clientX,ctr:RULER_CTR,w:w,span:RULER_SPAN};
+    RULER_DRAG={x:e.clientX,ctr:RULER_CTR,w:w,span:RULER_SPAN,moved:false,focusMz:focusMzAttr};
     try{host.setPointerCapture(e.pointerId);}catch(err){}
-    var sv=host.querySelector("svg");if(sv)sv.style.cursor="grabbing";
   });
   host.addEventListener("pointermove",function(e){
     if(!RULER_DRAG)return;
+    if(Math.abs(e.clientX-RULER_DRAG.x)>3)RULER_DRAG.moved=true;
+    if(!RULER_DRAG.moved)return;
     e.preventDefault();
+    var sv=host.querySelector("svg");if(sv)sv.style.cursor="grabbing";
     RULER_CTR=RULER_DRAG.ctr-((e.clientX-RULER_DRAG.x)/RULER_DRAG.w)*RULER_DRAG.span;
     redrawRuler();
   });
   function endDrag(e){
     if(!RULER_DRAG)return;
+    var wasClick=!RULER_DRAG.moved&&RULER_DRAG.focusMz;
+    var fmz=wasClick?parseFloat(RULER_DRAG.focusMz):NaN;
     RULER_DRAG=null;
     try{host.releasePointerCapture(e.pointerId);}catch(err){}
     var sv=host.querySelector("svg");if(sv)sv.style.cursor="grab";
+    if(wasClick&&isFinite(fmz))setMassFocus(fmz);
   }
   host.addEventListener("pointerup",endDrag);
   host.addEventListener("pointercancel",endDrag);

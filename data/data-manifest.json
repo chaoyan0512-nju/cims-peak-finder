@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-26-3c4f35",
-  "updated": "2026-11-26T22:20:46",
+  "version": "2026-11-27-4dc1f2",
+  "updated": "2026-11-27T08:34:55",
   "includes_unpublished": false,
   "files": [
     {
@@ -12,8 +12,8 @@
     {
       "name": "cims_ionlist.csv",
       "rows": 8906,
-      "bytes": 1752057,
-      "sha256": "f0520691135f4fda04522c3b4dd0cebd9e2edecb9c13ba0314475462c11719c7"
+      "bytes": 1771462,
+      "sha256": "4f6aedc802d56b7560e9bd8dfcd8b77713c87a7d2c90cb2a874a1d5a897105c7"
     },
     {
       "name": "cims_refspectra.csv",
